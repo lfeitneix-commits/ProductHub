@@ -528,7 +528,7 @@ const S = {
   view: "interno", persona: "Persona humana",
   q: "", fUnidad: "", fCat: "", fEstado: "", fNeed: "",
   cliente: blankCliente(),
-  prop: {cliente:"", asesor:"", contacto:"", mensaje:"", items:[]},
+  prop: {cliente:"", asesor:"", mail:"", tel:"", mensaje:"", items:[]},
   sim: "caucion",
   simv: {
     caucion:{modo:"colocar", monto:50000000, tna:32, dias:7, arancel:0.5, garantia:100000000, aforo:85},
@@ -990,8 +990,9 @@ function vPropuesta(){
   <div class="pr-grid"><div class="stack">
    <div class="panel stack"><h3 style="margin:0">Para quién</h3>
     <label class="f" for="pr_cliente">Cliente<input class="input" id="pr_cliente" data-pf="cliente" value="${esc(P.cliente)}" placeholder="Nombre o razón social"></label>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="f" for="pr_asesor">Asesor<input class="input" id="pr_asesor" data-pf="asesor" value="${esc(P.asesor)}" placeholder="Tu nombre" list="asesoresList" autocomplete="off"></label>${asesoresList()}
-    <label class="f" for="pr_contacto">Contacto<input class="input" id="pr_contacto" data-pf="contacto" value="${esc(P.contacto)}" placeholder="Mail o celular"></label></div>
+    <label class="f" for="pr_asesor">Asesor<input class="input" id="pr_asesor" data-pf="asesor" value="${esc(P.asesor)}" placeholder="Tu nombre" list="asesoresList" autocomplete="off"></label>${asesoresList()}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="f" for="pr_mail">Mail<input class="input" id="pr_mail" data-pf="mail" type="email" value="${esc(P.mail||"")}" placeholder="nombre@neix.com.ar"></label>
+    <label class="f" for="pr_tel">Teléfono<input class="input" id="pr_tel" data-pf="tel" type="tel" value="${esc(P.tel||"")}" placeholder="+54 9 11 …"></label></div>
     <label class="f" for="pr_msg">Tu mensaje<textarea class="input" id="pr_msg" data-pf="mensaje" placeholder="Retomá lo que conversaron: qué te contó, qué busca y por qué estas ideas tienen sentido para su momento.">${esc(P.mensaje)}</textarea></label></div>
    <div class="panel stack"><h3 style="margin:0">Productos (${P.items.length})</h3>
     ${P.items.length ? P.items.map((it,i)=>{ const p = S.byId[it.id]; if (!p) return ""; return `<div class="pr-item"><div class="h"><b class="small">${esc(p.nombre)}</b><span class="btn-row" style="gap:2px">
@@ -1019,7 +1020,7 @@ function propDoc(){
     <div class="pp-facts"><span><b>Moneda</b> ${esc(p.cliente.ficha.moneda)}</span><span><b>Plazo</b> ${esc(p.cliente.ficha.plazo)}</span><span><b>Monto</b> ${esc(p.cliente.ficha.minimo)}</span><span><b>Liquidez</b> ${esc(p.cliente.ficha.liquidez)}</span></div>
     <p class="pp-note">${esc(p.cliente.aTener.join(" "))}</p></div></div>`).join("")}
    <div class="pp-sec"><div class="ey">Próximos pasos</div><div class="pp-steps"><div><b>Lo revisamos juntos</b>Repasamos cada idea con tus números y resolvemos tus dudas.</div><div><b>Definimos el plan</b>Montos, plazos y el orden de implementación.</div><div><b>Lo implementamos</b>Nos ocupamos de la operatoria y te acompañamos en el seguimiento.</div></div>
-    <div class="pp-contact"><div><div class="ey">Tu asesor en Neix</div><div style="font-family:Inter,Arial,sans-serif;font-weight:300;font-size:18px;margin-top:2px">${esc(P.asesor||"Tu asesor")}</div></div><div style="font-size:13px">${esc(P.contacto||"(011) 4859-1552 · www.neix.com.ar")}</div></div>
+    <div class="pp-contact"><div><div class="ey">Tu asesor en Neix</div><div style="font-family:Inter,Arial,sans-serif;font-weight:300;font-size:18px;margin-top:2px">${esc(P.asesor||"Tu asesor")}</div></div><div style="font-size:13px">${esc([P.mail, P.tel].filter(Boolean).join(" · ") || P.contacto || "(011) 4859-1552 · www.neix.com.ar")}</div></div>
     <p class="pp-legal">${esc(LEYENDA)}</p></div>
   </div></div>`;
 }
@@ -1057,7 +1058,7 @@ const findAsesor = n => { const k = normNom(n); return k ? (S.asesores||[]).find
 const asesoresList = () => `<datalist id="asesoresList">${(S.asesores||[]).map(a=>`<option value="${esc(a.nombre)}">${esc(a.area||"")}</option>`).join("")}</datalist>`;
 const AREAS = {"Banca Privada":"bancaprivada@neix.com.ar","Banca Corporativa":"bancacorporativa@neix.com.ar","Financial Advisors":"fas@neix.com.ar","Mesa · Mercado de Capitales":"info@neix.com.ar","Estrategia":"info@neix.com.ar"};
 const PZ_SUG = [["Tesorería corporativa",["cauciones","fci","fondo-dedicado","echeq-tesoreria"]],["Financiamiento pyme",["cheques","pagares","avales-sgr","facturas-fce"]],["Cobertura cambiaria",["futuros-dolar","bonos-cer-dl","pricing-fx"]],["Dolarizar e invertir afuera",["t-bills","cedears","cuentas-offshore","operatoria-internacional"]]];
-S.pz = {titulo:"Soluciones de inversión y financiamiento", bajada:"Banca Corporativa · Banca Privada · Financial Advisors", cliente:"", inst:true, asesor:"", area:"", items:[]};
+S.pz = {titulo:"Soluciones de inversión y financiamiento", bajada:"Banca Corporativa · Banca Privada · Financial Advisors", cliente:"", inst:true, asesor:"", mail:"", tel:"", area:"", items:[]};
 try { const sv = JSON.parse(localStorage.getItem("neix-hub-pz")||"null"); if (sv) Object.assign(S.pz, sv); } catch(e) {}
 function pzSave(){ try { localStorage.setItem("neix-hub-pz", JSON.stringify(S.pz)); } catch(e) {} }
 function vPresentaciones(){
@@ -1074,7 +1075,9 @@ function vPresentaciones(){
     <label class="f" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="pz_inst" ${P.inst?"checked":""}> Incluir presentación institucional de Neix</label></div>
    <div class="panel stack"><h3 style="margin:0">Asesor</h3>
     <label class="f" for="pz_asesor">Nombre<input class="input" id="pz_asesor" data-pz="asesor" value="${esc(P.asesor)}" placeholder="Escribí tu nombre" list="asesoresList" autocomplete="off"></label>${asesoresList()}
-    <label class="f" for="pz_area">Área<select class="input" id="pz_area"><option value="">Elegir área</option>${Object.keys(AREAS).map(a=>`<option ${P.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select><span class="hint">Si elegís tu nombre de la lista, el cierre muestra tu mail, tu celular y tu área.</span></label></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="f" for="pz_mail">Mail<input class="input" id="pz_mail" data-pz="mail" type="email" value="${esc(P.mail||"")}" placeholder="nombre@neix.com.ar"></label>
+    <label class="f" for="pz_tel">Teléfono<input class="input" id="pz_tel" data-pz="tel" type="tel" value="${esc(P.tel||"")}" placeholder="+54 9 11 …"></label></div>
+    <label class="f" for="pz_area">Área<select class="input" id="pz_area"><option value="">Elegir área</option>${Object.keys(AREAS).map(a=>`<option ${P.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select><span class="hint">Si elegís tu nombre de la lista, se completan mail, teléfono y área.</span></label></div>
    <div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><h3 style="margin:0">Productos</h3><span class="tiny muted">${P.items.length} elegidos</span></div>
     <div class="chips" style="margin-bottom:10px">${PZ_SUG.map(([n,ids],i)=>`<button class="chip" data-act="pzSug" data-v="${i}">${esc(n)}</button>`).join("")}${S.prop.items.length?`<button class="chip" data-act="pzProp">Usar los de mi propuesta (${S.prop.items.length})</button>`:""}${P.items.length?`<button class="chip" data-act="pzClear">Limpiar</button>`:""}</div>
     <div class="pz-list">${cats.map(c=>`<div class="cat">${esc(c)}</div>${byCat[c].map(p=>`<label><input type="checkbox" data-pzp="${p.id}" ${P.items.includes(p.id)?"checked":""}> ${esc(p.nombre)}</label>`).join("")}`).join("")}</div></div>
@@ -1099,7 +1102,7 @@ function deckSlides(){
      <div class="ben">${c.beneficios.slice(0,3).map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div></div>${slideFoot("")}</div>`); });
   const mail = P.area ? AREAS[P.area] : "info@neix.com.ar";
   out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><div class="pad" style="justify-content:flex-end"><h2 style="font-size:92px">Hablemos.</h2>
-   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:44px;font-size:19px">${P.asesor?(()=>{ const a = findAsesor(P.asesor); return `<div><div class="ey">Tu asesor</div><div style="margin-top:8px">${esc(P.asesor)}${a?`<br>${esc(a.mail)}<br>${esc(a.tel)}`:""}</div></div>`; })():""}<div><div class="ey">Contacto</div><div style="margin-top:8px">(011) 4859-1552<br>${esc(mail)}</div></div><div><div class="ey">Oficinas</div><div style="margin-top:8px">Don Francisco 3345, piso 5<br>San Fernando · www.neix.com.ar</div></div></div>
+   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:44px;font-size:19px">${P.asesor?`<div><div class="ey">Tu asesor</div><div style="margin-top:8px">${[P.asesor, P.mail, P.tel].filter(Boolean).map(esc).join("<br>")}</div></div>`:""}<div><div class="ey">Contacto</div><div style="margin-top:8px">(011) 4859-1552<br>${esc(mail)}</div></div><div><div class="ey">Oficinas</div><div style="margin-top:8px">Don Francisco 3345, piso 5<br>San Fernando · www.neix.com.ar</div></div></div>
    <p style="font-size:12px;color:#A9A196;margin-top:40px">${esc(LEYENDA)}</p></div></div>`);
   return out;
 }
@@ -1207,7 +1210,7 @@ document.addEventListener("click", e => {
   else if (a==="consultar") consultar();
   else if (a==="sim") { S.sim = v; render(); }
   else if (a==="pzSug") { PZ_SUG[+v][1].forEach(id=>{ if (S.byId[id] && !S.pz.items.includes(id)) S.pz.items.push(id); }); pzSave(); render(); }
-  else if (a==="pzProp") { S.prop.items.forEach(it=>{ if (!S.pz.items.includes(it.id)) S.pz.items.push(it.id); }); if (S.prop.cliente && !S.pz.cliente) S.pz.cliente = S.prop.cliente; if (S.prop.asesor && !S.pz.asesor) S.pz.asesor = S.prop.asesor; pzSave(); render(); }
+  else if (a==="pzProp") { S.prop.items.forEach(it=>{ if (!S.pz.items.includes(it.id)) S.pz.items.push(it.id); }); if (S.prop.cliente && !S.pz.cliente) S.pz.cliente = S.prop.cliente; if (S.prop.asesor && !S.pz.asesor) { S.pz.asesor = S.prop.asesor; S.pz.mail = S.prop.mail || ""; S.pz.tel = S.prop.tel || ""; } pzSave(); render(); }
   else if (a==="pzClear") { S.pz.items = []; pzSave(); render(); }
   else if (a==="pzPDF") pzPDF();
   else if (a==="openSim") { S.sim = v; }
@@ -1218,10 +1221,10 @@ document.addEventListener("input", e => {
   if (t.id==="q") { S.q = t.value; const pos = t.selectionStart; render(); const n = $("#q"); if (n) { n.focus(); try { n.setSelectionRange(pos,pos); } catch(_){} } }
   else if (t.dataset.s && t.type!=="checkbox" && t.tagName!=="SELECT") { S.simv[S.sim][t.dataset.s] = t.value; calcSim(); }
   else if (t.dataset.pz) { S.pz[t.dataset.pz] = t.value;
-    if (t.dataset.pz==="asesor") { const a = findAsesor(t.value); if (a && t.value !== a.nombre) { t.value = S.pz.asesor = a.nombre; } if (a && AREAS[a.area]) { S.pz.area = a.area; const sel = $("#pz_area"); if (sel) sel.value = a.area; } }
+    if (t.dataset.pz==="asesor") { const a = findAsesor(t.value); if (a && t.value !== a.nombre) { t.value = S.pz.asesor = a.nombre; } if (a) { S.pz.mail = a.mail || ""; S.pz.tel = a.tel || ""; const m = $("#pz_mail"), te = $("#pz_tel"); if (m) m.value = S.pz.mail; if (te) te.value = S.pz.tel; } if (a && AREAS[a.area]) { S.pz.area = a.area; const sel = $("#pz_area"); if (sel) sel.value = a.area; } }
     pzSave(); refreshDeck(); }
   else if (t.dataset.pf) { S.prop[t.dataset.pf] = t.value;
-    if (t.dataset.pf==="asesor") { const a = findAsesor(t.value); if (a) { if (t.value !== a.nombre) t.value = S.prop.asesor = a.nombre; S.prop.contacto = [a.mail, a.tel].filter(Boolean).join(" · "); const c = $("#pr_contacto"); if (c) c.value = S.prop.contacto; } }
+    if (t.dataset.pf==="asesor") { const a = findAsesor(t.value); if (a) { if (t.value !== a.nombre) t.value = S.prop.asesor = a.nombre; S.prop.mail = a.mail || ""; S.prop.tel = a.tel || ""; delete S.prop.contacto; const m = $("#pr_mail"), te = $("#pr_tel"); if (m) m.value = S.prop.mail; if (te) te.value = S.prop.tel; } }
     persist(); refreshPreview(); }
   else if (t.dataset.pi) { S.prop.items[+t.dataset.pi].nota = t.value; persist(); refreshPreview(); }
 });
