@@ -1,82 +1,94 @@
 {
   "lista": [
     {
-      "mail": "mlipovetzky@neix.com.ar",
-      "nombre": "Marcelo Lipovetzky",
-      "tel": ""
+      "nombre": "Lucas Mieres",
+      "area": "Dirección general",
+      "mail": "lm@neix.com.ar",
+      "tel": "+54 9 11 6178-7951"
     },
     {
-      "mail": "bmerino@neix.com.ar",
-      "nombre": "Brenda Merino",
-      "tel": ""
+      "nombre": "Esteban Goyheneix",
+      "area": "Dirección general",
+      "mail": "eg@neix.com.ar",
+      "tel": "+34 659 80 03 71"
     },
     {
-      "mail": "lbattaglia@neix.com.ar",
-      "nombre": "Lucila Battaglia",
-      "tel": ""
-    },
-    {
-      "mail": "jgonzalez@neix.com.ar",
-      "nombre": "Julian Gonzalez",
-      "tel": ""
-    },
-    {
-      "mail": "av@neix.com.ar",
-      "nombre": "Alvanny Viloria",
-      "tel": ""
-    },
-    {
+      "nombre": "Facundo Linares",
       "area": "Banca Corporativa",
       "mail": "fl@neix.com.ar",
-      "nombre": "Facundo Linares",
-      "tel": ""
+      "tel": "+54 9 11 6178-7918"
     },
     {
-      "area": "Banca Privada",
-      "mail": "nfurlani@neix.com.ar",
-      "nombre": "Nicanor Furlani",
-      "tel": ""
+      "nombre": "Esteban Petracchi",
+      "area": "Banca Corporativa",
+      "mail": "epetracchi@neix.com.ar",
+      "tel": "+54 9 11 5645-6949"
     },
     {
-      "mail": "tvodanovich@neix.com.ar",
-      "nombre": "Tomas Vodanovich",
-      "tel": ""
+      "nombre": "Marcelo Lipovetzky",
+      "area": "Banca Corporativa",
+      "mail": "mlipovetzky@neix.com.ar",
+      "tel": "+54 9 11 2737-0961"
     },
     {
-      "mail": "lmalaccorto@neix.com.ar",
-      "nombre": "Lucas Malaccorto",
-      "tel": ""
+      "nombre": "Brenda Merino",
+      "area": "Banca Corporativa",
+      "mail": "bmerino@neix.com.ar",
+      "tel": "+54 9 11 6890-5157"
     },
     {
-      "mail": "mdegrossi@neix.com.ar",
-      "nombre": "Martina Degrossi",
-      "tel": ""
+      "nombre": "Lucila Battaglia",
+      "area": "Banca Corporativa",
+      "mail": "lbattaglia@neix.com.ar",
+      "tel": "+54 9 11 6466-6412"
     },
     {
+      "nombre": "Soledad Sicouly",
       "area": "Financial Advisors",
       "mail": "ssicouly@neix.com.ar",
-      "nombre": "Soledad Sicouly",
-      "tel": ""
+      "tel": "+54 9 11 2370-8468"
     },
     {
-      "mail": "fmigliano@neix.com.ar",
-      "nombre": "Franco Migliano",
-      "tel": ""
-    },
-    {
-      "mail": "mdepino@neix.com.ar",
-      "nombre": "Manuela Depino",
-      "tel": ""
-    },
-    {
-      "mail": "mc@neix.com.ar",
       "nombre": "Manuela Conti",
-      "tel": ""
+      "area": "Financial Advisors",
+      "mail": "mc@neix.com.ar",
+      "tel": "+54 9 11 3397-5002"
     },
     {
-      "mail": "vlopresti@neix.com.ar",
+      "nombre": "Manuela Depino",
+      "area": "Financial Advisors",
+      "mail": "mdepino@neix.com.ar",
+      "tel": "+54 9 11 3397-5004"
+    },
+    {
+      "nombre": "Franco Migliano",
+      "area": "Financial Advisors",
+      "mail": "fmigliano@neix.com.ar",
+      "tel": "+54 9 11 7854-8289"
+    },
+    {
       "nombre": "Valentina Lo Presti",
-      "tel": ""
+      "area": "Financial Advisors",
+      "mail": "vlopresti@neix.com.ar",
+      "tel": "+54 9 11 6800-7370"
+    },
+    {
+      "nombre": "Nicanor Furlani",
+      "area": "Banca Privada",
+      "mail": "nfurlani@neix.com.ar",
+      "tel": "+54 9 11 3812-7281"
+    },
+    {
+      "nombre": "Tomás Vodanovich",
+      "area": "Banca Privada",
+      "mail": "tvodanovich@neix.com.ar",
+      "tel": "+54 9 11 6025-2958"
+    },
+    {
+      "nombre": "Lucas Malaccorto",
+      "area": "Banca Privada",
+      "mail": "lmalaccorto@neix.com.ar",
+      "tel": "+54 9 11 6958-7199"
     }
   ]
 }
