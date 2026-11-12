@@ -970,6 +970,9 @@ const PP_CSS = `
 .pp-ben h4{font-size:15px;margin-bottom:3px}.pp-ben p{margin:0;font-size:12.5px;color:var(--paper-ink-2)}
 .pp-facts{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12px;color:var(--paper-ink-2)}.pp-facts b{color:var(--paper-ink);font-weight:600}
 .pp-note{font-size:12px;color:var(--paper-ink-2);margin-top:10px}
+.pp-neix p{margin:0;font-size:14px;line-height:1.55;max-width:62ch}
+.pp-nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:14px}
+.pp-nums div{border-top:1px solid var(--paper-ink);padding-top:8px;font-size:12px;color:var(--paper-ink-2)}.pp-nums b{display:block;font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:300;font-size:22px;color:var(--paper-ink);margin-bottom:2px}
 .pp-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:12px}
 .pp-steps div{border-top:1px solid var(--paper-ink);padding-top:8px;font-size:13px}.pp-steps b{display:block;font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:300;font-size:15px;margin-bottom:2px}
 .pp-contact{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;background:var(--paper-dark);color:#F4F1ED;border-radius:6px;padding:16px 18px;margin-top:18px}
@@ -979,7 +982,7 @@ const PP_CSS = `
 .pp th,.pp td{background:transparent;color:inherit;letter-spacing:normal;text-transform:none;font-size:inherit}
 .pp .pp-glance th{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-arena);border-bottom:1px solid var(--paper-ink)}
 .pp .pp-glance td:first-child{color:var(--paper-arena)}
-@media (max-width:600px){.pp-cover{padding:24px 20px}.pp-body{padding:4px 20px 24px}.pp-item{grid-template-columns:minmax(0,1fr)}.pp-steps{grid-template-columns:minmax(0,1fr)}.pp-glance .hide-s{display:none}.pp-cover h1{font-size:28px}}
+@media (max-width:600px){.pp-cover{padding:24px 20px}.pp-body{padding:4px 20px 24px}.pp-item{grid-template-columns:minmax(0,1fr)}.pp-steps{grid-template-columns:minmax(0,1fr)}.pp-nums{grid-template-columns:repeat(2,minmax(0,1fr))}.pp-glance .hide-s{display:none}.pp-cover h1{font-size:28px}}
 `;
 function vPropuesta(){
   const P = S.prop, sug = {};
@@ -1011,6 +1014,8 @@ function propDoc(){
    <div class="pp-meta"><span>${esc(fecha)}</span>${P.asesor?`<span>Tu asesor: ${esc(P.asesor)}</span>`:""}<span>${items.length} ${items.length===1?"producto":"productos"}</span></div></div>
   <div class="pp-body">
    ${P.mensaje||objs.length?`<div class="pp-sec">${P.mensaje?`<p class="pp-msg">${esc(P.mensaje)}</p>${P.asesor?`<p class="pp-firma">${esc(P.asesor)}</p>`:""}`:""}${objs.length?`<div style="margin-top:${P.mensaje?"16px":"0"}"><div class="ey">Lo que buscás</div><div class="pp-obj">${objs.map(o=>`<span>${esc(o)}</span>`).join("")}</div></div>`:""}</div>`:""}
+   <div class="pp-sec pp-neix"><div class="ey">Quiénes somos</div><p style="margin-top:8px">Neix es una ALyC boutique que acompaña a familias, empresas e inversores desde hace 18 años. Trabajamos con cuatro equipos especializados (Banca Privada, Banca Corporativa, Financial Advisors y Mercado de Capitales) y una misma forma de hacer las cosas: atención cercana, mirada de largo plazo y ejecución propia en el mercado.</p>
+    <div class="pp-nums"><div><b>18</b>años en el mercado de capitales</div><div><b>Top 5</b>en ByMA</div><div><b>Top 10</b>en A3 Mercados</div><div><b>7°</b>año consecutivo Great Place to Work</div></div></div>
    <div class="pp-sec"><div class="ey">Tu propuesta en una mirada</div><table class="pp-glance"><thead><tr><th></th><th>Producto</th><th class="hide-s">Moneda</th><th class="hide-s">Plazo</th><th>Riesgo</th></tr></thead><tbody>
     ${items.map(({p},i)=>`<tr><td>${String(i+1).padStart(2,"0")}</td><td><b>${esc(p.nombre)}</b><br><span style="color:var(--paper-ink-2)">${esc(p.cliente.titular)}</span></td><td class="hide-s">${esc(p.cliente.ficha.moneda)}</td><td class="hide-s">${esc(p.cliente.ficha.plazo)}</td><td>${esc(RISK_TXT[p.riesgoNivel])}</td></tr>`).join("")}</tbody></table></div>
    ${items.map(({it,p},i)=>`<div class="pp-sec pp-item"><div class="pp-n">${String(i+1).padStart(2,"0")}</div><div><div class="ey">${esc(p.nombre)}</div><h3>${esc(p.cliente.titular)}</h3>
