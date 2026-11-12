@@ -6,7 +6,8 @@
  *
  * Dos modos, según public/js/firebase-config.js:
  *   Firebase (hay apiKey): datos en Firestore, lectura abierta; los editores ingresan con un link al mail.
- *   Local (sin apiKey):    JSON de data/ servidos por scripts/dev-server.mjs, sin login (fase 1).
+ *   Local (sin apiKey):    JSON de public/data/, sin login (fase 1).
+ *   Si Firebase no deja leer (reglas sin publicar, base vacía), el Hub usa staticDb() en solo lectura.
  *                          Con ?editor=1 en la URL se simula un editor para probar Gestión.
  *
  *   db         collection(n)[.orderBy(campo, dir)][.limit(n)].onSnapshot · doc(p).onSnapshot · doc(p).set · doc(p).update
@@ -299,6 +300,7 @@
       const make = services[name];
       return make ? make().catch((e) => { console.error("neixRuntime." + name, e); return null; }) : Promise.resolve(null);
     },
+    staticDb: createStaticDb, // fichas de public/data, en solo lectura si Firebase no responde
     enviarLink,
     completarLink,
     logout,

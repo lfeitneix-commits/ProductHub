@@ -1281,14 +1281,24 @@ async function boot(){
   S.db = db;
   if (S.canEdit) watchNotas();
   const timer = setTimeout(()=>{ S.slow = true; render(); }, 10000);
-  db.collection("productos").onSnapshot(snap => {
+  // Si Firebase no deja leer (reglas sin publicar o base vacía), se muestran las fichas de public/data en solo lectura.
+  let respaldo = false;
+  const usarRespaldo = () => {
+    if (respaldo || !c.staticDb) return false; respaldo = true; S.soloLectura = true;
+    leer(c.staticDb()); return true;
+  };
+  const leer = (src) => {
+  src.collection("productos").onSnapshot(snap => {
+    if (!snap.docs.length && !snap.metadata.fromCache && src === db && usarRespaldo()) return;
     setProductos(snap.docs.map(d=>Object.assign({id:d.id}, JSON.parse(JSON.stringify(d.data())))));
     if (!snap.metadata.fromCache) { clearTimeout(timer); S.loading = false; S.slow = false; }
     softRender();
-  }, () => { clearTimeout(timer); S.loading = false; if (!S.productos.length) S.dbMissing = true; render(); });
-  db.collection("validaciones").onSnapshot(snap => { const v = {}; snap.docs.forEach(d=>v[d.id]=d.data()); S.vals = v; if (S.productos.length) softRender(); }, ()=>{});
-  db.doc("config/impuestos").onSnapshot(d => { S.imp = d.exists ? d.data() : null; if (S.productos.length) softRender(); }, ()=>{});
-  db.doc("config/onepagers").onSnapshot(d => { S.onepagers = d.exists ? (d.data().map||{}) : {}; if (S.raw) { setProductos(S.raw); softRender(); } }, ()=>{});
+  }, () => { if (src === db && usarRespaldo()) return; clearTimeout(timer); S.loading = false; if (!S.productos.length) S.dbMissing = true; render(); });
+  src.collection("validaciones").onSnapshot(snap => { const v = {}; snap.docs.forEach(d=>v[d.id]=d.data()); S.vals = v; if (S.productos.length) softRender(); }, ()=>{});
+  src.doc("config/impuestos").onSnapshot(d => { S.imp = d.exists ? d.data() : null; if (S.productos.length) softRender(); }, ()=>{});
+  src.doc("config/onepagers").onSnapshot(d => { S.onepagers = d.exists ? (d.data().map||{}) : {}; if (S.raw) { setProductos(S.raw); softRender(); } }, ()=>{});
+  };
+  leer(db);
 }
 boot();
 })();

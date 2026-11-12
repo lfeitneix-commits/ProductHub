@@ -1,14 +1,14 @@
-// Carga data/ en Firestore.
+// Carga public/data/ en Firestore.
 //
 //   npm run seed                 carga solo lo que falta (no pisa fichas ya editadas en el Hub)
-//   npm run seed -- --force      pisa todo con lo que hay en data/
+//   npm run seed -- --force      pisa todo con lo que hay en public/data/
 //   npm run seed -- --dry-run    muestra qué haría, sin conectarse
 //
 // Variables (en .env o en el entorno):
 //   GOOGLE_APPLICATION_CREDENTIALS  JSON de la cuenta de servicio (fuera del repo)
 //   EDITORES                        mails separados por coma -> config/editores
 //
-// Colecciones: productos/{id} (data/productos/*.json), config/{asesores,exterior,impuestos,onepagers,editores}.
+// Colecciones: productos/{id} (public/data/productos/*.json), config/{asesores,exterior,impuestos,onepagers,editores}.
 // validaciones no se toca: la completan los editores desde el Hub.
 import { readFile, readdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
@@ -34,10 +34,10 @@ const enc = (v) =>
 const readJSON = async (p) => JSON.parse(await readFile(join(ROOT, p), "utf8"));
 
 const docs = [];
-for (const f of (await readdir(join(ROOT, "data/productos"))).filter((f) => f.endsWith(".json") && f !== "index.json").sort())
-  docs.push(["productos/" + f.slice(0, -5), await readJSON("data/productos/" + f)]);
-for (const n of ["asesores", "exterior", "impuestos"]) docs.push(["config/" + n, await readJSON(`data/config/${n}.json`)]);
-docs.push(["config/onepagers", await readJSON("data/config/onepagers.local.json")]); // rutas a public/onepagers
+for (const f of (await readdir(join(ROOT, "public/data/productos"))).filter((f) => f.endsWith(".json") && f !== "index.json").sort())
+  docs.push(["productos/" + f.slice(0, -5), await readJSON("public/data/productos/" + f)]);
+for (const n of ["asesores", "exterior", "impuestos"]) docs.push(["config/" + n, await readJSON(`public/data/config/${n}.json`)]);
+docs.push(["config/onepagers", await readJSON("public/data/config/onepagers.local.json")]); // rutas a public/onepagers
 
 const editores = (process.env.EDITORES || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
 const malos = editores.filter((m) => !m.endsWith("@neix.com.ar"));
