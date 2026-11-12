@@ -991,8 +991,8 @@ function vPropuesta(){
    <div class="panel stack"><h3 style="margin:0">Para quién</h3>
     <label class="f" for="pr_cliente">Cliente<input class="input" id="pr_cliente" data-pf="cliente" value="${esc(P.cliente)}" placeholder="Nombre o razón social"></label>
     <label class="f" for="pr_asesor">Asesor<input class="input" id="pr_asesor" data-pf="asesor" value="${esc(P.asesor)}" placeholder="Tu nombre" list="asesoresList" autocomplete="off"></label>${asesoresList()}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="f" for="pr_mail">Mail<input class="input" id="pr_mail" data-pf="mail" type="email" value="${esc(P.mail||"")}" placeholder="nombre@neix.com.ar"></label>
-    <label class="f" for="pr_tel">Teléfono<input class="input" id="pr_tel" data-pf="tel" type="tel" value="${esc(P.tel||"")}" placeholder="+54 9 11 …"></label></div>
+    <label class="f" for="pr_mail">Mail<input class="input" id="pr_mail" data-pf="mail" type="email" value="${esc(P.mail||"")}" placeholder="nombre@neix.com.ar"></label>
+    <label class="f" for="pr_tel">Teléfono<input class="input" id="pr_tel" data-pf="tel" type="tel" value="${esc(P.tel||"")}" placeholder="+54 9 11 …"></label>
     <label class="f" for="pr_msg">Tu mensaje<textarea class="input" id="pr_msg" data-pf="mensaje" placeholder="Retomá lo que conversaron: qué te contó, qué busca y por qué estas ideas tienen sentido para su momento.">${esc(P.mensaje)}</textarea></label></div>
    <div class="panel stack"><h3 style="margin:0">Productos (${P.items.length})</h3>
     ${P.items.length ? P.items.map((it,i)=>{ const p = S.byId[it.id]; if (!p) return ""; return `<div class="pr-item"><div class="h"><b class="small">${esc(p.nombre)}</b><span class="btn-row" style="gap:2px">
@@ -1075,8 +1075,8 @@ function vPresentaciones(){
     <label class="f" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="pz_inst" ${P.inst?"checked":""}> Incluir presentación institucional de Neix</label></div>
    <div class="panel stack"><h3 style="margin:0">Asesor</h3>
     <label class="f" for="pz_asesor">Nombre<input class="input" id="pz_asesor" data-pz="asesor" value="${esc(P.asesor)}" placeholder="Escribí tu nombre" list="asesoresList" autocomplete="off"></label>${asesoresList()}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="f" for="pz_mail">Mail<input class="input" id="pz_mail" data-pz="mail" type="email" value="${esc(P.mail||"")}" placeholder="nombre@neix.com.ar"></label>
-    <label class="f" for="pz_tel">Teléfono<input class="input" id="pz_tel" data-pz="tel" type="tel" value="${esc(P.tel||"")}" placeholder="+54 9 11 …"></label></div>
+    <label class="f" for="pz_mail">Mail<input class="input" id="pz_mail" data-pz="mail" type="email" value="${esc(P.mail||"")}" placeholder="nombre@neix.com.ar"></label>
+    <label class="f" for="pz_tel">Teléfono<input class="input" id="pz_tel" data-pz="tel" type="tel" value="${esc(P.tel||"")}" placeholder="+54 9 11 …"></label>
     <label class="f" for="pz_area">Área<select class="input" id="pz_area"><option value="">Elegir área</option>${Object.keys(AREAS).map(a=>`<option ${P.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select><span class="hint">Si elegís tu nombre de la lista, se completan mail, teléfono y área.</span></label></div>
    <div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><h3 style="margin:0">Productos</h3><span class="tiny muted">${P.items.length} elegidos</span></div>
     <div class="chips" style="margin-bottom:10px">${PZ_SUG.map(([n,ids],i)=>`<button class="chip" data-act="pzSug" data-v="${i}">${esc(n)}</button>`).join("")}${S.prop.items.length?`<button class="chip" data-act="pzProp">Usar los de mi propuesta (${S.prop.items.length})</button>`:""}${P.items.length?`<button class="chip" data-act="pzClear">Limpiar</button>`:""}</div>
