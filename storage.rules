@@ -1,0 +1,22 @@
+rules_version = '2';
+// Hub de Productos Neix: one pagers e imágenes que suben los editores desde Gestión.
+// - Leer: cualquiera (los links se muestran en las fichas, que son de lectura abierta).
+// - Subir: solo editores (mismo criterio que firestore.rules), PDF o imagen de hasta 15 MB.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function esEditor() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in firestore.get(/databases/(default)/documents/config/editores).data.mails;
+    }
+    match /uploads/{archivo} {
+      allow read: if true;
+      allow create: if esEditor()
+        && request.resource.size < 15 * 1024 * 1024
+        && (request.resource.contentType == 'application/pdf' || request.resource.contentType.matches('image/.*'));
+    }
+    match /{otro=**} {
+      allow read, write: if false;
+    }
+  }
+}

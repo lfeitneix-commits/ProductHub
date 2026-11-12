@@ -1,0 +1,46 @@
+rules_version = '2';
+// Hub de Productos Neix
+// - Leer fichas, validaciones y config: cualquiera (el Hub no pide login para consultar).
+// - Notas para Marketing: cualquiera puede crear una; solo los editores las leen.
+// - Escribir: solo editores. Ingresan con un link a su mail (Firebase Auth, "Email link") y su mail
+//   tiene que estar en config/editores (campo "mails", en minúscula).
+// - config/editores solo lo leen los propios editores (no se expone la lista).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function esEditor() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in get(/databases/$(database)/documents/config/editores).data.mails;
+    }
+
+    match /productos/{id} {
+      allow read: if true;
+      allow write: if esEditor();
+    }
+    match /validaciones/{id} {
+      allow read: if true;
+      allow write: if esEditor();
+    }
+    // Notas para Marketing: cualquiera que use el Hub puede dejar una (sin login); solo los editores las leen.
+    match /notas/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['producto', 'productoNombre', 'texto', 'fecha', 'autor', 'enviada'])
+        && request.resource.data.producto is string
+        && request.resource.data.texto is string
+        && request.resource.data.texto.size() > 0
+        && request.resource.data.texto.size() <= 2000
+        && request.resource.data.enviada == false;
+      allow read, update, delete: if esEditor();
+    }
+    match /config/editores {
+      allow read, write: if esEditor();
+    }
+    match /config/{id} {
+      allow read: if id != 'editores';
+      allow write: if id != 'editores' && esEditor();
+    }
+    // Todo lo demás, cerrado.
+    match /{otro=**} {
+      allow read, write: if false;
+    }
+  }
+}
