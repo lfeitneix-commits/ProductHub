@@ -703,9 +703,9 @@ function vProducto(id){
   ${S.view==="cliente" ? `<div class="p-grid full"><div style="min-width:0">${clienteView(p)}</div></div>` : `<div class="p-grid"><div style="min-width:0">${S.view==="interno"?playbook(p):operativa(p)}</div>${aside(p,e)}</div>`}`;
 }
 function aside(p, e){
-  return `<aside class="aside"><div class="panel"><h3 class="ph">¿Algo para corregir o sumar?</h3><p class="small muted" style="margin-bottom:12px">Dejale una nota a Marketing sobre esta ficha. Le llega por mail al equipo.</p>
-   <div style="display:grid;gap:8px"><textarea class="input" id="mkNota" placeholder="Ej.: cambió el mínimo, falta un dato, un cliente preguntó por…" aria-label="Nota para Marketing"></textarea>
-   <button class="btn" data-act="notaMkt" data-id="${p.id}">Enviar a Marketing</button>
+  return `<aside class="aside"><div class="panel"><h3 class="ph">¿Algo para corregir o sumar?</h3><p class="small muted" style="margin-bottom:12px">Dejá una nota sobre esta ficha.</p>
+   <div style="display:grid;gap:8px"><textarea class="input" id="mkNota" placeholder="Ej.: cambió el mínimo, falta un dato, un cliente preguntó por…" aria-label="Nota sobre esta ficha"></textarea>
+   <button class="btn" data-act="notaMkt" data-id="${p.id}">Enviar</button>
    ${S.canEdit?`<a class="btn ghost" href="#editar-${p.id}">Editar contenido</a>`:""}</div></div>
    ${S.canEdit && p.observaciones.length?`<details class="warnbox"><summary>${p.observaciones.length} pendientes del relevamiento</summary><ul class="clean small">${p.observaciones.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></details>`:""}</aside>`;
 }
@@ -804,9 +804,9 @@ async function notaMkt(id){
   const b = document.querySelector('[data-act="notaMkt"]'); if (b) { b.disabled = true; b.textContent = "Enviando"; }
   try { const nid = Date.now().toString(36) + Math.random().toString(36).slice(2,7);
     await S.db.doc("notas/"+nid).set({producto:id, productoNombre:p?p.nombre:id, texto:t.slice(0,2000), fecha:new Date().toISOString(), autor:S.uid||"", enviada:false});
-    el.value = ""; toast("Nota enviada. Marketing la recibe por mail."); }
+    el.value = ""; toast("Nota enviada"); }
   catch(e) { toast("No pudimos guardar la nota. Probá de nuevo."); }
-  if (b) { b.disabled = false; b.textContent = "Enviar a Marketing"; }
+  if (b) { b.disabled = false; b.textContent = "Enviar"; }
 }
 async function validar(id){
   if (!S.db) return;
