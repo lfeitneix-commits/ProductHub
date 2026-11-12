@@ -1,0 +1,1259 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Hub de Productos Neix</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap">
+<style>
+/* Layout: app de dos zonas. Sidebar grafito fija (desktop) + contenido crema; en mobile, barra superior y tab bar inferior. Fichas con estética del nuevo one pager. */
+:root{
+  --bg:#F4F1ED; --surface:#FFFFFF; --surface-2:#EFEBE6; --surface-3:#E7E1D9;
+  --ink:#33312E; --ink-2:#6A635A; --ink-3:#958C80; --line:#E3DDD5; --line-2:#D6CEC3;
+  --arena:#9A8E7D; --sel:#3D3D3D; --sel-ink:#F7F5F3;
+  --side:#2E2D2B; --side-ink:#EDE8E1; --side-2:#A49C90; --side-hi:rgba(255,255,255,.08);
+  --ok:#4C7558; --ok-bg:#E3EDE5; --warn:#94661C; --warn-bg:#F5EBD9; --crit:#9C4636; --crit-bg:#F4E2DD;
+  --shadow:0 1px 2px rgba(40,35,30,.05),0 6px 20px -12px rgba(40,35,30,.18);
+  --shadow-hi:0 2px 4px rgba(40,35,30,.06),0 16px 32px -16px rgba(40,35,30,.28);
+  --focus:#7E705E; --logo-a:block; --logo-b:none;
+  /* papel del cliente: siempre claro, a propósito */
+  --paper:#FFFFFF; --paper-2:#F3EFEA; --paper-ink:#33312E; --paper-ink-2:#6A635A; --paper-line:#E3DDD5; --paper-dark:#33312E; --paper-arena:#9A8E7D;
+  --f-display:"Inter", Arial, sans-serif;
+  --f-body:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1A1918; --surface:#232220; --surface-2:#2C2A27; --surface-3:#35322E;
+  --ink:#ECE7E0; --ink-2:#B6AEA3; --ink-3:#8C8479; --line:#383430; --line-2:#48433E;
+  --arena:#B8AB96; --sel:#ECE7E0; --sel-ink:#1A1918;
+  --side:#121211; --side-ink:#ECE7E0; --side-2:#8F877C; --side-hi:rgba(255,255,255,.07);
+  --ok:#8DBB98; --ok-bg:#22322A; --warn:#DDB167; --warn-bg:#3A2F1C; --crit:#E39483; --crit-bg:#3B2420;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px -12px rgba(0,0,0,.6); --shadow-hi:0 2px 4px rgba(0,0,0,.3),0 16px 32px -16px rgba(0,0,0,.7);
+  --focus:#CDBFA8; --logo-a:none; --logo-b:block; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1A1918; --surface:#232220; --surface-2:#2C2A27; --surface-3:#35322E;
+  --ink:#ECE7E0; --ink-2:#B6AEA3; --ink-3:#8C8479; --line:#383430; --line-2:#48433E;
+  --arena:#B8AB96; --sel:#ECE7E0; --sel-ink:#1A1918;
+  --side:#121211; --side-ink:#ECE7E0; --side-2:#8F877C; --side-hi:rgba(255,255,255,.07);
+  --ok:#8DBB98; --ok-bg:#22322A; --warn:#DDB167; --warn-bg:#3A2F1C; --crit:#E39483; --crit-bg:#3B2420;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px -12px rgba(0,0,0,.6); --shadow-hi:0 2px 4px rgba(0,0,0,.3),0 16px 32px -16px rgba(0,0,0,.7);
+  --focus:#CDBFA8; --logo-a:none; --logo-b:block; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14.5px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--side)}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:500;letter-spacing:-.01em;text-wrap:balance;margin:0}
+p{margin:0}
+.eyebrow{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--arena);font-weight:600}
+.muted{color:var(--ink-2)} .small{font-size:13px} .tiny{font-size:12px} .num{font-variant-numeric:tabular-nums}
+.ico{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Shell ── */
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{background:var(--side);color:var(--side-ink);position:sticky;top:env(safe-area-inset-top,0px);height:calc(100vh - env(safe-area-inset-top,0px));display:flex;flex-direction:column;padding:22px 14px 18px;padding-left:max(14px,env(safe-area-inset-left,0px))}
+.side .brand{display:flex;flex-direction:column;gap:8px;padding:0 10px 22px;text-decoration:none}
+.side .brand img{height:16px;width:auto;align-self:flex-start}
+.side .brand span{font-family:var(--f-display);font-size:15px;color:var(--side-2)}
+.side nav{display:grid;gap:2px}
+.nav-a{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:8px;text-decoration:none;color:var(--side-2);font-size:14px;transition:background .15s,color .15s}
+.nav-a:hover{background:var(--side-hi);color:var(--side-ink)}
+.nav-a[aria-current="page"]{background:var(--side-hi);color:var(--side-ink);font-weight:600}
+.nav-a .count{margin-left:auto;min-width:20px;padding:0 6px;border-radius:10px;background:var(--side-ink);color:var(--side);font-size:11px;text-align:center;line-height:20px;font-weight:700}
+.side .foot{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--side-hi);font-size:12px;color:var(--side-2);display:grid;gap:4px}
+.mtop{display:none}
+.tabbar{display:none}
+.content{min-width:0}
+main{max-width:1160px;margin:0 auto;padding-block:30px 72px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+.view{animation:enter .22s ease-out}
+@keyframes enter{from{opacity:.4;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* ── Encabezados ── */
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.page-head h1{font-size:clamp(26px,3vw,34px);margin-top:4px}
+.page-head p{margin-top:6px;max-width:64ch}
+
+/* ── Controles ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line-2);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;text-decoration:none;font-size:13.5px;line-height:1.3;white-space:nowrap;transition:border-color .15s,background .15s,transform .1s}
+.btn:hover{border-color:var(--arena)} .btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)} .btn.primary:hover{opacity:.9}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--ink-2)} .btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
+.btn.icon{padding:8px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.input{width:100%;border:1px solid var(--line-2);background:var(--surface);border-radius:8px;padding:9px 11px;font-size:13.5px}
+textarea.input{min-height:76px;resize:vertical}
+label.f{display:grid;gap:5px;font-size:12.5px;color:var(--ink-2);font-weight:500}
+label.f .hint{font-size:11.5px;color:var(--ink-3);font-weight:400}
+.search{position:relative}
+.search .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-3);width:19px;height:19px}
+.search input{padding:13px 14px 13px 44px;font-size:15px;border-radius:12px;box-shadow:var(--shadow);border-color:var(--line)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.chip{border:1px solid var(--line-2);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer;line-height:1.2;white-space:nowrap;transition:all .15s}
+.chip:hover{border-color:var(--arena)}
+.chip[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:7px 13px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--ink-2);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:var(--shadow)}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 9px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.crit{background:var(--crit-bg);color:var(--crit)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none} .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.crit{background:var(--crit)}
+.risk{display:inline-flex;gap:3px;align-items:center} .risk i{width:6px;height:6px;border-radius:50%;background:var(--line-2)} .risk i.on{background:var(--ink-2)}
+.utag{font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--surface-2);color:var(--ink-2)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;min-width:0}
+.panel>h3,.ph{font-size:16px;margin-bottom:10px}
+.empty{border:1px dashed var(--line-2);border-radius:var(--r);padding:26px;text-align:center;color:var(--ink-2)}
+
+/* ── Productos ── */
+.needs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:18px 0 20px}
+.need{display:flex;flex-direction:column;gap:10px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .15s;min-width:0}
+.need:hover{border-color:var(--arena);transform:translateY(-1px)}
+.need .ic{width:32px;height:32px;border-radius:9px;background:var(--surface-2);display:grid;place-items:center;color:var(--ink)}
+.need b{font-size:13px;font-weight:600;line-height:1.3}
+.need span.n{font-size:11.5px;color:var(--ink-3)}
+.need[aria-pressed="true"]{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}
+.need[aria-pressed="true"] .ic{background:rgba(255,255,255,.14);color:var(--sel-ink)} .need[aria-pressed="true"] span.n{color:inherit;opacity:.7}
+.filters{display:grid;gap:10px;padding:12px 0 14px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.frow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;min-width:0}
+.frow .lbl{font-size:11.5px;color:var(--ink-3);font-weight:600;min-width:52px}
+.frow .chips{flex:1;min-width:0}
+.rescount{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--ink-2);padding-top:4px}
+.group{margin-top:24px}
+.group-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.group-h .ic{width:30px;height:30px;border-radius:8px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center}
+.group-h h2{font-size:20px} .group-h span{font-size:12.5px;color:var(--ink-3)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;text-decoration:none;min-width:0;box-shadow:var(--shadow);transition:transform .18s,box-shadow .18s,border-color .18s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-hi);border-color:var(--line-2)}
+.card h3{font-size:17.5px;line-height:1.25}
+.card .tit{color:var(--ink-2);font-size:13px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:6px}
+.card .units{display:flex;gap:4px;flex-wrap:wrap}
+
+/* ── Ficha ── */
+.crumb{font-size:12.5px;color:var(--ink-3);display:flex;gap:6px;align-items:center;margin-bottom:12px}
+.crumb a{text-decoration:none;color:var(--ink-2)} .crumb a:hover{color:var(--ink)}
+.p-hero{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px}
+.p-hero .ic{width:46px;height:46px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center} .p-hero .ic .ico{width:22px;height:22px}
+.p-hero h1{font-size:clamp(22px,2.6vw,28px);margin:3px 0 2px}
+.p-hero .sub{color:var(--ink-2);font-size:13.5px}
+.p-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.p-grid{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:18px;align-items:start}
+.aside{position:sticky;top:20px;display:grid;gap:12px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:12.5px} .kv dt{color:var(--ink-3)} .kv dd{margin:0}
+
+/* One pager en pantalla */
+.op{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;min-width:0;box-shadow:var(--shadow)}
+.op-hero{padding:24px 26px 20px;background:var(--surface-2);display:grid;gap:8px}
+.op-hero img{height:14px;width:auto}
+.op-hero h2{font-size:clamp(22px,2.5vw,28px);line-height:1.2;margin-top:8px}
+.op-hero p{color:var(--ink-2);font-size:15px;max-width:62ch}
+.op-body{padding:4px 26px 22px}
+.op-sec{padding:16px 0;border-bottom:1px solid var(--line)}
+.op-sec:last-child{border-bottom:0}
+.op-sec h3,.op-h{font-size:17px;margin-bottom:8px}
+.op-sec p{max-width:70ch}
+.op-2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
+.facts{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.facts div{padding:10px 12px;border-right:1px solid var(--line);min-width:0} .facts div:last-child{border-right:0}
+.facts dt{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--arena);font-weight:600;margin-bottom:3px} .facts dd{margin:0;font-size:12.5px;line-height:1.35}
+.blist{display:grid;gap:10px} .blist div{display:grid;gap:2px} .blist b{font-family:var(--f-display);font-weight:500;font-size:15px} .blist span{font-size:13px;color:var(--ink-2)}
+ol.steps{list-style:none;padding:0;margin:0;display:grid;gap:7px;counter-reset:s}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:24px 1fr;gap:6px;font-size:13.5px}
+ol.steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--f-display);color:var(--arena);font-size:13px;padding-top:1px}
+ul.clean{margin:0;padding-left:17px;display:grid;gap:5px;font-size:13.5px}
+.enneix{background:var(--sel);color:var(--sel-ink);padding:16px 18px;border-radius:10px}
+.enneix .eyebrow{color:inherit;opacity:.65}
+details.fold{border:1px solid var(--line);border-radius:10px}
+details.fold>summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:11px 14px;font-weight:600;font-size:13.5px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"+";font-size:18px;color:var(--ink-3);font-weight:400}
+details.fold[open]>summary::after{content:"–"}
+details.fold>.in{padding:0 14px 14px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;background:var(--surface-2)}
+tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
+.tname{font-size:12.5px;font-weight:600;margin:10px 0 6px}
+
+/* Playbook */
+.pb{display:grid;gap:12px}
+.vent{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.vent div{border-left:2px solid var(--arena);padding:2px 0 2px 12px;display:grid;gap:2px}
+.vent b{font-family:var(--f-display);font-weight:500;font-size:15.5px;line-height:1.3}
+.vent span{font-size:13px;color:var(--ink-2);line-height:1.45}
+.keyfacts{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--ink-2);padding-top:12px;margin-top:14px;border-top:1px solid var(--line)}
+.keyfacts b{color:var(--ink);font-weight:600}
+.pb3 .panel h3{font-size:14.5px;margin-bottom:8px}
+.opstrip{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;margin-bottom:36px;font-size:13px}
+.opstrip div{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.opstrip b{font-weight:500}.opstrip span{color:var(--ink-2)}
+.opimg{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.opimg .bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--ink-2);background:var(--surface)}
+.opimg img{display:block;width:100%;max-width:760px;margin:0 auto;height:auto;background:#fff}
+.optag{font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:4px;padding:2px 6px}
+.upl{display:grid;gap:10px;border:1px dashed var(--line-2);border-radius:10px;padding:12px 14px}
+.cobro{background:var(--surface-2);border-radius:var(--r);padding:12px 16px;font-size:13px}
+.pb3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pb2{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px}
+.warnbox{background:var(--warn-bg);border-radius:var(--r);padding:12px 16px}
+.warnbox summary{cursor:pointer;color:var(--warn);font-weight:700;font-size:12.5px;letter-spacing:.04em}
+.warnbox ul{margin-top:8px}
+.rel{display:flex;flex-wrap:wrap;gap:6px} .rel a{text-decoration:none}
+
+/* Cliente */
+.cl-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
+.stack{display:grid;gap:12px}
+.q{display:grid;gap:7px} .q h4{font-family:var(--f-body);font-size:12px;font-weight:600;color:var(--ink-2)}
+.hold-row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.res-sec{margin-bottom:20px}
+.res-sec>h3{font-size:18px;margin-bottom:4px;display:flex;align-items:baseline;gap:8px}
+.res-sec>p{margin-bottom:10px}
+.res{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow)}
+.res .ic{width:34px;height:34px;border-radius:9px;background:var(--surface-2);display:grid;place-items:center;grid-row:span 2}
+.res h4{font-size:16px} .res h4 a{text-decoration:none}
+.res .why{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:11.5px;border-radius:5px;padding:2px 7px;background:var(--surface-2);color:var(--ink-2)}
+.tag.cond{background:var(--warn-bg);color:var(--warn)} .tag.no{background:var(--crit-bg);color:var(--crit)}
+.demo{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:var(--warn-bg);color:var(--warn);padding:2px 6px;border-radius:4px;font-weight:700}
+
+/* Simuladores */
+.sim{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
+.stat .v{font-family:var(--f-display);font-size:clamp(20px,2.4vw,25px);line-height:1.2;margin-top:4px}
+.stat.hl{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)} .stat.hl .eyebrow{color:inherit;opacity:.65}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+.chart svg{display:block;width:100%;height:auto}
+
+/* Propuesta: editor */
+.pr-grid{display:grid;grid-template-columns:370px minmax(0,1fr);gap:20px;align-items:start}
+.pr-item{display:grid;gap:8px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.pr-item .h{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.paper-wrap{background:var(--surface-3);border-radius:var(--r);padding:18px;min-width:0}
+.paper-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12.5px;color:var(--ink-2)}
+
+/* Gestión */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--sel);color:var(--sel-ink);padding:10px 16px;border-radius:10px;font-size:13.5px;z-index:40;max-width:calc(100% - 32px);box-shadow:var(--shadow-hi)}
+.state{padding:70px 0;text-align:center;color:var(--ink-2)} .state h2{font-size:24px;color:var(--ink);margin-bottom:8px}
+
+@media (max-width:1100px){.needs{grid-template-columns:repeat(3,minmax(0,1fr))}.p-grid{grid-template-columns:minmax(0,1fr)}.aside{position:static;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.facts{grid-template-columns:repeat(3,minmax(0,1fr))}.facts div:nth-child(3){border-right:0}.facts div:nth-child(-n+3){border-bottom:1px solid var(--line)}}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .side{display:none}
+  .mtop{display:flex;align-items:center;gap:10px;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--side);color:var(--side-ink);padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .mtop img{height:14px} .mtop span{font-family:var(--f-display);color:var(--side-2);font-size:14px}
+  .tabbar{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--side);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--side-2);text-decoration:none;padding:6px 2px;border-radius:8px;position:relative}
+  .tabbar a[aria-current="page"]{color:var(--side-ink);background:var(--side-hi)}
+  .tabbar .count{position:absolute;top:2px;right:calc(50% - 20px);min-width:16px;line-height:16px;border-radius:8px;background:var(--side-ink);color:var(--side);font-size:10px;font-weight:700;text-align:center}
+  main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 100px}
+  .cl-grid,.sim,.pr-grid,.op-2,.pb2{grid-template-columns:minmax(0,1fr)}
+  .pb3{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+  .needs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .p-hero{grid-template-columns:auto minmax(0,1fr)} .p-hero .btn-row{grid-column:1/-1}
+  .op-hero{padding:18px} .op-body{padding:2px 18px 18px}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))} .facts div{border-right:1px solid var(--line)!important;border-bottom:1px solid var(--line)} .facts div:nth-child(2n){border-right:0!important}
+  .paper-wrap{padding:8px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>
+/* Prueba de estilo: bandas grafito con halo arena (header, héroes y footer) sobre página blanca; tipografía Inter liviana y grande; datos en columnas con divisores finos. Look único claro, a propósito. */
+:root:not(#_){
+  --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4F2EF; --surface-3:#ECE8E2;
+  --ink:#2A2927; --ink-2:#6B655D; --ink-3:#9A9389; --line:#E7E3DD; --line-2:#D8D2C9;
+  --arena:#8C7F6B; --sel:#2A2927; --sel-ink:#FFFFFF;
+  --dark:#262523; --dark-ink:#F3F0EB; --dark-2:#A9A196; --glow:rgba(196,178,148,.55);
+  --side:#262523; --side-ink:#F3F0EB; --side-2:#A9A196; --side-hi:rgba(255,255,255,.08);
+  --ok:#4C7558; --ok-bg:#E6EEE7; --warn:#8E6420; --warn-bg:#F5EDDD; --crit:#9C4636; --crit-bg:#F4E3DE;
+  --shadow:none; --shadow-hi:0 10px 30px -18px rgba(38,37,35,.35);
+  --focus:#8C7F6B; --logo-a:none; --logo-b:block;
+  --f-display:"Inter", "Helvetica Neue", Arial, sans-serif; --f-body:"Inter", "Helvetica Neue", Arial, sans-serif;
+  --r:16px; color-scheme:light}
+body{font:15px/1.6 var(--f-body);letter-spacing:-.003em}
+h1,h2,h3,h4{font-weight:300;letter-spacing:-.025em}
+.eyebrow{font-size:11px;letter-spacing:.14em;color:var(--arena);font-weight:500}
+body::before{background:var(--dark)}
+
+/* Header superior en lugar del sidebar */
+.shell{display:block}
+.side{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;height:auto;flex-direction:row;align-items:center;justify-content:space-between;gap:20px;padding-block:18px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px));border-bottom:1px solid rgba(255,255,255,.06)}
+.side .brand{flex-direction:row;align-items:center;gap:14px;padding:0}
+.side .brand img{height:15px}
+.side .brand span{font-family:var(--f-body);font-size:13px;color:var(--side-2);padding-left:14px;border-left:1px solid rgba(255,255,255,.18)}
+.side nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav-a{font-size:13px;font-weight:500;padding:7px 12px;border-radius:999px;color:var(--side-2)}
+.nav-a .ico{display:none}
+.nav-a[aria-current="page"]{background:rgba(255,255,255,.1);color:var(--side-ink);font-weight:500}
+.nav-a .count{margin-left:6px;line-height:18px;min-width:18px}
+.side .foot{display:none}
+main{max-width:1180px;padding-block:0 0}
+
+/* Héroe oscuro de cada sección */
+.page-head,.p-hero{position:relative;background:radial-gradient(70% 120% at 50% 135%, var(--glow), transparent 62%) var(--dark);box-shadow:0 0 0 100vmax var(--dark);clip-path:inset(0 -100vmax);color:var(--dark-ink);border:0;border-radius:0;margin:0 0 36px;padding-block:48px 56px}
+.page-head{align-items:flex-end}
+.page-head h1{font-size:clamp(34px,4.2vw,50px);line-height:1.02;margin-top:14px}
+.page-head p,.page-head .muted{color:var(--dark-2);font-size:15.5px}
+.page-head .eyebrow,.p-hero .eyebrow{color:var(--dark-2)}
+.page-head .btn,.p-hero .btn{background:#fff;color:var(--dark);border-color:#fff;border-radius:999px;padding:10px 20px;font-weight:500}
+.page-head .btn.ghost{background:transparent;color:var(--dark-ink);border-color:rgba(255,255,255,.3)}
+.page-head .btn .ico,.p-hero .btn .ico{width:16px;height:16px}
+.kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);color:var(--dark-ink);border-radius:999px;padding:6px 14px 6px 12px;font-size:12.5px;font-weight:500}
+.kicker::before{content:"";width:6px;height:6px;border-radius:50%;background:#D9CDB8}
+
+.p-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px 56px;align-items:end}
+.p-hero h1{font-size:clamp(34px,4.2vw,52px);line-height:1.02;margin:18px 0 0}
+.p-hero .crumb{margin:0 0 22px;color:var(--dark-2)} .p-hero .crumb a{color:var(--dark-2)} .p-hero .crumb a:hover{color:var(--dark-ink)}
+.p-hero .units .utag{background:rgba(255,255,255,.08);color:var(--dark-2)}
+.p-hero .lead{font-size:16px;line-height:1.55;color:var(--dark-ink);font-weight:500;max-width:46ch}
+.p-hero .lead span{display:block;font-weight:400;color:var(--dark-2);margin-top:8px;font-size:14.5px}
+.p-hero .btn-row{margin-top:22px}
+
+/* Controles */
+.btn{border-radius:999px;padding:9px 16px;font-weight:500}
+.seg{border-radius:999px;background:var(--surface-2);padding:4px}
+.seg button{border-radius:999px;padding:8px 16px}
+.chip{padding:7px 14px}
+.search input{border-radius:999px;box-shadow:none;border-color:var(--line-2);padding:15px 18px 15px 46px}
+.panel{border-radius:var(--r);padding:22px 24px}
+.panel>h3,.ph{font-size:20px}
+
+/* Productos */
+.needs{margin:22px 0 26px}
+.need{border-radius:var(--r);padding:16px}
+.need b{font-weight:500}
+.group{margin-top:44px}
+.group-h{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:16px}
+.group-h .ic{border:0;background:var(--surface-2)}
+.group-h h2{font-size:22px;font-weight:400}
+.card{border-radius:var(--r);padding:20px;gap:10px}
+.card:hover{transform:none;border-color:var(--ink-3)}
+.card h3{font-size:18px;line-height:1.25;font-weight:400}
+
+/* Ficha para el cliente: estructura de la referencia */
+.p-bar{margin-bottom:34px}
+.p-grid.full{grid-template-columns:minmax(0,1fr)}
+.xf{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--line)}
+.xf div{padding:2px 22px 4px;border-left:1px solid var(--line);min-width:0} .xf div:first-child{border-left:0;padding-left:0}
+.xf dt{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--arena);font-weight:500;margin-bottom:6px}
+.xf dd{margin:0;font-size:16.5px;font-weight:400;letter-spacing:-.01em;line-height:1.4}
+.xsplit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:16px 56px;margin-bottom:40px}
+.xsplit h2{font-size:clamp(20px,2vw,24px);line-height:1.25;font-weight:400}
+.xsplit .t{color:var(--ink-2);font-size:14.5px;display:grid;gap:14px;max-width:56ch}
+.xsplit .t .note{color:var(--arena)}
+.xbox{background:var(--surface-2);border-radius:16px;padding:24px 26px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:16px 56px;margin-bottom:40px}
+.xbox .ic{width:32px;height:32px;border-radius:9px;background:var(--surface-3);display:grid;place-items:center;margin-bottom:12px}
+.xbox h2{font-size:clamp(20px,2vw,24px);font-weight:400}
+.xben{display:grid;gap:16px}
+.xben div{display:grid;gap:2px;padding-bottom:16px;border-bottom:1px solid var(--line-2)} .xben div:last-child{border-bottom:0;padding-bottom:0}
+.xben b{font-weight:500;font-size:14.5px} .xben span{color:var(--ink-2);font-size:14px}
+.xsteps{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:x}
+.xsteps li{counter-increment:x;display:grid;grid-template-columns:30px 1fr;font-size:14.5px;color:var(--ink-2)}
+.xsteps li::before{content:counter(x,decimal-leading-zero);font-size:12px;letter-spacing:.08em;color:var(--arena);padding-top:3px}
+.xtax{margin-bottom:40px}
+.xtax-h{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px 56px;align-items:end;margin-bottom:14px}
+.xtax-h h2{font-size:clamp(20px,2vw,24px);font-weight:400}
+.xtax .seg{margin-bottom:6px}
+.xneix{border-top:1px solid var(--line-2);padding-top:14px;font-size:14.5px}
+.tw{border:0;border-radius:0;background:transparent}
+table{font-size:13px}
+th{background:transparent;font-weight:500;letter-spacing:.1em;color:var(--ink-2);border-bottom:1px solid var(--line-2);padding:10px 12px 10px 0}
+td{padding:11px 12px 11px 0;color:var(--ink-2)}
+td:first-child{color:var(--ink)}
+.gr{display:inline-block;background:var(--dark);color:#fff;border-radius:999px;padding:2px 10px;font-size:11.5px;font-weight:500}
+.tname{font-size:14px;font-weight:500;margin:22px 0 4px;color:var(--ink)}
+
+/* Asesor */
+.vent div{border-left:1px solid var(--line-2);padding-left:16px}
+.vent b{font-family:var(--f-body);font-weight:500;font-size:15.5px}
+.cobro{border-radius:var(--r);padding:18px 22px}
+
+/* Análisis de cartera */
+.cart{display:grid;grid-template-columns:150px minmax(0,1fr);gap:22px;align-items:center}
+.cart svg{width:150px;height:150px;display:block}
+.crow{display:grid;grid-template-columns:12px minmax(0,1fr) auto auto;gap:4px 12px;align-items:center;font-size:13.5px;padding:5px 0}
+.crow i{width:11px;height:11px;border-radius:2px;display:block}
+.crow .pc{color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums}
+.crow .us{text-align:right;font-variant-numeric:tabular-nums;min-width:96px}
+.alert{background:var(--warn-bg);border-radius:10px;padding:12px 16px;font-size:13.5px;margin-top:16px}
+.alert b{display:flex;align-items:center;gap:8px;font-weight:600}.alert b::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--warn)}
+.alert.okb{background:var(--ok-bg)}.alert.okb b::before{background:var(--ok)}
+.cmp td.r{font-variant-numeric:tabular-nums}
+.dif-up{color:var(--ok)} .dif-dn{color:var(--crit)}
+/* Presentaciones */
+.pz-grid{display:grid;grid-template-columns:370px minmax(0,1fr);gap:22px;align-items:start}
+.pz-list{display:grid;gap:4px;max-height:360px;overflow:auto;padding-right:4px}
+.pz-list label{display:flex;gap:10px;align-items:center;font-size:13px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.pz-list label:hover{background:var(--surface-2)}
+.pz-list .cat{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--arena);font-weight:600;padding:10px 8px 2px}
+.slides{display:grid;gap:14px}
+.slide-wrap{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;border-radius:10px;box-shadow:0 8px 24px -14px rgba(0,0,0,.35);background:#fff}
+.slide-wrap .sl{position:absolute;top:0;left:0;transform-origin:0 0}
+.sl{width:1280px;height:720px;font-family:"Inter","Helvetica Neue",Arial,sans-serif;color:#2A2927;background:#fff;box-sizing:border-box;overflow:hidden;position:relative}
+.sl.dk{background:radial-gradient(70% 90% at 50% 125%, rgba(196,178,148,.55), transparent 62%) #262523;color:#F3F0EB}
+.sl .lg{position:absolute;top:56px;left:72px;height:22px}
+.sl .tg{position:absolute;top:58px;right:72px;font-size:15px;color:#A9A196}
+.sl .ey{font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:#8C7F6B;font-weight:600}
+.sl.dk .ey{color:#A9A196}
+.sl h1,.sl h2{font-weight:300;letter-spacing:-.025em;margin:0}
+.sl .pad{position:absolute;inset:150px 72px 96px 72px;display:flex;flex-direction:column}
+.sl .kick{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border-radius:999px;padding:8px 18px;font-size:16px;align-self:flex-start}
+.sl .kick::before{content:"";width:7px;height:7px;border-radius:50%;background:#D9CDB8}
+.sl.lt .kick{background:#F4F2EF;color:#2A2927}
+.sl .ft{position:absolute;left:72px;right:72px;bottom:40px;display:flex;justify-content:space-between;font-size:12px;color:#9A9389}
+.sl.dk .ft{color:#A9A196}
+.sl .ben{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:auto}
+.sl .ben div{border-top:1.5px solid #2A2927;padding-top:14px}
+.sl .ben b{display:block;font-weight:500;font-size:20px;margin-bottom:6px}
+.sl .ben span{font-size:16px;color:#6B655D;line-height:1.45}
+.sl .fx{display:grid;grid-template-columns:repeat(4,1fr);margin-top:34px}
+.sl .fx div{border-left:1px solid #E7E3DD;padding:0 20px}.sl .fx div:first-child{border-left:0;padding-left:0}
+.sl .fx dt{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8C7F6B;margin-bottom:6px}
+.sl .fx dd{margin:0;font-size:18px;line-height:1.3}
+.sl .big{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:auto}
+.sl .big b{display:block;font-weight:300;font-size:56px;letter-spacing:-.03em;line-height:1}
+.sl .big span{display:block;font-size:16px;color:#A9A196;margin-top:10px;line-height:1.35}
+.sl .agenda{display:grid;gap:0;margin-top:30px}
+.sl .agenda div{display:grid;grid-template-columns:60px 1fr auto;padding:16px 0;border-top:1px solid #E7E3DD;font-size:22px;align-items:baseline}
+.sl .agenda span{color:#8C7F6B;font-size:15px}
+@media (max-width:900px){.pz-grid,.cart{grid-template-columns:minmax(0,1fr)}.cart svg{margin:0 auto}}
+/* Hablemos */
+.xfoot{background:radial-gradient(60% 140% at 80% -30%, rgba(196,178,148,.28), transparent 60%) var(--dark);color:var(--dark-ink);margin-top:88px}
+.xfoot .in{max-width:1180px;margin:0 auto;padding-block:56px 36px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+.xfoot .top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:32px 56px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.12)}
+.xfoot h2{font-size:clamp(28px,3vw,36px);margin-bottom:22px}
+.xfoot img{height:15px}
+.xfoot dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 32px;margin:0}
+.xfoot dt{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dark-2);margin-bottom:6px}
+.xfoot dd{margin:0;font-weight:500;font-size:14px;overflow-wrap:anywhere}
+.xfoot .legal{font-size:11.5px;color:var(--dark-2);padding-top:20px}
+
+@media (max-width:900px){
+  .side{display:none}
+  .mtop{background:var(--dark)}
+  .tabbar{background:var(--dark)}
+  main{padding-block:0 40px}
+  .page-head,.p-hero{padding-block:40px 48px;margin-bottom:28px}
+  .p-hero{grid-template-columns:minmax(0,1fr)}
+  .xsplit,.xbox,.xtax-h,.xfoot .top{grid-template-columns:minmax(0,1fr)}
+  .xf{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 0}
+  .xf div:nth-child(odd){border-left:0;padding-left:0}
+  .xfoot{margin-top:56px;padding-bottom:70px}
+}
+@media (max-width:560px){.xfoot dl{grid-template-columns:minmax(0,1fr)}.xbox{padding:22px}}
+</style>
+<div class="shell">
+<aside class="side"><a class="brand" href="#soluciones"><img src="data:image/png;base64,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" alt="NEIX"><span>Hub de Productos</span></a>
+<nav aria-label="Secciones"><a class="nav-a" href="#soluciones" data-sec="soluciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg><span>Productos</span></a><a class="nav-a" href="#cliente" data-sec="cliente"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></svg><span>Cliente</span></a><a class="nav-a" href="#simuladores" data-sec="simuladores"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6zM9 7h6M9 12h6M9 16h3"/></svg><span>Simuladores</span></a><a class="nav-a" href="#propuesta" data-sec="propuesta"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/></svg><span>Propuesta</span><span class="count pcount" hidden>0</span></a><a class="nav-a" href="#presentaciones" data-sec="presentaciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM8 20h8M12 16v4"/></svg><span>Presentaciones</span></a><a class="nav-a" href="#gestion" data-sec="gestion" data-admin hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M16 4v4M10 10v4"/></svg><span>Gestión</span></a></nav>
+<div class="foot"><span>Prototipo v2 · noviembre 2026</span><span>Tenencias: API simulada</span></div></aside>
+<div class="content"><div class="mtop"><img src="data:image/png;base64,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" alt="NEIX"><span>Hub de Productos</span></div>
+<main id="app" aria-live="polite"></main><footer class="xfoot" id="xfoot"></footer></div>
+<nav class="tabbar" aria-label="Secciones"><a href="#soluciones" data-sec="soluciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Productos</a><a href="#cliente" data-sec="cliente"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></svg>Cliente</a><a href="#simuladores" data-sec="simuladores"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6zM9 7h6M9 12h6M9 16h3"/></svg>Simuladores</a><a href="#propuesta" data-sec="propuesta"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/></svg>Propuesta<span class="count pcount" hidden>0</span></a><a href="#presentaciones" data-sec="presentaciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM8 20h8M12 16v4"/></svg>Presentar</a><a href="#gestion" data-sec="gestion" data-admin hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M16 4v4M10 10v4"/></svg>Gestión</a></nav></div>
+<script>
+(function(){
+"use strict";
+const LOGO_DARK = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAABWCAYAAADi4gy8AAAcJ0lEQVR42u2df5RcVZXv99nnnNvdSSCCkw5xeMzIi78aRp1XM6GputW3YxJXYHQ9RSszPEf5FUCQn6KDJkCnEAFFxSTKL8EQR2VNrm9gKY4+ICY3XdUdYVod1B5FxcfjSUjHxEAauvuec/Z5f/Qt7ReJSd9b3VXdOZ+1ai3/wF6Vqlv7nrvP53w3KxaLFjJgrTVCCG6MeXDHjh3vWbVqFYZhaKBJCIJARFGki8XiFiFESSmlGWNikn9GSSmlUuqTvb291+VyOTkwMKCg+UEAoHw+/wYhxM+stTCbsdZqz/NEHMcXVSqVL9W++xny9hkA2GKx+FNE7DDGEGMMU/wdJaWUcRzfUqlU1jTLtTrhd3iVlPL2OI7T/A4BACwAWEQc1lr/XbVarZRKJd7ImmOhxBmE5oEFb80fI/F7o5aEBeDp/pbV81GKF415T+n5H/4rZr6qGOPGGJJSvtv3/feHYWhKpRIHh8PhSIiiSJdKJb5379474jjuF0IIa22aosqstZYxdiwibgyCYN6EG1wDijOwEAA2/UXQ6gm7ngBaCCxL+beojQnxAql/n/v8gW/3ACDW6X0yrTVxzu/I5/OvCcOQktWbw+FwAABAGIZ2cHAwJqL3E9EoIloAoJSLQiWlfKsxZm0YhiYIggYtCku4CkIzJ/7d2nko/2bUGsMg1ZOP5QDWWDuGYN5/Jvxy7BQosboVaCKyiDgXETcBgA2CwBVoh8MxEQIA3tfX9ysA+Fiyik7bd5NxHGvO+Ud93z+ttkKf5tUzMgjNlkV/lWthfO0B0jplcQYLVs9Dwcesvu69u37ys20QiFUQmroVUcYY11obKeXbC4XCxVEU6SAIhLsmHQ7HxCIdBIFYunTpxjiOd0gpubWWIP0eC7fWfqVUKnlDQ0Nsmlsd7N8WL25B4PcjMLDjrQ2WojibuUzIF42usOP1hm0QiG6IDNS7DcEYQ2MMcc5v8n3/5CiKjGt1OByOifWovb3dlstlS0QXEdELjDGbbP6lqTfG87zX79q16+ZkFT0t9WYbBIIBmBeH55TnoTh11BoDwHiKVbiVwCAG87KxdMmqwcG4G7qJJZ9Hvf8xjIgs5/zPAGADALBSqcTcNelwOOAPvWiTy+VEX1/fz40x5WQVbdIuCrXWGhGvLBQKfhiGpqenZ0qL9BYo8aUQ6a+1//Xpc1FcNTze2uAp1R3TipyPGrPuH3Y/+ZMtUOIMyjTxEQHqvIrmSinjed7f5fP5853V4XA4DmZgYEAFQSAqlcr6OI57pZRZrA6GiAIR787n88cMDg5OWavDJn93y4mdba3c3mXHrQ1M19oAamUoDhjdf/buH9+2DQJRgpAO7uHAFBRpVEoZzvn6IAhOdFaHw+GAP1bvCACIMXaOMWakDlZHByJeP7VWx7i1YfXI9XNRvDmrtUHWjoCi83oAcA+0W3ZQq2eqiiaz1gLnfA4R3e+sDofDAYewOnp7e39tjPlonayOa4rFYn4qrI7fWxsL37KkBfFjw/WwNoDWrNr74593Q4Cr4I8P20xZ0UysDi2EWFYoFD7krA6Hw3Eoq2P58uV3xnH8vaz9aABAa+3mlStXttTT6kgOpLBtfxG0IuKmzNYGCnmAVPS714gvboNALE2sjWkr0BNPGQohbuzs7FzcCFfR4XDAjLA6OOcXG2P24/j5uTQraTTGGCnl4uHh4U8li8K61JvtEPBVAGb36P5PzEPeMZLS2gAAkoCgLQ0rqy+5eGBAbYduOtS/d6rbDrUDLMdLKTdO9e6qw+GAGWt1RFH0SyK6gXOe2ergnF/m+35Qj0WhTayNbyx6S2Ee51cMk9aY0toAAGpF5KNEN5z9/E//cwsAL0+wNqa7QP/e6pBSrnzssccudFaHw+GAQ1sdG5VS27NaHYwxzhi7a/ny5fOzZHXUsja+uSg3hwHeTQBeemvDUtu4tVH5++f/4/ZtEIi/BzCHO4kD01Cka1bH7YVC4SRndcxsGGPN+kLGWMOCcxxQD6sDjDHnGmNeqoPV8caxsbEbslgd462N0IyCWTcX+SlprQ0LYAUwq8G+rDQ7v2ZtHK6PM12bdjWro81auxkAlgZBwGtfiANmQpSnEUJwrfX7rbWPIyInItOM77W1tXV38oM37puDGWd19Pf3P5PP5z/S2tp6ZxzHJrnpQhqrQwhxdVdX10NRFPVONpZ03NqI9Jb2vz69hcFHsxxIGd8YlOJ32nzsfb/90S/GNwbDw0bhimlcdXGttZZSdvu+f0UURRtmUK6y4w+F+pfVavWpmfJ23Tc2M62OKIru8X3/3VLKtyulDGOTL4yMMbTWMiLa3NnZecrQ0JCq5W4fqbXxzUW5ObE1mxigJSBkwFJZG/NQiBeN/t7CN86/c9vuQCyFI8spx2l+NObGGMM5X+f7/usHBgac1THzCnQbAGAul5PJ9dNUr2Qj2rU4ZrjVAQCWiC4lon2J1UEZrI7XCiFum0xWR83aGAV10zwu3jCSobUhAUETHdBIlyyNIp1YG9B0BTqxOgARjwOAL05XsImjfiAiAQCdfPLJlPxomupVLpfJrZxhtmR1/MoYc70QInXi3QSr4xLf95cdiaRgAXApRPqBhW/5SwG4+mWriWWyNjgfI7P27OeefOpw1kajC/TErI7lzz333Aed1eFwOODQVscdY2NjW+tgdTBEvCMIglcdzurYntRFgXB/C+PHGGstS/FURmBpDuP8RdLbV+1+cuN41sbkngSwQRYAKqU0In6mWCy+Nmncu9W0w+GAg60OpdS5xpjhjFaHFkK83hiz7k9ZHeObd6C/vvDNl89B0fWSNWPJulpP5mXBagnMaKBhEnx1DwBOjBFt6gJdu6txzlsTqwNcVofD4Xglq+Pxxx//v1rrq+uR1SGEuLJQKHS/0gGWJEbUhAvffNo8LjYgAJuLvGUuCj4XhZjMaw5ycRz35CjZa89+duBX3RAgm0RrA6bb4vgTVkfR9/0PR1H0OWd1OByOQ1gd9xWLxbOklGdktDoAETfncrk3DQ0Nxf+/1RECAFiG2CmAffuAUTEAE5Nd9Vpg1MoQf8vUID7/uru3wOv4kSh1TVWgD7I6bgiC4N+iKPpZo0eoOxwOaEarAxDxUmvtE4h4XLJpiCmtjpPa2to+G0XRJRPrzarkVN97d/1oPQCsr8/b/2Gm/7eoo2/K0lodQoj5xpg7SqXSigkJVG4n3uFw1KwOGUXR/y4Wi9cJIe5SSukkvS6NpKA55xfl8/kHwzB85OBFoQVg2yHg2zO+71Og3b5ShOi0F2jGGEt6QyztsFnP85bu2rXrQ5VKZYNbRTscDngFqyOKort93z9LCPF2rXWqVkdSpxjn/IudnZ2nAcALExeF4y2NSDfDvxuzZjJYa0eJ6H8hIsviKiZWx6fz+fx/dVaHw+GAV7Y6GBGdR0QHslgdRKSllIuFEDdO7QSWBhZoa63lnHuMsTXGmJ1CCMw4V6wFEb8CAMxZHQ6HA/7Y6sC+vr7nrLVX1Mnq+JDv+8uaNase6+E0G2NeAIDLAEAnwSY2g9WRLxaLH4miSCfHiR0Oh6OGCYJA9Pb2blZKPZx1AosdP8Vy/4oVK+ZmiSVt2gKdpNS9ulKpDGit1ycfGGVQ7wwiXlcoFE4ZGBhQ7pShw+GYSM3q0FpfRkR7EJFlyOogIcSJIyMjn09ONeOsKtAJGgBw3759a+I4/k/OOU/5gTFrLTDGjkXEO4MgEPWcK+ZwOGBWWB1BEPD+/v5niGgN5xyzLAoTq+P8fD5/ZrNFT2CdLA4LADQ4OKg45x8AAErbG6qtoqWURWPMFZNJoHI4HHC0bBjqpNVxr1LqO0k/2mSog0wIsTEIgj/r6OiwzbIorOtBlZUrV3rf/e53/933/Zs9z7sujmPNGBMZrI5bfN9/OAzDp5IP0QX8Q8OnqfAgCMSBAwd4EASsCX6oBpwzf1RbHZ7nnae1/jkizkuj+zLGkIiUlPLkOI4/US6XL0mUPj2rCvQxxxyjS6US379//62jo6PvEEK8NaWrWMvq8JKsjkIQBOgmsDQF+5MLV7uPwtFgKDkzsdv3/cs9z/tKMoElTYtCKqWUlPKDxWLxwSiKHmmG8xh1LdAdHR12cHCQPfrooy8VCoVLEDFKPqw0dzWutdae53UWCoV/iqLoVpfV0djFc9K1Osv3/Q7OOTPG2Aau5C0iMiHEd7Zu3brXnT6Fo7kfLaIo+mqS1fGutFkdAMCJyALApiAI3gAAI42+rsRUfGDJnWdnsVj8jJRyTdq72oSJ4GtPP/30h/v7+3/iThk2rCAiEQHnfG1tRlwy6aJhcM5hbGysAAB9pVIJ3XVxdMeSEtGVxpjTEXFBxqyO1yilNoZheF6j6w1O0V2NgiAQJ5xwwg1xHP+Ec55WvWPjWdkwj3N+dy6Xk87qaCxaa6OU0o1+aa3jZI/DPVE5KAgCXq1W/w8RfTyr1aG11kKIcwqFwjsbbXXgVCZQhWFIjLFzGGM67WNCMrLGeJ6Xb2tru9pZHY3fJGSMiUa/AEAwxkRyA3e4VbTO5XKyUqlsUkp9K4vVYa3F5HzHBt/3FzTS6sCpdhV7e3t/oJT6pOd53FqrM2Z13NTV1fUml9XhcDjgjwOVTFJILzDG7E9acDbl6WgjhPhLxtgny+UyNWpRiFOtQJVKJT46OvpprfUPMtzValkdkog2AwCUSiW3cnI4HAdbHVipVPZYay9Nhs2mfXIXSVbHhV1dXWc0qtUx1XcF29HRYQcGBl5WSn3QWjuWMavDCCH+1vf9khs263A4DmV1VCqVB+I4/nqGALfaStpaazctWbLk2EZkdUz5sj15POD9/f1PENGnMmZ1IBERY+yuZcuWvToMQ+taHQ6HY0L/mLW3t9vly5fPZ4y9mYgsq2lHKeojEZEQYqGU8guNyOrAabqr1ayOG5VSTyaPHpRyAovlnB8/Ojp6LwBQLpdzq2iHwwEAAN3d3TwMQzM6OvpZKeWpRERZ6tyE6Il/LBQK757uJ3eczrliYRgSEX3AWqsyWB21CSzvKhQKH6hNWnCXpsNxdFMqlXgURbpQKJwhhLgg0TB5PVblidXx+dNOO21h8uTOZlOB/r3VUa1W/0NrfaPneRwAVIbeEAkhbg2C4MQkj8G1OhyOoxcGALBs2bJXc87vSjYH6xUGV7M6TvI87+baZuSsKtAA41ZHEATCGPNZpdQTnHOZ1uogIouIi4jodgCwbgKLw3H0ksvlRBiGZmxs7FNCiJOMMSbNUNkjsDrO933/HdPV6pjuoma7u7tp586dI4yxi4loNIvVoZTSUsr3+r5/drOOrHE4HFNLEARiYGBAdXV1nSmEuEAppdKkaB6p1cEYu2/58uXzp8PqmPZVZ83q2LFjxw+11rdkncCSBKPc4fv+gjAMybU6pnyXnKy1ptEvADDWWpNkkTuOUnp6erC9vd0GQfAqa+2XiAistVO1J1WzOtrHxsbunA6rAxvkKlIQBGLFihU3xXH8gyxWR9K8fxUA3AcA1lkdMNUBRSiE4I1+cc6lEILDFAR+OWYO27dvxzAMjTHm81LK1xCRyaDVHfGikHN+tu/7753qVkejLm7b3t5uy+Wy7erqOtda+0Sy28rSxpJKKd/p+/55lUplU7OEbc+2xTNjjBljfswYewEaHMPIGCMiQgDYDzAedeu+IjjqrI0wDLXv++8QQpyjlNJT0do4xMLQIuLngiCohGE4NFUDRUQT5Lj+uFgslqWUNyulFADItFYHIt5SKBS2RlH0rJvAUv/WRpJKuLq3t/fxZnt/5XLZfddHF6yjo8P6vr+AMXanHQencPF8cL3Rnuf9F631rQBwbnKzmDUraAD4g9XR1tb2uZdeeum/c85PSzmBBYnISCkXWmvXA8BZbgLL1GCMmdvT04O7du3iixYtMk1QmK0L6oej0tool8vK9/1PSylPTDYGJUzfE5yI41hLKc/xff+hMAwfmors6Eb372x3dzeVy2Xt+/5FRPT9JEJy0scza70hz/Pe5fv+P0ZR9M+lUokPDQ25q7mOICIlG73snnvucTdABzTC2oiiSBUKhXdKKc9N++Rdq0FpTYzakztj7F7f9yMAeLHerT9shkfTUqnEK5XKk0T0CSGEAACTJTsaETe+7W1vWxiGIe3Zs8dZHQ7HLFojdHd3U2dn5/GIeI8xJtNCM+OGIhKRFUK8mjF211RYHdgkCVSUJFDdqpR6IkssKREBIs6P43gTANgFCxa4Au1wwKzZGGTlcpmEEBuEECcQkUm5AraMMbDWjiS1xma0Olb5vv8Ptb21WVWgIbE6kg/p3OQAi80QS6qllGcUi8XVURSNusva4Zg11obJ5/N/I4R4n9Zapz0taK01nHOw1v4PALhPCMEyxJLWrI7PdHZ2/nk9oyewyXJceaVSGSSiHimlAACdpTeEiDf7vn9ycod1frTDMXNhQ0NDbPHixS2c83tr1kaa1bO1VksphVLqXyuVykNa648bY/akncCSDJslIcSfe573KQCw9Roogs02VywIArFv377Px3HclyGrA5OsjgWMsY3j34l1O/0Ox8xdPWMURfqEE05YK6V8S7I5h2l0UURkxpg9nPOLgyAQO3fu3AcAqzMMtwbGGE+yOt5XLBbfU68DLNiEea40ODgYW2svstaOJE8PabM6jOd5ZxYKhXcCwN7pcCQdDsfUtDaKxeJ/Q8Q1yYGUtLWLOOeciC6Noui3yTFxsWPHjm8qpTYn0RM6QxQyAcCXOjs7j6/HsFlsxgMHpVKJV6vVnxpj1mW0OpjWmhhjdwPAqePZ3S6rw+GYaa2NIAhaAeB+xhhmaG2YpLXxL5VK5RtBEIgwDE1yXgKVUtcaY57hnPOUh9xYYnUcJ4T4Uj2GzWKTzhWrWR23KaV2ZrA6kIiQMbYIEfPGGKhnBKHD4YApP5ASRZHWWl8vpfwrItIZWxu/McZcUdP1aqvqIAjw+9///m4i+kjahM2JKZtCiLOKxeL7srY6mrVY2dqHZ4w5z1r7cpYPzfWgHY6Z2doYGBhQxWJxiZTyGqWUhvTOM3HO0Rjz4f7+/qEgCHBiPEAURTqXy8lKpfINrfUDSYBb6vMYyWG72wqFwklDQ0Msba1t2tVkuVymIAh4f3//z4wx10spOaS0OtKEMDkcjsa3NlauXNkC40mVLXWwNv6lWq1uyeVy8pXC1AYGBnTy1P1BrfVuREx7KhCTOYaLAGBdIj/MrgI90eoYGRnZqJSqZLA6HA7HDLQ2hoeHe6SUpyYZPVlaG7u11pcCACaF+BX/81KpxPr6+g4AwAWcc0xrdSCiiONYJ7GkQdqBIjgDpvTSwMCA0lpfmLQ6XLvC4TgKrI2urq6/5ZxfWw9rwxhzSaLT/clWae0kYG9v77eVUvd5npfa6rDWMkRsRcQvLFmy5Ng0E1iavkDXrI5aqyOL1eFwOGbG8NdcLjfHWrspOaWX1dr4WrVafTA5gk1H8ORem8z0cWPMr9NaHbVTzUKIU1taWtbWDuPNqgI98a5WqVQ+p7WuZLA6HA4HNP/w17a2thuklKcYY7JYG0hEzwLA1QdZG4dddQdBgJVKZY/W+pqMVoeI41gj4j8Vi8X8ZFsdM0Y5Sz5cZq29gIiGM1odDoejSa2NIAg6hRBXZ7U2EJER0dWVSmVPLWQJJrn/Va1WH1RKfTWr1ZH8z80dHR3eZFodM6ZA16yOSqXyVB2sDkfaq358zBQ+/fTTmFw/TfXq6elBZ+zM7AMpxpgvW2u9rNaG1vrrvb29/zOXy8k0QfpRFJlSqcSFEJcaY3ZlsTqMMUYIsfi44467bTKtjhl1aKN2VxNCfCGO4x1CCGd1TP8swBEAoIGBAZX05ZrqlayS3JMVzLgQfp4cSLnR87w3GWMyWRta6+dbW1sPZ20cSZg/RFE0TETnZ7E6aln1nPNL8/n80iNtdcy4icjJBBbq6upabYz5IWOsJc0EFkfqAr3Y9/19iMiTLN6moqWlBRhjux977LGGD7Z1TG74axAEnQBwTWJt8AzWhojj+KLkGuBZZpNOmJ36Xd/37/E876I4jtMMp2XWWkBEIYT4wvLly/MAMHy4a3TGFeia1RGG4S98318jpVyfsVflOMId6eSo/D/X7oVJPCM002BbAMDR0dGLAeCe2qrMfXvNb22sWLFi7ujo6Jc55ywZ/pqqteF5nojjeHO1Wv1WUlh1HZ7cCQBwbGxsDSIu45yfnCZNL/kNac/zOsbGxq4Pw/Ajh3uPMzKXYoLVsUFrHTmrY9oLYbO+KFHk3aoZZpa1MTIysk5K+aaM1gbXWj/T0tJyzSStjcOuykulEnviiSf2aq0/zBizyUCRVFaHUkpzzq/J5/PFw7U6ZmxwUM3qEEJcYK094KwOh2NmWhu+7xeEEFdleRJmjBEiAhFdtXXr1r0HZ23Ua1HY19f3TWPM5ixWBwBg0u7YnKT0HdLqmLEFulwuUy6XE9u2bfuVMWatszocjplnbeRyuTmMsS9ba0UWa0MIIZRSX61UKg8dKmujDq0OUyqV+Pz58y/TWv8msToopdWhpZSv1Vp/9k9ZHTM6ejNxJsWiRYvuiON4W2J1uCLtcMDMsDbmzJlzk5Ty9XWwNn5jrf0QALAM1sYRWR0PP/zwy0R0XmJ12Azh/kYIcXGhUFhxqFbHjM9GjqKIEsdxtTFmuDbA0f0EHI7mbW1EUaQLhYKPiFdmzdpIjKILk5AjnMpWZ63VUa1WH9Va35khq4NZaxkAcM75hiAIXvVKE1hmQ3g9AQCvVCpPE9G1QggOLqvD4WhqayOfzx+DiPdlzNqoHUj5crVa/U6StWGmY1EIANjW1nadUuoXaWcZJsOttRDijUS0rnYYb7YVaACAmtVxh9Z6q5TSWR0OBzSvtcE5LyetjbSr51pK3dNa648CAEZRNF2/eSqVSuyRRx7Zp7W+eoLVYdNmdXDOrywUCt0HtzpmzfinmtUBABcaY/Y7q8PhgGbrO4tkQkoX5/wKpZSCdNaGtdYSY8waY67auXPnviQQ30636tvf3/9tY8x9idVBWSawIOLmzs7OtolPGrOmQNceD3p7e39NRGuc1eFwNOeBFADYZK3l1lqeJUbUGLO5Wq1+a6qsjSO1OhDxCqXUs5xzzGB1GCHESUKI2ydaHbNqgGotq2PZsmV3x3H8mLM6HI7msjZGR0dvkVKenNbaqKXUGWOebW1tvTxj1gbUw+qIomiUiM5BRJbV6uCcry4UCmfUatmsm3AdRRGVy2Uyxqw2xuxNjoy6VofDAY21NnzfDxDxsizWhrWWOOdca7360UcffanReSsTDrBs01pv9DyPE1EmqwMR1/u+f1x7e7vFWXg9UNIbesYYc7fnea7V4XA0sLXR0dFhlyxZcixj7F7GGGSZkOJ5nlBK3dPX1/fIdFkbR9Lq6OnpQWttj9b6qURSSG11SClfxxhbF4ahmY0FGqIoMkks6S1xHP/IDZt1OBrX2iiXy+R53iellIszWhuotf455/zaabY2DnvvGBwcZJVK5XfW2suttWNpJYXE6jCIeEVXV9eZOEuvC9vd3U1Jjuvl1toXXavD4Whca0MIcWkcxxoAZMrWhmWMWa31tVEU7Z9ua+NIWx29vb2PGGMeEEJgVquDiL72/wCBlDLlPvIbTAAAAABJRU5ErkJggg==";
+const LOGO_LIGHT = "data:image/png;base64,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";
+
+/* ── Íconos ── */
+const P_ = {
+  "Financiamiento":"M3 7h18v10H3zM12 9.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5M6 10v4M18 10v4",
+  "Liquidez y tesorería":"M12 3.5s6 6.4 6 10.8a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5z",
+  "Renta fija":"M5 20V11M12 20V5M19 20v-6M3 20h18",
+  "Renta variable":"M3 17l6-6 4 4 8-8M15 7h6v6",
+  "Cobertura":"M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z",
+  "Internacional":"M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M3 12h18M12 3c3.2 3.3 3.2 14.7 0 18M12 3c-3.2 3.3-3.2 14.7 0 18",
+  "Inversión a medida":"M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4",
+  "Planificación patrimonial":"M4 11l8-7 8 7v9H4zM10 20v-5h4v5",
+  "Eficiencia impositiva":"M19 5L5 19M7.5 5.5a2 2 0 1 0 0 4a2 2 0 1 0 0-4M16.5 14.5a2 2 0 1 0 0 4a2 2 0 1 0 0-4",
+  "Comercio exterior y FX":"M4 8h14l-4-4M20 16H6l4 4",
+  "Ejecución y acceso a mercado":"M13 3L5 13.5h6L10 21l8-10.5h-6z",
+  _sol:"M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",
+  _cli:"M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5",
+  _sim:"M6 3h12v18H6zM9 7h6M9 11h1M12 11h1M15 11h0M9 15h1M12 15h1M15 15v3",
+  _prop:"M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6",
+  _ges:"M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M16 4v4M10 10v4M18 16v4",
+  _search:"M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14M20 20l-4-4",
+  _dl:"M12 4v11M7 10l5 5 5-5M5 20h14",
+  _wa:"M4 20l1.3-4A8 8 0 1 1 8 19z",
+  _calc:"M6 3h12v18H6zM9 7h6M9 12h6M9 16h3",
+  _plus:"M12 5v14M5 12h14", _check:"M5 12l5 5 9-10"
+};
+const ico = (k, cls) => `<svg class="ico ${cls||""}" viewBox="0 0 24 24" aria-hidden="true"><path d="${P_[k]||P_._sol}"/></svg>`;
+
+/* ── Diccionarios ── */
+const UNI = {"Banca Corporativa":"BC", "Banca Privada":"BP", "Financial Advisors":"FAs", "Mercado de Capitales":"MdC"};
+const TIPO = {persona:"Persona humana", pyme:"Empresa pyme", grande:"Empresa grande", fa:"Cliente de FA"};
+const PERFIL = {conservador:"Conservador", moderado:"Moderado", agresivo:"Agresivo"};
+const PERFIL_MAX = {conservador:2, moderado:3, agresivo:5};
+const HORIZ = {corto:"Menos de 1 año", medio:"1 a 3 años", largo:"Más de 3 años"};
+const OBJ = {preservar_usd:"Preservar capital en dólares", renta:"Generar renta", crecimiento:"Hacer crecer el capital", cobertura_inflacion:"Cubrirse de la inflación", cobertura_devaluacion:"Cubrirse de una devaluación", financiamiento:"Conseguir financiamiento", tesoreria:"Ordenar la tesorería", eficiencia_impositiva:"Eficiencia impositiva", sucesion:"Planificar la sucesión", internacional:"Diversificar afuera", cobertura_precios:"Cubrir precios o posiciones"};
+const EVT = {excedente_liquidez:"Tiene liquidez sin invertir", necesita_financiamiento:"Necesita financiamiento", vende_a_grandes:"Cobra con cheques o factura a grandes empresas", nomina:"Tiene empleados en relación de dependencia", venta_empresa:"Vendió o va a vender su empresa", herencia:"Herencia o cambio familiar", activos_eeuu:"Tiene activos en EE.UU. a su nombre", agro:"Actividad agropecuaria", impuestos_proximos:"Vencimientos fiscales relevantes", importa_exporta:"Importa o exporta"};
+const NEEDS = [
+  {k:"fin", label:"Financiarse", icon:"Financiamiento", objs:["financiamiento"]},
+  {k:"liq", label:"Rentabilizar liquidez", icon:"Liquidez y tesorería", objs:["tesoreria"]},
+  {k:"renta", label:"Generar renta", icon:"Renta fija", objs:["renta"]},
+  {k:"usd", label:"Dolarizar e invertir afuera", icon:"Internacional", objs:["preservar_usd","internacional"]},
+  {k:"cob", label:"Cubrirse", icon:"Cobertura", objs:["cobertura_inflacion","cobertura_devaluacion","cobertura_precios"]},
+  {k:"pat", label:"Ordenar el patrimonio", icon:"Planificación patrimonial", objs:["sucesion","eficiencia_impositiva"]}
+];
+const CAT_ORDER = ["Financiamiento","Liquidez y tesorería","Eficiencia impositiva","Comercio exterior y FX","Renta fija","Renta variable","Cobertura","Internacional","Ejecución y acceso a mercado","Inversión a medida","Planificación patrimonial"];
+const PATRI = [["", "Sin dato"], ["50000", "Hasta USD 100 mil"], ["300000", "USD 100 mil a 1 M"], ["1500000", "USD 1 M a 3 M"], ["5000000", "Más de USD 3 M"]];
+const RISK_TXT = ["", "Muy bajo", "Bajo", "Medio", "Medio alto", "Alto"];
+const LEYENDA = "NEIX S.A. ALyC Propio registrado bajo el N° 145 de la CNV y Agente de Colocación y Distribución Integral de FCI registrado bajo el N° 14 de la CNV. Material informativo: no constituye oferta ni recomendación.";
+
+/* API de tenencias SIMULADA. En producción: NEIX Connect por número de comitente. */
+const API_DEMO = {
+  "10234": {nombre:"Familia Etchart", tipo:"persona", perfil:"moderado", tenencia:[
+    {activo:"GD30 · Bono soberano USD", tag:"soberanos", usd:182400}, {activo:"ON YPF 2027 · USD", tag:"on", usd:118900},
+    {activo:"CEDEAR SPY", tag:"cedears", usd:61250}, {activo:"Fondo offshore renta fija global", tag:"internacional", usd:40000}, {activo:"Caución colocadora ARS", tag:"caucion", usd:24800}, {activo:"FCI money market ARS", tag:"fci", usd:15300}]},
+  "20871": {nombre:"Metalúrgica del Plata S.A.", tipo:"pyme", perfil:"conservador", tenencia:[
+    {activo:"FCI money market ARS", tag:"fci", usd:221500}, {activo:"Caución colocadora ARS", tag:"caucion", usd:89700}, {activo:"Bono dólar linked", tag:"dl", usd:64000}]},
+  "31555": {nombre:"Lucía Mendizábal", tipo:"persona", perfil:"agresivo", tenencia:[
+    {activo:"AL30 · Bono soberano USD", tag:"soberanos", usd:41200}, {activo:"Acciones GGAL · PAMP · YPFD", tag:"acciones", usd:33800}, {activo:"FCI renta fija ARS", tag:"fci", usd:9600}]}
+};
+
+/* ── Estado ── */
+const blankCliente = () => ({comitente:"", nombre:"", tipo:"", perfil:"", horizonte:"", patrimonio:"", objetivos:[], eventos:[], tenencia:null, consultando:false, apiErr:""});
+const S = {
+  productos: [], byId: {}, vals: {}, imp: null,
+  db: null, uid: null, canEdit: false, dl: null, assets: null, user: null, notas: [], names: {},
+  loading: true, slow: false, dbMissing: false,
+  view: "interno", persona: "Persona humana",
+  q: "", fUnidad: "", fCat: "", fEstado: "", fNeed: "",
+  cliente: blankCliente(),
+  prop: {cliente:"", asesor:"", contacto:"", mensaje:"", items:[]},
+  sim: "caucion",
+  simv: {
+    caucion:{modo:"colocar", monto:50000000, tna:32, dias:7, arancel:0.5, garantia:100000000, aforo:85},
+    descuento:{vn:20000000, dias:90, tna:38, comision:0.6, aval:false, sgr:4},
+    fal:{emp:120, sal:1800000, tipo:"pyme", fondo:"I", aj:25, rot:8, ant:5, meses:36}
+  }
+};
+const LS = "neix-hub-v2";
+try { const sv = JSON.parse(localStorage.getItem(LS) || "null"); if (sv) { if (sv.prop) S.prop = Object.assign(S.prop, sv.prop); if (sv.cliente) S.cliente = Object.assign(blankCliente(), sv.cliente, {consultando:false}); if (sv.persona) S.persona = sv.persona; } } catch(e) {}
+function persist(){ try { localStorage.setItem(LS, JSON.stringify({prop:S.prop, cliente:S.cliente, persona:S.persona})); } catch(e) {} }
+
+/* ── Utilidades ── */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = (n, d=0) => (isFinite(n) ? Number(n) : 0).toLocaleString("es-AR", {minimumFractionDigits:d, maximumFractionDigits:d});
+const ars = n => "$ " + fmt(n);
+const usd = n => "USD " + fmt(n);
+const todayISO = () => new Date().toISOString().slice(0,10);
+const daysTo = iso => iso ? Math.round((new Date(iso+"T12:00:00") - new Date(todayISO()+"T12:00:00"))/864e5) : null;
+const fdate = iso => { if (!iso) return "Sin fecha"; const [y,m,d] = iso.split("-"); return `${d}/${m}/${y}`; };
+function toast(msg){ const t = document.createElement("div"); t.className = "toast"; t.setAttribute("role","status"); t.textContent = msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 2600); }
+async function copy(text){ try { await navigator.clipboard.writeText(text); toast("Copiado al portapapeles"); } catch(e) { const ta = document.createElement("textarea"); ta.value = text; ta.className = "input"; ta.style.cssText = "position:fixed;inset:20% 10% auto;height:40%;z-index:50"; document.body.appendChild(ta); ta.select(); toast("Seleccioná y copiá el texto"); ta.addEventListener("blur", ()=>ta.remove()); } }
+const risk = n => `<span class="risk" title="Riesgo ${esc(RISK_TXT[n]||"")}" aria-label="Riesgo ${esc(RISK_TXT[n]||"")}">${[1,2,3,4,5].map(i=>`<i class="${i<=n?"on":""}"></i>`).join("")}</span>`;
+const units = p => p.unidades.map(u=>`<span class="utag" title="${esc(u)}">${UNI[u]||esc(u)}</span>`).join("");
+
+const blobUrl = id => "/_blob/" + id;
+async function dlPdf(id){
+  const p = S.byId[id]; if (!p || !p.onePager) return;
+  if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
+  let buf = null;
+  try { const r = await fetch(blobUrl(p.onePager.pdf), {credentials:"same-origin", cache:"no-store"}); if (r.ok) buf = await r.arrayBuffer(); } catch(_) {}
+  const ok = buf && buf.byteLength > 1000 && new TextDecoder().decode(new Uint8Array(buf, 0, 5)) === "%PDF-";
+  if (!ok) { toast("Abrimos el PDF original en otra pestaña"); const l = document.createElement("a"); l.href = blobUrl(p.onePager.pdf); l.target = "_blank"; l.rel = "noopener"; document.body.appendChild(l); l.click(); l.remove(); return; }
+  try { await S.dl.save({filename: p.onePager.archivo || (p.nombre+" - Neix.pdf"), data: new Blob([buf], {type:"application/pdf"})}); toast("PDF listo"); }
+  catch(e) { if (e && e.code === "declined") return; toast(e && e.code === "rate_limited" ? "Ya hay una descarga pendiente" : "No pudimos descargar el PDF. Usá Abrir PDF."); }
+}
+function estadoDe(p){
+  const v = S.vals[p.id];
+  const vence = v && v.vence ? v.vence : p.vence;
+  const d = daysTo(vence);
+  if (d !== null && d < 0) return {k:"vencida", txt:"Vencida", cls:"crit", vence, d, v};
+  if (v && v.estado === "validado") return {k:"validado", txt: d !== null && d <= 30 ? "Vence pronto" : "Validada", cls: d !== null && d <= 30 ? "warn" : "ok", vence, d, v};
+  return {k:"a_validar", txt:"A validar", cls:"warn", vence, d, v};
+}
+
+/* ── Matcher ── */
+function evaluar(p, c){
+  const m = p.match, r = {p, score:0, why:[], cond:[], no:[], tiene:false};
+  const held = (c.tenencia||[]).map(h=>h.tag);
+  if (m.tenencia.some(t=>held.includes(t))) r.tiene = true;
+  if (c.tipo && !m.tipos.includes(c.tipo)) r.no.push("Pensado para " + m.tipos.map(t=>TIPO[t]).join(", ").toLowerCase());
+  if (c.perfil) { const gap = p.riesgoNivel - PERFIL_MAX[c.perfil]; if (gap >= 2) r.no.push("Riesgo alto para un perfil " + PERFIL[c.perfil].toLowerCase()); else if (gap === 1) r.cond.push("Riesgo por encima del perfil: usar como parte menor"); }
+  if (m.minimoUSD && c.patrimonio && Number(c.patrimonio) < m.minimoUSD) r.cond.push("Requiere desde " + usd(m.minimoUSD));
+  c.objetivos.forEach(o => { if (m.objetivos.includes(o)) { r.score += 2; r.why.push(OBJ[o]); } });
+  c.eventos.forEach(e => { if (m.eventos.includes(e)) { r.score += 3; r.why.push(EVT[e]); } });
+  if (c.horizonte && m.horizonte.includes(c.horizonte)) r.score += 1;
+  return r;
+}
+function resultados(){
+  const c = S.cliente, out = {rec:[], pos:[], tiene:[], no:[], cross:[]};
+  S.productos.map(p => evaluar(p, c)).forEach(r => {
+    if (r.tiene) out.tiene.push(r);
+    else if (r.no.length) out.no.push(r);
+    else if (r.score >= 4 && !r.cond.length) out.rec.push(r);
+    else if (r.score >= 2) out.pos.push(r);
+  });
+  out.rec.sort((a,b)=>b.score-a.score); out.pos.sort((a,b)=>b.score-a.score);
+  const shown = new Set([...out.rec, ...out.pos, ...out.tiene].map(r=>r.p.id)), cross = {};
+  out.tiene.forEach(r => r.p.interno.relacionados.forEach(id => { const q = S.byId[id]; if (!q || shown.has(id)) return; const e = evaluar(q, c); if (e.no.length || e.tiene) return; (cross[id] = cross[id] || {r:e, from:[]}).from.push(r.p.nombre); }));
+  out.cross = Object.values(cross);
+  return out;
+}
+
+/* ── Router ── */
+function route(){ const h = (location.hash || "").slice(1); return (!h || h === "catalogo") ? "soluciones" : h; }
+function go(h){ if (location.hash.slice(1) === h) render(); else location.hash = h; }
+window.addEventListener("hashchange", () => { render(true); window.scrollTo(0,0); });
+
+/* ── Render ── */
+function render(anim){
+  const r = route(), app = $("#app");
+  const sec = r.startsWith("p-") || r.startsWith("editar-") ? "soluciones" : r;
+  document.querySelectorAll("[data-sec]").forEach(a => a.setAttribute("aria-current", a.dataset.sec === sec ? "page" : "false"));
+  document.querySelectorAll("[data-admin]").forEach(a => a.hidden = !S.canEdit);
+  document.querySelectorAll(".pcount").forEach(c => { c.textContent = S.prop.items.length; c.hidden = !S.prop.items.length; });
+  let html;
+  if (S.dbMissing) html = stateMsg("Abrí el Hub con tu cuenta de Neix", "Las fichas viven en una base compartida. Iniciá sesión en claude.ai con tu cuenta de la organización para verlas.");
+  else if (S.loading && !S.productos.length) html = stateMsg(S.slow ? "No pudimos conectar con la base de fichas" : "Cargando productos", S.slow ? "Revisá tu conexión. El Hub se actualiza solo cuando la base responda." : "Un momento.");
+  else if (!S.productos.length) html = stateMsg("Todavía no hay fichas cargadas", "Marketing las carga desde Gestión.");
+  else if (r === "soluciones") html = vSoluciones();
+  else if (r.startsWith("p-")) html = vProducto(r.slice(2));
+  else if (r.startsWith("editar-")) html = vEditar(r.slice(7));
+  else if (r === "cliente") html = vCliente();
+  else if (r === "simuladores") html = vSimuladores();
+  else if (r === "propuesta") html = vPropuesta();
+  else if (r === "presentaciones") html = vPresentaciones();
+  else if (r === "gestion") html = S.canEdit ? vGestion() : stateMsg("Gestión es para el equipo de Marketing", "Si necesitás cambiar una ficha, dejá una nota al validarla.");
+  else html = vSoluciones();
+  app.innerHTML = `<div class="${anim?"view":""}">${html}</div>`;
+  footer(r);
+  if (r === "simuladores") calcSim();
+  if (r === "propuesta") refreshPreview();
+  if (r === "presentaciones") refreshDeck();
+}
+function footer(r){
+  const f = $("#xfoot"); if (!f) return;
+  const p = r.startsWith("p-") ? S.byId[r.slice(2)] : null;
+  const corp = p && p.unidades.includes("Banca Corporativa") && !p.unidades.includes("Banca Privada");
+  const mail = p ? (corp ? "bancacorporativa@neix.com.ar" : "bancaprivada@neix.com.ar") : "bancaprivada@neix.com.ar · bancacorporativa@neix.com.ar";
+  f.innerHTML = `<div class="in"><div class="top"><div><h2>Hablemos.</h2><img src="${LOGO_LIGHT}" alt="NEIX"></div>
+   <dl><div><dt>Teléfono</dt><dd>(011) 4859-1552</dd></div><div><dt>Email</dt><dd>${esc(mail)}</dd></div><div><dt>Oficinas</dt><dd>Don Francisco 3345, piso 5, San Fernando</dd></div><div><dt>Web</dt><dd>www.neix.com.ar</dd></div></dl></div>
+   <p class="legal">${esc(LEYENDA)}</p></div>`;
+}
+function stateMsg(t, d){ return `<div class="page-head"><div><div class="eyebrow">Hub de Productos</div><h1>${esc(t)}</h1><p>${esc(d)}</p></div></div>`; }
+
+/* ── Productos ── */
+function filtrar(){
+  const q = S.q.trim().toLowerCase(), need = NEEDS.find(n=>n.k===S.fNeed);
+  return S.productos.filter(p => {
+    if (S.fUnidad && !p.unidades.includes(S.fUnidad)) return false;
+    if (S.fCat && p.categoria !== S.fCat) return false;
+    if (S.fEstado && estadoDe(p).k !== S.fEstado) return false;
+    if (need && !p.match.objetivos.some(o=>need.objs.includes(o))) return false;
+    if (q) { const hay = (p.nombre+" "+p.cliente.titular+" "+p.categoria+" "+p.interno.perfiles.join(" ")+" "+p.unidades.join(" ")+" "+ventajas(p).map(v=>v.join(" ")).join(" ")).toLowerCase(); if (!hay.includes(q)) return false; }
+    return true;
+  });
+}
+function vSoluciones(){
+  const list = filtrar();
+  const cats = CAT_ORDER.filter(c=>S.productos.some(p=>p.categoria===c)).concat([...new Set(S.productos.map(p=>p.categoria))].filter(c=>!CAT_ORDER.includes(c)));
+  const groups = {}; list.forEach(p => (groups[p.categoria] = groups[p.categoria] || []).push(p));
+  const any = S.q || S.fUnidad || S.fCat || S.fEstado || S.fNeed;
+  const nCount = n => S.productos.filter(p=>p.match.objetivos.some(o=>n.objs.includes(o))).length;
+  return `
+  <div class="page-head"><div><div class="eyebrow">Hub de Productos</div><h1>Productos Neix</h1>
+   <p class="muted">${S.productos.length} productos de Banca Corporativa, Banca Privada, FAs y la Mesa, con la versión para el cliente, el playbook interno y cómo se opera.</p></div>
+   <a class="btn primary" href="#cliente">${ico("_cli")}Buscar para un cliente</a></div>
+  <div class="search">${ico("_search")}<input class="input" id="q" type="search" placeholder="Buscá por producto, necesidad o tipo de cliente" value="${esc(S.q)}" aria-label="Buscar productos" autocomplete="off"></div>
+  <div class="needs" role="group" aria-label="Qué necesita tu cliente">${NEEDS.map(n=>`<button class="need" data-act="fNeed" data-v="${n.k}" aria-pressed="${S.fNeed===n.k}"><span class="ic">${ico(n.icon)}</span><b>${n.label}</b><span class="n">${nCount(n)} productos</span></button>`).join("")}</div>
+  <div class="filters">
+   <div class="frow"><span class="lbl">Unidad</span><div class="chips scroll">${[["","Todas"]].concat(Object.keys(UNI).map(u=>[u, u==="Mercado de Capitales"?"Mesa · Mercado de Capitales":u])).map(([u,t])=>`<button class="chip" data-act="fUnidad" data-v="${esc(u)}" aria-pressed="${S.fUnidad===u}">${esc(t)}</button>`).join("")}</div></div>
+   <div class="rescount"><span>${list.length} ${list.length===1?"resultado":"resultados"}</span><span class="btn-row">
+
+    ${any?`<button class="btn ghost" data-act="clearF">Limpiar</button>`:""}</span></div>
+  </div>
+  ${list.length ? cats.filter(c=>groups[c]).map(c => `<section class="group"><div class="group-h"><span class="ic">${ico(c)}</span><h2>${esc(c)}</h2><span>${groups[c].length}</span></div><div class="grid">${groups[c].map(card).join("")}</div></section>`).join("") : `<div class="empty" style="margin-top:20px">No hay productos con esos filtros. <button class="btn ghost" data-act="clearF">Limpiar filtros</button></div>`}`;
+}
+function card(p){
+  const e = estadoDe(p);
+  return `<a class="card" href="#p-${p.id}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="units">${units(p)}</span><span class="dot ${e.cls}" title="${e.txt}" aria-label="${e.txt}"></span></div>
+  <h3>${esc(p.nombre)}</h3><p class="tit">${esc(p.cliente.titular)}</p>
+  <div class="foot"><span class="btn-row" style="gap:6px">${p.onePager?`<span class="optag">One pager</span>`:""}<span class="tiny muted">${p.simulador?"Con simulador":""}</span></span>${risk(p.riesgoNivel)}</div></a>`;
+}
+
+/* ── Ficha ── */
+function vProducto(id){
+  const p = S.byId[id]; if (!p) return stateMsg("No encontramos esa ficha", "Volvé a Productos.");
+  const e = estadoDe(p), inProp = S.prop.items.some(i=>i.id===id);
+  const tabs = [["interno","Para el asesor"],["cliente","Para el cliente"],["opera","Cómo se opera"]];
+  return `<div class="p-hero"><div style="min-width:0"><div class="crumb"><a href="#soluciones">Productos</a><span>/</span><a href="#soluciones" data-act="goCat" data-v="${esc(p.categoria)}">${esc(p.categoria)}</a></div>
+   <span class="kicker">${esc(p.categoria)}</span><h1>${esc(p.nombre)}</h1></div>
+   <div style="min-width:0"><div class="units" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px">${units(p)}</div><p class="lead">${esc(p.cliente.titular)}<span>${esc(p.cliente.bajada)}</span></p>
+   <div class="btn-row"><button class="btn" data-act="toggleProp" data-id="${p.id}">${ico(inProp?"_check":"_plus")}${inProp?"En la propuesta":"Agregar a propuesta"}</button></div></div></div>
+  <div class="p-bar"><div class="seg" role="tablist">${tabs.map(([k,t])=>`<button role="tab" data-act="view" data-v="${k}" aria-pressed="${S.view===k}">${t}</button>`).join("")}</div>
+   <div class="btn-row">${p.onePager?`<button class="btn" data-act="dlPdf" data-id="${p.id}">${ico("_dl")}One pager PDF</button>`:`<button class="btn" data-act="dlOnePager" data-id="${p.id}">${ico("_dl")}One pager</button>`}<button class="btn" data-act="copyWA" data-id="${p.id}">${ico("_wa")}WhatsApp</button>${p.simulador?`<a class="btn" href="#simuladores" data-act="openSim" data-v="${p.simulador}">${ico("_calc")}Simular</a>`:""}</div></div>
+  ${S.view==="cliente" ? `<div class="p-grid full"><div style="min-width:0">${clienteView(p)}</div></div>` : `<div class="p-grid"><div style="min-width:0">${S.view==="interno"?playbook(p):operativa(p)}</div>${aside(p,e)}</div>`}`;
+}
+function aside(p, e){
+  return `<aside class="aside"><div class="panel"><h3 class="ph">¿Algo para corregir o sumar?</h3><p class="small muted" style="margin-bottom:12px">Dejale una nota a Marketing sobre esta ficha. Le llega por mail al equipo.</p>
+   <div style="display:grid;gap:8px"><textarea class="input" id="mkNota" placeholder="Ej.: cambió el mínimo, falta un dato, un cliente preguntó por…" aria-label="Nota para Marketing"></textarea>
+   <button class="btn" data-act="notaMkt" data-id="${p.id}">Enviar a Marketing</button>
+   ${S.canEdit?`<a class="btn ghost" href="#editar-${p.id}">Editar contenido</a>`:""}</div></div>
+   ${S.canEdit && p.observaciones.length?`<details class="warnbox"><summary>${p.observaciones.length} pendientes del relevamiento</summary><ul class="clean small">${p.observaciones.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></details>`:""}</aside>`;
+}
+function facts(f){ return `<dl class="facts">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Monto",f.minimo],["Liquidez",f.liquidez],["Dónde opera",f.mercado]].map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`; }
+function clienteView(p){
+  const o = p.onePager; if (!o) return onePager(p);
+  return `<div class="opstrip"><div><b>One pager oficial</b><span>Actualizado ${fdate(o.fecha)}</span></div><span class="btn-row"><a class="btn ghost" href="${blobUrl(o.pdf)}" target="_blank" rel="noopener">Abrir PDF ↗</a><button class="btn" data-act="dlPdf" data-id="${p.id}">${ico("_dl")}Descargar PDF</button></span></div>${onePager(p)}`;
+}
+function onePager(p){
+  const c = p.cliente, f = c.ficha;
+  return `<div class="x1">
+   <dl class="xf">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Dónde opera",f.mercado]].map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+   <section class="xsplit"><h2>Para quién</h2><div class="t"><p>${esc(c.paraQuien)}</p>${c.aTener[0]?`<p class="note">${esc(c.aTener[0])}</p>`:""}</div></section>
+   <section class="xsplit"><h2>De qué se trata</h2><div class="t"><p>${esc(c.queEs)}</p><p class="small"><b style="color:var(--ink);font-weight:500">Monto</b> ${esc(f.minimo)} · <b style="color:var(--ink);font-weight:500">Liquidez</b> ${esc(f.liquidez)}</p></div></section>
+   <section class="xbox"><div><span class="ic">${ico(p.categoria)}</span><h2>Ventajas</h2></div><div class="xben">${c.beneficios.map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div></section>
+   <section class="xsplit"><h2>Cómo funciona</h2><ol class="xsteps">${c.comoFunciona.map(s=>`<li><span>${esc(s)}</span></li>`).join("")}</ol></section>
+   ${p.impuestos.length && S.imp ? `<section class="xtax"><div class="xtax-h"><h2>Tratamiento impositivo</h2><div><p class="small muted" style="margin-bottom:10px">Por instrumento, tipo de persona e ingreso.</p><div class="seg">${["Persona humana","Persona jurídica"].map(x=>`<button data-act="persona" data-v="${x}" aria-pressed="${S.persona===x}">${x}</button>`).join("")}</div></div></div>
+     ${p.impuestos.map(k=>taxTable(k, S.persona, true)).join("")}<p class="tiny muted" style="margin-top:12px">Información orientativa. Consultá tu caso con tu asesor impositivo.</p></section>` : ""}
+   <section class="xsplit"><h2>Lo que tenés que saber</h2><div class="t"><ul class="clean" style="font-size:14.5px">${c.aTener.map(a=>`<li>${esc(a)}</li>`).join("")}</ul><div class="xneix"><div class="eyebrow" style="margin-bottom:6px">En Neix</div>${esc(c.enNeix)}</div></div></section>
+  </div>`;
+}
+function taxTable(k, persona, cliente){
+  const t = S.imp && S.imp.tablas[k]; if (!t) return "";
+  const rows = t.filas.filter(f => !persona || f[0] === persona);
+  const cols = cliente ? [["Ingreso",1],["Ganancias",2],["IVA",3],["Bienes Personales",5],["IIBB CABA",6]] : [["Persona",0],["Ingreso",1],["Ganancias",2],["IVA",3],["Reg. información",4],["Bienes Personales",5],["IIBB CABA",6]];
+  return `<div class="tname">${esc(t.nombre)}</div><div class="tw"><table><thead><tr>${cols.map(c=>`<th>${c[0]}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${r[c[1]]==="Gravado"?`<span class="gr">Gravado</span>`:esc(r[c[1]])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+const ventajas = p => (p.interno.ventajas && p.interno.ventajas.length) ? p.interno.ventajas : p.cliente.beneficios;
+function playbook(p){
+  const i = p.interno, f = p.cliente.ficha, li = a => a && a.length ? `<ul class="clean small">${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : `<p class="small muted">Sin cargar.</p>`;
+  return `<div class="pb">
+   <div class="panel"><h3>Por qué ofrecerlo</h3><div class="vent">${ventajas(p).map(b=>`<div><b>${esc(b[0])}</b>${b[1]?`<span>${esc(b[1])}</span>`:""}</div>`).join("")}</div>
+    <div class="keyfacts">${[["Moneda",f.moneda],["Plazo",f.plazo],["Monto",f.minimo],["Liquidez",f.liquidez],["Opera en",f.mercado]].map(([k,v])=>`<span><b>${k}</b> ${esc(v)}</span>`).join("")}<span><b>Riesgo</b> ${risk(p.riesgoNivel)} ${esc(RISK_TXT[p.riesgoNivel])}</span></div></div>
+   ${i.ingreso?`<div class="cobro"><span class="eyebrow">Cómo cobramos</span><p style="margin-top:4px">${esc(i.ingreso)}</p></div>`:""}
+   <div class="pb3"><div class="panel"><h3>A quién</h3>${li(i.perfiles)}</div><div class="panel"><h3>Cuándo aparece</h3>${li(i.senales)}</div><div class="panel"><h3>Qué preguntar</h3>${li(i.preguntas)}</div></div>
+   <div class="pb2"><div class="panel"><h3>Se combina con</h3><div class="rel">${i.relacionados.map(id=>S.byId[id]?`<a class="chip" href="#p-${id}">${esc(S.byId[id].nombre)}</a>`:"").join("")}</div></div>
+    <div class="panel"><h3>Encaje</h3><dl class="kv"><dt>Clientes</dt><dd>${p.match.tipos.map(t=>TIPO[t]).join(", ")}</dd><dt>Objetivos</dt><dd>${p.match.objetivos.map(o=>OBJ[o]).join(", ")}</dd><dt>Mínimo</dt><dd>${p.match.minimoUSD?usd(p.match.minimoUSD):"Sin mínimo relevante"}</dd></dl></div></div>
+   ${p.impuestos.length&&S.imp?`<details class="fold" style="background:var(--surface)"><summary>Matriz impositiva completa</summary><div class="in">${p.impuestos.map(k=>taxTable(k,null,false)).join("")}<p class="tiny muted" style="margin-top:6px">Fuente: ${esc(S.imp.fuente)}.</p></div></details>`:""}
+  </div>`;
+}
+function operativa(p){
+  const i = p.interno;
+  return `<div class="pb"><div class="panel"><h3>Paso a paso operativo</h3><ol class="steps">${i.operativa.map(s=>`<li><span>${esc(s)}</span></li>`).join("")}</ol></div>
+  <div class="pb2"><div class="panel"><h3>Video o instructivo</h3>${i.video?`<a class="btn" href="${esc(i.video)}" target="_blank" rel="noopener">Abrir material ↗</a>`:`<p class="small muted">Este producto no tiene video propio. Si existe un instructivo, Marketing lo suma desde Editar.</p>`}</div>
+  <div class="panel"><h3>Instructivos generales</h3><ul class="clean small"><li>Apertura de cuenta comitente</li><li>Cómo operar en home banking y app</li><li>Alta de empresas en EPYME</li></ul><p class="tiny muted" style="margin-top:8px">Links a cargar por Marketing.</p></div></div></div>`;
+}
+
+/* ── Editor ── */
+const EDIT_FIELDS = [
+ ["Cabecera",[["nombre","Nombre"],["categoria","Tipo"],["validador","Validador de negocio"],["vence","Revisar antes de","date"],["fuente","Fuente"]]],
+ ["Vista cliente",[["cliente.titular","Titular: qué le resuelve"],["cliente.bajada","Bajada","area"],["cliente.queEs","De qué se trata","area"],["cliente.paraQuien","Para quién es","area"],["cliente.comoFunciona","Cómo funciona (un paso por línea)","list"],["cliente.beneficios","Beneficios (Título | descripción, uno por línea)","pairs"],["cliente.aTener","Lo que tenés que saber (uno por línea)","list"],["cliente.enNeix","En Neix","area"],["cliente.ficha.moneda","Moneda"],["cliente.ficha.plazo","Plazo"],["cliente.ficha.riesgo","Riesgo"],["cliente.ficha.minimo","Monto"],["cliente.ficha.liquidez","Liquidez"],["cliente.ficha.mercado","Dónde opera"]]],
+ ["Para el asesor",[["interno.ventajas","Por qué ofrecerlo (Ventaja | detalle, una por línea). Si queda vacío, se muestran los beneficios del cliente","pairs"],["interno.ingreso","Cómo cobramos (opcional)","area"],["interno.perfiles","A quién (uno por línea)","list"],["interno.senales","Cuándo aparece (una por línea)","list"],["interno.preguntas","Qué preguntar (una por línea)","list"],["interno.operativa","Operativa (un paso por línea)","list"],["interno.video","Link a video o instructivo"],["observaciones","Pendientes del relevamiento (uno por línea)","list"]]]
+];
+const getP = (o, path) => path.split(".").reduce((a,k)=>a==null?a:a[k], o);
+function setP(o, path, v){ const ks = path.split("."); let a = o; ks.slice(0,-1).forEach(k=>{ a[k] = a[k] || {}; a = a[k]; }); a[ks[ks.length-1]] = v; }
+function vEditar(id){
+  const p = S.byId[id]; if (!p) return stateMsg("No encontramos esa ficha", "");
+  if (!S.canEdit) return stateMsg("Solo Marketing edita las fichas", "Si ves algo para corregir, dejá una nota al validar la ficha.");
+  return `<div class="crumb"><a href="#gestion">Gestión</a><span>/</span><a href="#p-${id}">${esc(p.nombre)}</a></div><div class="page-head"><div><div class="eyebrow">Editar ficha</div><h1>${esc(p.nombre)}</h1></div>
+  <div class="btn-row"><a class="btn" href="#p-${id}">Cancelar</a><button class="btn primary" data-act="save" data-id="${id}">Guardar cambios</button></div></div>
+  <form id="editForm" class="stack" onsubmit="return false"><div class="panel"><h3>One pager oficial</h3>${p.onePager?`<p class="small" style="margin-bottom:10px">Cargado el ${fdate(p.onePager.fecha)}: ${esc(p.onePager.archivo||"PDF")}. Subí uno nuevo para reemplazarlo.</p>`:`<p class="small muted" style="margin-bottom:10px">Todavía no tiene el PDF oficial.</p>`}
+   ${S.assets?`<div class="upl"><label class="f" for="up_pdf">PDF del one pager<input class="input" id="up_pdf" type="file" accept="application/pdf"></label><label class="f" for="up_img">Imagen de vista previa (opcional)<input class="input" id="up_img" type="file" accept="image/jpeg,image/png,image/webp"><span class="hint">Una captura del one pager completo. Se muestra en la pestaña Para el cliente.</span></label><button class="btn" type="button" data-act="upOP" data-id="${id}">Subir one pager</button></div>`:`<p class="tiny muted">Solo los editores del Hub pueden subir archivos.</p>`}</div>${EDIT_FIELDS.map(([g,fs])=>`<div class="panel"><h3>${g}</h3><div class="stack">${fs.map(([k,l,t])=>{
+    const v = getP(p,k); let val = v;
+    if (t==="list") val = (v||[]).join("\n"); if (t==="pairs") val = (v||[]).map(x=>x.join(" | ")).join("\n");
+    const fid = "ed_"+k.replace(/\./g,"_");
+    return `<label class="f" for="${fid}">${esc(l)}${t==="area"||t==="list"||t==="pairs"?`<textarea class="input" id="${fid}" data-k="${k}" data-t="${t||""}">${esc(val)}</textarea>`:`<input class="input" id="${fid}" data-k="${k}" data-t="${t||""}" type="${t==="date"?"date":"text"}" value="${esc(val)}">`}</label>`; }).join("")}</div></div>`).join("")}</form>`;
+}
+async function save(id){
+  const p = JSON.parse(JSON.stringify(S.byId[id]));
+  document.querySelectorAll("#editForm [data-k]").forEach(el => {
+    const t = el.dataset.t, raw = el.value; let v = raw.trim();
+    if (t==="list") v = raw.split("\n").map(s=>s.trim()).filter(Boolean);
+    if (t==="pairs") v = raw.split("\n").map(s=>s.trim()).filter(Boolean).map(s=>{ const i = s.indexOf("|"); return i<0 ? [s,""] : [s.slice(0,i).trim(), s.slice(i+1).trim()]; });
+    setP(p, el.dataset.k, v);
+  });
+  p.ultimaRevision = todayISO();
+  const b = document.querySelector('[data-act="save"]'); if (b) { b.disabled = true; b.textContent = "Guardando"; }
+  try { await S.db.doc("productos/"+id).set(p); toast("Ficha guardada"); go("p-"+id); }
+  catch(e) { toast(e && e.code === "permission_denied" ? "No tenés permiso para editar fichas" : "No se pudo guardar. Probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Guardar cambios"; } }
+}
+async function upOP(id){
+  const pdf = ($("#up_pdf")||{}).files?.[0], img = ($("#up_img")||{}).files?.[0];
+  if (!pdf) { toast("Elegí el PDF del one pager"); return; }
+  if (!S.assets || !S.db) { toast("No tenés permiso para subir archivos"); return; }
+  const b = document.querySelector('[data-act="upOP"]'); if (b) { b.disabled = true; b.textContent = "Subiendo"; }
+  try {
+    const a = await S.assets.upload(pdf), i = img ? await S.assets.upload(img) : null, p = S.byId[id];
+    const op = {pdf:a.id, archivo: p.nombre+" - Neix.pdf", fecha: todayISO()}; if (i) op.img = i.id; else if (p.onePager && p.onePager.img) op.img = p.onePager.img;
+    await S.db.doc("productos/"+id).update({onePager: op}); toast("One pager cargado"); go("p-"+id);
+  } catch(e) { toast("No se pudo subir. Revisá el archivo y probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Subir one pager"; } }
+}
+async function notaMkt(id){
+  const el = $("#mkNota"), t = (el && el.value || "").trim(), p = S.byId[id];
+  if (!t) { toast("Escribí la nota antes de enviarla"); return; }
+  if (!S.db) { toast("Abrí el Hub con tu cuenta de Neix para dejar notas"); return; }
+  const b = document.querySelector('[data-act="notaMkt"]'); if (b) { b.disabled = true; b.textContent = "Enviando"; }
+  try { const nid = Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+    await S.db.doc("notas/"+nid).set({producto:id, productoNombre:p?p.nombre:id, texto:t.slice(0,2000), fecha:new Date().toISOString(), autor:S.uid||"", enviada:false});
+    el.value = ""; toast("Nota enviada. Marketing la recibe por mail."); }
+  catch(e) { toast("No pudimos guardar la nota. Probá de nuevo."); }
+  if (b) { b.disabled = false; b.textContent = "Enviar a Marketing"; }
+}
+async function validar(id){
+  if (!S.db) return;
+  const nota = ($("#valNota")||{}).value || "", d = new Date(); d.setDate(d.getDate()+90);
+  try { await S.db.doc("validaciones/"+id).set({estado:"validado", fecha:todayISO(), vence:d.toISOString().slice(0,10), por:S.uid||"", nota:nota.trim()}); toast("Ficha validada por 90 días"); }
+  catch(e) { toast("No pudimos registrar la validación. Pedí acceso al Hub."); }
+}
+
+/* ── Cliente ── */
+function vCliente(){
+  const c = S.cliente, filled = c.tipo || c.objetivos.length || c.eventos.length || c.tenencia, R = filled ? resultados() : null;
+  const sel = (k, map) => `<div class="chips">${Object.entries(map).map(([v,t])=>`<button class="chip" data-act="cset" data-k="${k}" data-v="${v}" aria-pressed="${c[k]===v}">${t}</button>`).join("")}</div>`;
+  const multi = (k, map) => `<div class="chips">${Object.entries(map).map(([v,t])=>`<button class="chip" data-act="cmulti" data-k="${k}" data-v="${v}" aria-pressed="${c[k].includes(v)}">${t}</button>`).join("")}</div>`;
+  const tot = (c.tenencia||[]).reduce((a,h)=>a+h.usd,0);
+  return `<div class="page-head"><div><div class="eyebrow">Cliente</div><h1>¿Qué le ofrecemos?</h1>
+  <p class="muted">Leé su tenencia con el número de comitente, marcá qué busca y el Hub te muestra qué le aplica, qué ya tiene y qué conviene sumar.</p></div>
+  <button class="btn ghost" data-act="resetC">Empezar de nuevo</button></div>
+  <div class="cl-grid"><div class="stack">
+   <div class="panel"><h3>Cuenta comitente</h3>
+    <div style="display:flex;gap:8px"><input class="input num" id="comitente" inputmode="numeric" placeholder="N° de comitente" value="${esc(c.comitente)}" aria-label="Número de comitente"><button class="btn primary" data-act="consultar" ${c.consultando?"disabled":""}>${c.consultando?"Leyendo":"Leer"}</button></div>
+    <p class="tiny muted" style="margin-top:8px"><span class="demo">API simulada</span> Probá con 10234, 20871 o 31555. En producción se conecta a NEIX Connect.</p>
+    ${c.apiErr?`<p class="small" style="color:var(--crit);margin-top:8px">${esc(c.apiErr)}</p>`:""}
+    ${c.tenencia?`<div style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><b>${esc(c.nombre)}</b><span class="num small">${usd(tot)}</span></div><p class="tiny muted" style="margin:2px 0 6px">Tenencia valorizada al ${new Date().toLocaleDateString("es-AR")}</p>
+     ${c.tenencia.map(h=>`<div class="hold-row"><span>${esc(h.activo)}</span><span class="num">${usd(h.usd)}</span></div>`).join("")}</div>`:""}</div>
+   <div class="panel stack"><h3 style="margin:0">Perfil</h3>
+    <div class="q"><h4>Tipo de cliente</h4>${sel("tipo",TIPO)}</div><div class="q"><h4>Perfil de inversor</h4>${sel("perfil",PERFIL)}</div><div class="q"><h4>Horizonte</h4>${sel("horizonte",HORIZ)}</div>
+    <label class="f">Patrimonio o liquidez disponible<select class="input" id="patrimonio">${PATRI.map(([v,t])=>`<option value="${v}" ${c.patrimonio===v?"selected":""}>${t}</option>`).join("")}</select></label></div>
+   <div class="panel"><h3>Qué busca</h3>${multi("objetivos",OBJ)}</div>
+   <div class="panel"><h3>Situación actual</h3>${multi("eventos",EVT)}</div>
+  </div><div style="min-width:0">${c.tenencia ? carteraHTML(c) : ""}${R ? resultadosHTML(R) : `<div class="empty"><h3 style="font-size:19px;margin-bottom:6px">Las recomendaciones aparecen acá</h3><p>Leé una cuenta comitente o marcá el tipo de cliente y lo que busca.</p></div>`}</div></div>`;
+}
+function resHTML(r, extra){
+  const inProp = S.prop.items.some(i=>i.id===r.p.id);
+  return `<div class="res"><span class="ic">${ico(r.p.categoria)}</span><div style="min-width:0"><h4><a href="#p-${r.p.id}">${esc(r.p.nombre)}</a></h4><div class="small muted">${esc(r.p.cliente.titular)}</div></div>
+  <button class="btn ${inProp?"":"primary"}" data-act="toggleProp" data-id="${r.p.id}">${inProp?"Agregado":"Agregar"}</button>
+  <div class="why">${extra||""}${r.why.map(w=>`<span class="tag">${esc(w)}</span>`).join("")}${r.cond.map(w=>`<span class="tag cond">${esc(w)}</span>`).join("")}${r.no.map(w=>`<span class="tag no">${esc(w)}</span>`).join("")}</div></div>`;
+}
+function resultadosHTML(R){
+  const sec = (t, n, body, d) => `<div class="res-sec"><h3>${t} <span class="muted small">${n}</span></h3>${d?`<p class="small muted">${d}</p>`:""}${body}</div>`;
+  return (R.rec.length ? sec("Recomendados", R.rec.length, R.rec.map(r=>resHTML(r)).join(""), "Coinciden con lo que busca y con su perfil.") : sec("Recomendados", 0, `<div class="empty small">Sumá objetivos o situaciones para afinar la recomendación.</div>`))
+   + (R.cross.length ? sec("Para complementar lo que ya tiene", R.cross.length, R.cross.map(x=>resHTML(x.r, `<span class="tag">Complementa ${esc(x.from.join(", "))}</span>`)).join(""), "Cross selling a partir de su tenencia.") : "")
+   + (R.pos.length ? sec("También pueden aplicar", R.pos.length, R.pos.map(r=>resHTML(r)).join("")) : "")
+   + (R.tiene.length ? sec("Ya los tiene", R.tiene.length, R.tiene.map(r=>`<div class="res"><span class="ic">${ico(r.p.categoria)}</span><div><h4><a href="#p-${r.p.id}">${esc(r.p.nombre)}</a></h4><div class="small muted">Detectado en su tenencia. Oportunidad de up selling: revisá montos y plazos.</div></div></div>`).join("")) : "")
+   + (R.no.length ? `<details class="fold"><summary>No aplican (${R.no.length})</summary><div class="in">${R.no.map(r=>resHTML(r)).join("")}</div></details>` : "");
+}
+async function consultar(){
+  const c = S.cliente, n = ($("#comitente").value||"").trim(); c.comitente = n; c.apiErr = "";
+  if (!n) { c.apiErr = "Ingresá un número de comitente."; render(); return; }
+  c.consultando = true; render();
+  await new Promise(r=>setTimeout(r, 600));
+  const d = API_DEMO[n]; c.consultando = false;
+  if (!d) { c.apiErr = "No encontramos esa cuenta en la API de prueba. Usá 10234, 20871 o 31555."; c.tenencia = null; }
+  else { c.nombre = d.nombre; c.tenencia = d.tenencia; c.tipo = d.tipo; c.perfil = d.perfil; if (!S.prop.cliente) S.prop.cliente = d.nombre; }
+  persist(); render();
+}
+
+/* ── Simuladores ── */
+function vSimuladores(){
+  const tabs = [["caucion","Caución"],["descuento","Descuento de documentos"],["fal","FAL"]];
+  return `<div class="page-head"><div><div class="eyebrow">Simuladores</div><h1>Números para la conversación</h1>
+  <p class="muted">Cálculos rápidos para mostrarle al cliente qué significa el producto en su caso. Las tasas son de ejemplo: confirmalas con la Mesa antes de compartir.</p></div></div>
+  <div class="seg" style="margin-bottom:16px">${tabs.map(([k,t])=>`<button data-act="sim" data-v="${k}" aria-pressed="${S.sim===k}">${t}</button>`).join("")}</div>
+  <div class="sim"><div class="panel stack" id="simForm">${simForm()}</div><div id="simOut" style="min-width:0"></div></div>`;
+}
+const numF = (id, l, v, hint, step) => `<label class="f" for="s_${id}">${l}<input class="input num" id="s_${id}" data-s="${id}" type="number" inputmode="decimal" step="${step||"any"}" value="${v}">${hint?`<span class="hint">${hint}</span>`:""}</label>`;
+function simForm(){
+  const v = S.simv[S.sim];
+  if (S.sim === "caucion") return `<div class="seg">${[["colocar","Colocar fondos"],["tomar","Tomar fondos"]].map(([k,t])=>`<button data-act="simset" data-k="modo" data-v="${k}" aria-pressed="${v.modo===k}">${t}</button>`).join("")}</div>
+   ${v.modo==="colocar" ? numF("monto","Monto a colocar ($)",v.monto) : numF("garantia","Cartera en garantía ($)",v.garantia) + `<label class="f" for="s_aforo">Aforo del título<select class="input" id="s_aforo" data-s="aforo">${[[85,"AL30 · 85%"],[80,"Acciones Galicia · 80%"],[93,"T-Bills · 93%"],[70,"Otro · 70%"]].map(([a,t])=>`<option value="${a}" ${Number(v.aforo)===a?"selected":""}>${t}</option>`).join("")}</select><span class="hint">Aforos de ejemplo. Los fija el mercado.</span></label>`}
+   ${numF("tna","TNA (%)",v.tna,"Valor de ejemplo")}${numF("dias","Plazo (días)",v.dias,"De 1 a 30 días",1)}${numF("arancel","Aranceles y derechos (% anual)",v.arancel,"Valor de ejemplo")}`;
+  if (S.sim === "descuento") return `<p class="small muted">Cheques de pago diferido, pagarés y facturas de crédito electrónicas.</p>${numF("vn","Valor del documento ($)",v.vn)}${numF("dias","Días al vencimiento",v.dias,"",1)}${numF("tna","Tasa de descuento (TNA %)",v.tna,"Valor de ejemplo")}${numF("comision","Comisiones y aranceles (% del nominal)",v.comision,"Valor de ejemplo")}
+   <label class="f" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="s_aval" data-s="aval" ${v.aval?"checked":""}> Con aval de SGR</label>${v.aval?numF("sgr","Costo del aval (TNA %)",v.sgr,"Aprox. 4% según one pager"):""}`;
+  return `${numF("emp","Empleados con más de 12 meses",v.emp,"",1)}${numF("sal","Salario bruto promedio ($)",v.sal)}
+   <div class="q"><h4>Tipo de empresa</h4><div class="seg">${[["pyme","Micro y pyme · 2,5%"],["grande","Grande · 1%"]].map(([k,t])=>`<button data-act="simset" data-k="tipo" data-v="${k}" aria-pressed="${v.tipo===k}">${t}</button>`).join("")}</div></div>
+   <div class="q"><h4>Fondo</h4><div class="seg">${[["I","Multiempleador I · 23%"],["II","Multiempleador II · 28%"]].map(([k,t])=>`<button data-act="simset" data-k="fondo" data-v="${k}" aria-pressed="${v.fondo===k}">${t}</button>`).join("")}</div><span class="tiny muted">TNA esperada bruta, Vinci Compass, octubre 2026.</span></div>
+   ${numF("aj","Ajuste salarial anual estimado (%)",v.aj)}${numF("rot","Desvinculaciones por año (% de la nómina)",v.rot)}${numF("ant","Antigüedad promedio (años)",v.ant)}${numF("meses","Horizonte (meses)",v.meses,"",1)}`;
+}
+const stat = (l, v, hl, sub) => `<div class="stat ${hl?"hl":""}"><div class="eyebrow">${l}</div><div class="v num">${v}</div>${sub?`<div class="tiny" style="opacity:.75;margin-top:2px">${sub}</div>`:""}</div>`;
+function calcSim(){
+  const out = $("#simOut"); if (!out) return;
+  const v = S.simv[S.sim];
+  if (S.sim === "caucion") {
+    const d = Math.max(1, +v.dias), tna = +v.tna/100, ar = +v.arancel/100;
+    if (v.modo === "colocar") {
+      const m = +v.monto, neto = m*(tna-ar)*d/365, tea = Math.pow(1+(tna-ar)*d/365, 365/d)-1;
+      out.innerHTML = `<div class="out">${stat("Interés neto", ars(neto), true, "en "+d+" días")}${stat("Recibís al vencimiento", ars(m+neto))}${stat("TEA si renovás", fmt(tea*100,1)+"%")}</div>
+      <div class="panel small"><b>Cómo leerlo.</b> Colocando ${ars(m)} a ${fmt(+v.tna,1)}% TNA por ${d} días, después de aranceles cobrás ${ars(neto)}. Si renovás a la misma tasa durante un año, el rendimiento efectivo es ${fmt(tea*100,1)}%.</div>`;
+    } else {
+      const max = +v.garantia*(+v.aforo/100), int = max*(tna+ar)*d/365;
+      out.innerHTML = `<div class="out">${stat("Podés tomar hasta", ars(max), true, "con aforo de "+v.aforo+"%")}${stat("Costo en "+d+" días", ars(int))}${stat("Devolvés", ars(max+int))}</div>
+      <div class="panel small"><b>Cómo leerlo.</b> Con una cartera de ${ars(+v.garantia)} en garantía conseguís liquidez por ${ars(max)} sin vender tus posiciones. El costo incluye tasa y aranceles.</div>`;
+    }
+  } else if (S.sim === "descuento") {
+    const vn = +v.vn, d = Math.max(1,+v.dias), tna = +v.tna/100;
+    const pv = vn/(1+tna*d/365), com = vn*(+v.comision/100), sgr = v.aval ? vn*(+v.sgr/100)*d/365 : 0, neto = pv - com - sgr, costo = vn - neto, cft = (vn/neto - 1)*365/d;
+    out.innerHTML = `<div class="out">${stat("Recibís hoy", ars(neto), true, "en 24 hs")}${stat("Costo total", ars(costo), false, fmt(costo/vn*100,2)+"% del nominal")}${stat("Costo financiero total", fmt(cft*100,1)+"% TNA")}</div>
+    <div class="panel small"><b>Cómo leerlo.</b> Por un documento de ${ars(vn)} que vence en ${d} días recibís ${ars(neto)} hoy. ${v.aval?"Cargá la tasa avalada que te pase la Mesa y compará contra la sin aval.":"Si la empresa califica en una SGR, con aval la tasa suele bajar: activá la opción para comparar."}</div>`;
+  } else {
+    const r = falCalc(v);
+    out.innerHTML = `<div class="out">${stat("Saldo a "+v.meses+" meses", ars(r.saldoFin), true)}${stat("Aporte mensual hoy", ars(r.aporte0), false, "se compensa con contribuciones")}${stat("Cubre un año de indemnizaciones", r.be?("Mes "+r.be):"Fuera del horizonte", false, "estimadas en "+ars(r.indFin)+" por año")}</div>
+    <div class="chart">${falChart(r)}</div>
+    <p class="tiny muted" style="margin-top:8px">Simulación ilustrativa en pesos nominales. Rendimiento esperado bruto, antes de honorarios (gerente 0,80% y depositaria 0,10% + IVA), no garantizado. Indemnización estimada como un salario por año de antigüedad. Validar contra la calculadora de neix.com.ar/fal.</p>`;
+  }
+}
+function falCalc(v){
+  const tasa = v.tipo==="pyme" ? .025 : .01, tna = v.fondo==="I" ? .23 : .28, gm = Math.pow(1+(+v.aj)/100, 1/12);
+  let saldo = 0, sal = +v.sal, be = null; const pts = [];
+  const aporte0 = +v.emp*sal*tasa;
+  for (let m=1; m<=Math.max(1,+v.meses); m++){
+    saldo = saldo*(1+tna/12) + (+v.emp)*sal*tasa;
+    const ind = (+v.emp)*(+v.rot/100)*sal*(+v.ant);
+    if (be===null && saldo >= ind) be = m;
+    pts.push({m, saldo, ind}); sal *= gm;
+  }
+  return {pts, be, saldoFin: pts[pts.length-1].saldo, indFin: pts[pts.length-1].ind, aporte0};
+}
+function falChart(r){
+  const W=640,H=250,L=70,R=14,T=30,B=30, n=r.pts.length;
+  const max = Math.max(...r.pts.map(p=>Math.max(p.saldo,p.ind)))*1.08 || 1;
+  const x = i => L + (W-L-R)*(i/(Math.max(1,n-1))), y = v => T + (H-T-B)*(1-v/max);
+  const path = k => r.pts.map((p,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(p[k]).toFixed(1)).join(" ");
+  const short = v => v>=1e9 ? fmt(v/1e9,1)+" mil M" : v>=1e6 ? fmt(v/1e6,0)+" M" : fmt(v);
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Saldo acumulado del FAL frente a la indemnización anual estimada">
+   ${[0,.25,.5,.75,1].map(f=>max*f).map(t=>`<line x1="${L}" x2="${W-R}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)"/><text x="${L-8}" y="${y(t)+4}" text-anchor="end" font-size="11" fill="var(--ink-3)">$ ${short(t)}</text>`).join("")}
+   ${r.pts.filter(p=>p.m%6===0||p.m===1).map(p=>`<text x="${x(p.m-1)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--ink-3)">Mes ${p.m}</text>`).join("")}
+   <path d="${path("saldo")} L ${x(n-1)} ${y(0)} L ${x(0)} ${y(0)} Z" fill="var(--arena)" fill-opacity=".14"/>
+   <path d="${path("saldo")}" fill="none" stroke="var(--ink)" stroke-width="2.2"/>
+   <path d="${path("ind")}" fill="none" stroke="var(--arena)" stroke-width="2" stroke-dasharray="5 4"/>
+   ${r.be?`<circle cx="${x(r.be-1)}" cy="${y(r.pts[r.be-1].saldo)}" r="5" fill="var(--ink)"/><text x="${x(r.be-1)+8}" y="${y(r.pts[r.be-1].saldo)-8}" font-size="12" fill="var(--ink)">Breakeven · mes ${r.be}</text>`:""}
+   <g font-size="12" fill="var(--ink-2)"><line x1="${L}" x2="${L+20}" y1="12" y2="12" stroke="var(--ink)" stroke-width="2.2"/><text x="${L+26}" y="16">Saldo del FAL</text>
+   <line x1="${L+130}" x2="${L+150}" y1="12" y2="12" stroke="var(--arena)" stroke-width="2" stroke-dasharray="5 4"/><text x="${L+156}" y="16">Indemnizaciones estimadas por año</text></g></svg>`;
+}
+
+/* ── Propuesta ── */
+const PP_CSS = `
+.pp{background:var(--paper);color:var(--paper-ink);font:14.5px/1.6 "Helvetica Neue",Helvetica,Arial,sans-serif;border-radius:6px;overflow:hidden;max-width:820px;margin:0 auto}
+.pp h1,.pp h2,.pp h3,.pp h4{font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:300;margin:0;letter-spacing:-.01em}
+.pp .ey{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-arena);font-weight:600}
+.pp-cover{background:radial-gradient(70% 120% at 50% 140%, rgba(196,178,148,.5), transparent 62%) var(--paper-dark);color:#F4F1ED;padding:34px 40px 30px;display:grid;gap:10px}
+.pp-cover img{height:15px;width:auto;margin-bottom:22px}
+.pp-cover .ey{color:#CFC6B8}
+.pp-cover h1{font-size:34px;line-height:1.12}
+.pp-meta{display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px;color:#CFC6B8;margin-top:6px}
+.pp-body{padding:8px 40px 34px}
+.pp-sec{padding:24px 0;border-bottom:1px solid var(--paper-line)}
+.pp-sec:last-child{border-bottom:0}
+.pp-msg{font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:300;font-size:19px;line-height:1.5;white-space:pre-line;max-width:62ch}
+.pp-firma{margin-top:10px;font-size:13px;color:var(--paper-ink-2)}
+.pp-obj{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.pp-obj span{font-size:12px;border:1px solid var(--paper-line);border-radius:999px;padding:4px 10px}
+.pp-glance{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.pp-glance th{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-arena);text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--paper-ink)}
+.pp-glance td{padding:10px;border-bottom:1px solid var(--paper-line);vertical-align:top}
+.pp-glance td:first-child{font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:300;color:var(--paper-arena);width:34px}
+.pp-item{display:grid;grid-template-columns:54px minmax(0,1fr);gap:4px 14px}
+.pp-n{font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:300;font-size:34px;line-height:1;color:var(--paper-arena)}
+.pp-item h3{font-size:22px;line-height:1.25;margin:4px 0 10px}
+.pp-why{background:var(--paper-2);border-radius:6px;padding:12px 14px;margin-bottom:12px;font-size:14px}
+.pp-why b{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-arena);margin-bottom:3px}
+.pp-ben{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:14px 0}
+.pp-ben div{border-top:1px solid var(--paper-ink);padding-top:8px}
+.pp-ben h4{font-size:15px;margin-bottom:3px}.pp-ben p{margin:0;font-size:12.5px;color:var(--paper-ink-2)}
+.pp-facts{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12px;color:var(--paper-ink-2)}.pp-facts b{color:var(--paper-ink);font-weight:600}
+.pp-note{font-size:12px;color:var(--paper-ink-2);margin-top:10px}
+.pp-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:12px}
+.pp-steps div{border-top:1px solid var(--paper-ink);padding-top:8px;font-size:13px}.pp-steps b{display:block;font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:300;font-size:15px;margin-bottom:2px}
+.pp-contact{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;background:var(--paper-dark);color:#F4F1ED;border-radius:6px;padding:16px 18px;margin-top:18px}
+.pp-contact .ey{color:#CFC6B8}
+.pp-legal{font-size:11px;color:var(--paper-ink-2);margin-top:18px}
+.pp p{margin:0}
+.pp th,.pp td{background:transparent;color:inherit;letter-spacing:normal;text-transform:none;font-size:inherit}
+.pp .pp-glance th{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-arena);border-bottom:1px solid var(--paper-ink)}
+.pp .pp-glance td:first-child{color:var(--paper-arena)}
+@media (max-width:600px){.pp-cover{padding:24px 20px}.pp-body{padding:4px 20px 24px}.pp-item{grid-template-columns:minmax(0,1fr)}.pp-steps{grid-template-columns:minmax(0,1fr)}.pp-glance .hide-s{display:none}.pp-cover h1{font-size:28px}}
+`;
+function vPropuesta(){
+  const P = S.prop, sug = {};
+  P.items.forEach(it => { const p = S.byId[it.id]; if (!p) return; p.interno.relacionados.forEach(r => { if (!P.items.some(i=>i.id===r) && S.byId[r]) (sug[r] = sug[r] || []).push(p.nombre); }); });
+  return `<div class="page-head"><div><div class="eyebrow">Propuesta</div><h1>Armá la propuesta</h1>
+  <p class="muted">Sumá productos, contá por qué tienen sentido para este cliente y exportala lista para enviar.</p></div>
+  <div class="btn-row"><button class="btn" data-act="copyPropWA" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar propuesta</button></div></div>
+  <div class="pr-grid"><div class="stack">
+   <div class="panel stack"><h3 style="margin:0">Para quién</h3>
+    <label class="f" for="pr_cliente">Cliente<input class="input" id="pr_cliente" data-pf="cliente" value="${esc(P.cliente)}" placeholder="Nombre o razón social"></label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="f" for="pr_asesor">Asesor<input class="input" id="pr_asesor" data-pf="asesor" value="${esc(P.asesor)}" placeholder="Tu nombre"></label>
+    <label class="f" for="pr_contacto">Contacto<input class="input" id="pr_contacto" data-pf="contacto" value="${esc(P.contacto)}" placeholder="Mail o celular"></label></div>
+    <label class="f" for="pr_msg">Tu mensaje<textarea class="input" id="pr_msg" data-pf="mensaje" placeholder="Retomá lo que conversaron: qué te contó, qué busca y por qué estas ideas tienen sentido para su momento.">${esc(P.mensaje)}</textarea></label></div>
+   <div class="panel stack"><h3 style="margin:0">Productos (${P.items.length})</h3>
+    ${P.items.length ? P.items.map((it,i)=>{ const p = S.byId[it.id]; if (!p) return ""; return `<div class="pr-item"><div class="h"><b class="small">${esc(p.nombre)}</b><span class="btn-row" style="gap:2px">
+     <button class="btn ghost icon" data-act="mv" data-i="${i}" data-d="-1" aria-label="Subir" ${i===0?"disabled":""}>↑</button><button class="btn ghost icon" data-act="mv" data-i="${i}" data-d="1" aria-label="Bajar" ${i===P.items.length-1?"disabled":""}>↓</button><button class="btn ghost" data-act="toggleProp" data-id="${p.id}">Quitar</button></span></div>
+     <textarea class="input" id="pn_${i}" data-pi="${i}" style="min-height:58px" aria-label="Por qué para este cliente" placeholder="Por qué para este cliente. Ej.: para que los dólares de la venta del campo rindan mientras definís la estructura.">${esc(it.nota||"")}</textarea></div>`; }).join("") : `<div class="empty small">Todavía no sumaste productos. <a href="#soluciones">Explorar</a> o <a href="#cliente">buscar por cliente</a>.</div>`}</div>
+   ${Object.keys(sug).length?`<div class="panel"><h3>Suelen ir juntas</h3><div class="stack" style="gap:8px">${Object.entries(sug).slice(0,5).map(([id,from])=>`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div class="small"><b>${esc(S.byId[id].nombre)}</b><div class="tiny muted">Complementa ${esc(from.join(", "))}</div></div><button class="btn" data-act="toggleProp" data-id="${id}">${ico("_plus")}</button></div>`).join("")}</div></div>`:""}
+  </div>
+  <div style="min-width:0"><div class="paper-label"><span>Así la recibe tu cliente</span><span class="tiny">Se descarga como página web y se guarda en PDF</span></div><div class="paper-wrap" id="preview"></div></div></div>`;
+}
+function propDoc(){
+  const P = S.prop, items = P.items.map(i=>({it:i, p:S.byId[i.id]})).filter(x=>x.p);
+  const objs = S.cliente.objetivos.map(o=>OBJ[o]);
+  const fecha = new Date().toLocaleDateString("es-AR",{day:"numeric",month:"long",year:"numeric"});
+  const nombre = P.cliente || "vos";
+  return `<div class="pp"><div class="pp-cover"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="ey">Propuesta personalizada</div><h1>Ideas para ${esc(nombre)}</h1>
+   <div class="pp-meta"><span>${esc(fecha)}</span>${P.asesor?`<span>Tu asesor: ${esc(P.asesor)}</span>`:""}<span>${items.length} ${items.length===1?"producto":"productos"}</span></div></div>
+  <div class="pp-body">
+   ${P.mensaje||objs.length?`<div class="pp-sec">${P.mensaje?`<p class="pp-msg">${esc(P.mensaje)}</p>${P.asesor?`<p class="pp-firma">${esc(P.asesor)}</p>`:""}`:""}${objs.length?`<div style="margin-top:${P.mensaje?"16px":"0"}"><div class="ey">Lo que buscás</div><div class="pp-obj">${objs.map(o=>`<span>${esc(o)}</span>`).join("")}</div></div>`:""}</div>`:""}
+   <div class="pp-sec"><div class="ey">Tu propuesta en una mirada</div><table class="pp-glance"><thead><tr><th></th><th>Producto</th><th class="hide-s">Moneda</th><th class="hide-s">Plazo</th><th>Riesgo</th></tr></thead><tbody>
+    ${items.map(({p},i)=>`<tr><td>${String(i+1).padStart(2,"0")}</td><td><b>${esc(p.nombre)}</b><br><span style="color:var(--paper-ink-2)">${esc(p.cliente.titular)}</span></td><td class="hide-s">${esc(p.cliente.ficha.moneda)}</td><td class="hide-s">${esc(p.cliente.ficha.plazo)}</td><td>${esc(RISK_TXT[p.riesgoNivel])}</td></tr>`).join("")}</tbody></table></div>
+   ${items.map(({it,p},i)=>`<div class="pp-sec pp-item"><div class="pp-n">${String(i+1).padStart(2,"0")}</div><div><div class="ey">${esc(p.nombre)}</div><h3>${esc(p.cliente.titular)}</h3>
+    ${it.nota?`<div class="pp-why"><b>Por qué para vos</b>${esc(it.nota)}</div>`:""}
+    <p>${esc(p.cliente.queEs)}</p>
+    <div class="pp-ben">${p.cliente.beneficios.slice(0,3).map(b=>`<div><h4>${esc(b[0])}</h4><p>${esc(b[1])}</p></div>`).join("")}</div>
+    <div class="pp-facts"><span><b>Moneda</b> ${esc(p.cliente.ficha.moneda)}</span><span><b>Plazo</b> ${esc(p.cliente.ficha.plazo)}</span><span><b>Monto</b> ${esc(p.cliente.ficha.minimo)}</span><span><b>Liquidez</b> ${esc(p.cliente.ficha.liquidez)}</span></div>
+    <p class="pp-note">${esc(p.cliente.aTener.join(" "))}</p></div></div>`).join("")}
+   <div class="pp-sec"><div class="ey">Próximos pasos</div><div class="pp-steps"><div><b>Lo revisamos juntos</b>Repasamos cada idea con tus números y resolvemos tus dudas.</div><div><b>Definimos el plan</b>Montos, plazos y el orden de implementación.</div><div><b>Lo implementamos</b>Nos ocupamos de la operatoria y te acompañamos en el seguimiento.</div></div>
+    <div class="pp-contact"><div><div class="ey">Tu asesor en Neix</div><div style="font-family:Inter,Arial,sans-serif;font-weight:300;font-size:18px;margin-top:2px">${esc(P.asesor||"Tu asesor")}</div></div><div style="font-size:13px">${esc(P.contacto||"(011) 4859-1552 · www.neix.com.ar")}</div></div>
+    <p class="pp-legal">${esc(LEYENDA)}</p></div>
+  </div></div>`;
+}
+function refreshPreview(){ const pv = $("#preview"); if (pv) pv.innerHTML = S.prop.items.length ? propDoc() : `<div class="empty" style="background:var(--surface)">La vista previa aparece cuando sumás productos.</div>`; }
+
+/* ── Análisis de cartera ── */
+const CLASE = {caucion:"Liquidez en pesos", fci:"Liquidez en pesos", soberanos:"Renta fija en dólares", on:"Renta fija en dólares", dl:"Cobertura (CER / DL)", cer:"Cobertura (CER / DL)", acciones:"Renta variable", cedears:"Renta variable", internacional:"Internacional", tbills:"Internacional"};
+const MODELO = {
+  conservador:{"Liquidez en pesos":20,"Renta fija en dólares":55,"Cobertura (CER / DL)":15,"Renta variable":5,"Internacional":5},
+  moderado:{"Liquidez en pesos":10,"Renta fija en dólares":45,"Cobertura (CER / DL)":10,"Renta variable":20,"Internacional":15},
+  agresivo:{"Liquidez en pesos":5,"Renta fija en dólares":30,"Cobertura (CER / DL)":5,"Renta variable":40,"Internacional":20}};
+const PIE = ["#2F2E2B","#A59A86","#A8243A","#6E675E","#CFC6B8","#4C7558","#8C7F6B","#D9B98C"];
+function donut(parts){
+  const tot = parts.reduce((a,p)=>a+p.v,0)||1, R = 60, C = 2*Math.PI*R; let off = 0;
+  return `<svg viewBox="0 0 150 150" role="img" aria-label="Composición de la cartera"><g transform="rotate(-90 75 75)">${parts.map((p,i)=>{ const L = p.v/tot*C, el = `<circle cx="75" cy="75" r="${R}" fill="none" stroke="${PIE[i%PIE.length]}" stroke-width="22" stroke-dasharray="${L} ${C-L}" stroke-dashoffset="${-off}"/>`; off += L; return el; }).join("")}</g></svg>`;
+}
+function carteraHTML(c){
+  const h = c.tenencia.slice().sort((a,b)=>b.usd-a.usd), tot = h.reduce((a,x)=>a+x.usd,0)||1, top = h[0];
+  const conc = top && top.usd/tot >= .35;
+  const perfil = c.perfil || "moderado", mod = MODELO[perfil];
+  const act = {}; h.forEach(x=>{ const k = CLASE[x.tag]||"Otros"; act[k] = (act[k]||0) + x.usd/tot*100; });
+  const clases = [...new Set(Object.keys(mod).concat(Object.keys(act)))];
+  return `<div class="res-sec"><h3>Análisis de la cartera <span class="muted small">${esc(c.nombre)}</span></h3>
+  <div class="panel"><div class="cart">${donut(h.map(x=>({v:x.usd})))}<div>${h.map((x,i)=>`<div class="crow"><i style="background:${PIE[i%PIE.length]}"></i><span>${esc(x.activo)}</span><span class="pc">${fmt(x.usd/tot*100,1)}%</span><span class="us">${usd(x.usd)}</span></div>`).join("")}</div></div>
+  ${conc?`<div class="alert"><b>Concentración</b>${esc(top.activo)} es el ${fmt(top.usd/tot*100,0)}% de la cartera.</div>`:`<div class="alert okb"><b>Cartera diversificada</b>Ninguna posición supera el 35% del total.</div>`}
+  <details class="fold" style="margin-top:12px"><summary>Comparar con la cartera modelo para perfil ${esc(PERFIL[perfil].toLowerCase())}</summary><div class="in"><div class="tw"><table class="cmp"><thead><tr><th>Clase de activo</th><th class="r">Actual</th><th class="r">Modelo</th><th class="r">Diferencia</th></tr></thead><tbody>
+   ${clases.map(k=>{ const a = act[k]||0, m = mod[k]||0, d = a-m; return `<tr><td>${esc(k)}</td><td class="r">${fmt(a,0)}%</td><td class="r">${fmt(m,0)}%</td><td class="r ${Math.abs(d)<5?"":d>0?"dif-up":"dif-dn"}">${d>0?"+":""}${fmt(d,0)} pp</td></tr>`; }).join("")}</tbody></table></div>
+   <p class="tiny muted" style="margin-top:8px">${c.perfil?"":"Sin perfil cargado: se compara contra la moderada. "}Cartera modelo de referencia, a reemplazar por la que publique Estrategia.</p></div></details></div></div>`;
+}
+
+/* ── Presentaciones ── */
+const AREAS = {"Banca Privada":"bancaprivada@neix.com.ar","Banca Corporativa":"bancacorporativa@neix.com.ar","Financial Advisors":"fas@neix.com.ar","Mesa · Mercado de Capitales":"info@neix.com.ar","Estrategia":"info@neix.com.ar"};
+const PZ_SUG = [["Tesorería corporativa",["cauciones","fci","fondo-dedicado","echeq-tesoreria"]],["Financiamiento pyme",["cheques","pagares","avales-sgr","facturas-fce"]],["Cobertura cambiaria",["futuros-dolar","bonos-cer-dl","pricing-fx"]],["Dolarizar e invertir afuera",["t-bills","cedears","cuentas-offshore","operatoria-internacional"]]];
+S.pz = {titulo:"Soluciones de inversión y financiamiento", bajada:"Banca Corporativa · Banca Privada · Financial Advisors", cliente:"", inst:true, asesor:"", area:"", items:[]};
+try { const sv = JSON.parse(localStorage.getItem("neix-hub-pz")||"null"); if (sv) Object.assign(S.pz, sv); } catch(e) {}
+function pzSave(){ try { localStorage.setItem("neix-hub-pz", JSON.stringify(S.pz)); } catch(e) {} }
+function vPresentaciones(){
+  const P = S.pz, byCat = {};
+  S.productos.forEach(p => (byCat[p.categoria] = byCat[p.categoria] || []).push(p));
+  const cats = CAT_ORDER.filter(c=>byCat[c]).concat(Object.keys(byCat).filter(c=>!CAT_ORDER.includes(c)));
+  return `<div class="page-head"><div><div class="eyebrow">Presentaciones</div><h1>Armá una presentación</h1><p>La presentación institucional de Neix más los productos que elijas, en el formato de marca. Se descarga en PDF.</p></div>
+  <div class="btn-row"><button class="btn" data-act="pzPDF" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
+  <div class="pz-grid"><div class="stack">
+   <div class="panel stack"><h3 style="margin:0">Portada</h3>
+    <label class="f" for="pz_titulo">Título<input class="input" id="pz_titulo" data-pz="titulo" value="${esc(P.titulo)}"></label>
+    <label class="f" for="pz_bajada">Bajada<input class="input" id="pz_bajada" data-pz="bajada" value="${esc(P.bajada)}"></label>
+    <label class="f" for="pz_cliente">Para (opcional)<input class="input" id="pz_cliente" data-pz="cliente" value="${esc(P.cliente)}" placeholder="Nombre del cliente o la empresa"></label>
+    <label class="f" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="pz_inst" ${P.inst?"checked":""}> Incluir presentación institucional de Neix</label></div>
+   <div class="panel stack"><h3 style="margin:0">Asesor</h3>
+    <label class="f" for="pz_asesor">Nombre<input class="input" id="pz_asesor" data-pz="asesor" value="${esc(P.asesor)}" placeholder="Escribí tu nombre"></label>
+    <label class="f" for="pz_area">Área<select class="input" id="pz_area"><option value="">Elegir área</option>${Object.keys(AREAS).map(a=>`<option ${P.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select><span class="hint">Opcional. Si lo completás, el cierre muestra tus datos y los de tu área.</span></label></div>
+   <div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><h3 style="margin:0">Productos</h3><span class="tiny muted">${P.items.length} elegidos</span></div>
+    <div class="chips" style="margin-bottom:10px">${PZ_SUG.map(([n,ids],i)=>`<button class="chip" data-act="pzSug" data-v="${i}">${esc(n)}</button>`).join("")}${S.prop.items.length?`<button class="chip" data-act="pzProp">Usar los de mi propuesta (${S.prop.items.length})</button>`:""}${P.items.length?`<button class="chip" data-act="pzClear">Limpiar</button>`:""}</div>
+    <div class="pz-list">${cats.map(c=>`<div class="cat">${esc(c)}</div>${byCat[c].map(p=>`<label><input type="checkbox" data-pzp="${p.id}" ${P.items.includes(p.id)?"checked":""}> ${esc(p.nombre)}</label>`).join("")}`).join("")}</div></div>
+  </div><div style="min-width:0"><div class="paper-label"><span id="pzCount">Vista previa</span><span class="tiny">16:9 · formato Neix</span></div><div id="deck" class="slides"></div></div></div>`;
+}
+function slideFoot(n){ return `<div class="ft"><span>NEIX S.A. · ALyC Propio N° 145 CNV · ACyDI FCI N° 14 CNV</span><span>${n}</span></div>`; }
+function deckSlides(){
+  const P = S.pz, items = P.items.map(id=>S.byId[id]).filter(Boolean), out = [];
+  const fecha = new Date().toLocaleDateString("es-AR",{month:"long",year:"numeric"});
+  out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><div class="pad" style="justify-content:flex-end;padding-bottom:30px"><div class="ey">${esc(P.cliente?("Para "+P.cliente):"Presentación")} · ${esc(fecha)}</div><h1 style="font-size:84px;line-height:1.02;margin-top:22px;max-width:15ch">${esc(P.titulo||"Neix")}</h1><p style="font-size:22px;color:#A9A196;margin:22px 0 0">${esc(P.bajada)}</p>${P.asesor?`<p style="font-size:17px;margin-top:28px">${esc(P.asesor)}${P.area?" · "+esc(P.area):""}</p>`:""}</div></div>`);
+  if (P.inst) {
+    out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><span class="tg">Quiénes somos</span><div class="pad"><span class="kick">Neix</span><h2 style="font-size:52px;line-height:1.1;margin-top:26px;max-width:22ch">Una ALyC boutique que acompaña a familias, empresas e inversores desde hace 18 años.</h2>
+     <div class="big"><div><b>18</b><span>años en el mercado de capitales</span></div><div><b>Top 5</b><span>en ByMA</span></div><div><b>Top 10</b><span>en A3 Mercados</span></div><div><b>7°</b><span>año consecutivo Great Place to Work</span></div></div></div>${slideFoot("")}</div>`);
+    out.push(`<div class="sl lt"><img class="lg" src="${LOGO_DARK}" alt="NEIX"><span class="tg" style="color:#9A9389">Cómo trabajamos</span><div class="pad"><span class="kick">Unidades de negocio</span><h2 style="font-size:46px;margin-top:22px">Cuatro equipos, una misma forma de trabajar.</h2>
+     <div class="ben" style="grid-template-columns:repeat(4,1fr)"><div><b>Banca Privada</b><span>Wealth management para familias y patrimonios, local e internacional.</span></div><div><b>Banca Corporativa</b><span>Financiamiento, tesorería y cobertura para empresas.</span></div><div><b>Financial Advisors</b><span>Plataforma y respaldo para asesores independientes.</span></div><div><b>Mercado de Capitales</b><span>Mesa propia, market making y ejecución en ByMA, A3 y MAV.</span></div></div></div>${slideFoot("")}</div>`);
+  }
+  if (items.length > 1) out.push(`<div class="sl lt"><img class="lg" src="${LOGO_DARK}" alt="NEIX"><div class="pad"><span class="kick">Agenda</span><h2 style="font-size:46px;margin-top:22px">Lo que vamos a ver</h2><div class="agenda">${items.map((p,i)=>`<div><span>${String(i+1).padStart(2,"0")}</span>${esc(p.nombre)}<span>${esc(p.categoria)}</span></div>`).join("")}</div></div>${slideFoot("")}</div>`);
+  items.forEach(p => { const c = p.cliente, f = c.ficha;
+    out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><span class="tg">${esc(p.unidades[0])}</span><div class="pad" style="justify-content:flex-end;padding-bottom:20px"><span class="kick">${esc(p.categoria)}</span><h2 style="font-size:72px;line-height:1.04;margin-top:24px;max-width:16ch">${esc(p.nombre)}</h2><p style="font-size:24px;color:#F3F0EB;margin:22px 0 0;max-width:40ch;font-weight:400">${esc(c.titular)}</p></div></div>`);
+    out.push(`<div class="sl lt"><img class="lg" src="${LOGO_DARK}" alt="NEIX"><span class="tg" style="color:#9A9389">${esc(p.nombre)}</span><div class="pad"><p style="font-size:24px;line-height:1.45;margin:0;max-width:52ch;color:#2A2927">${esc(c.queEs)}</p>
+     <dl class="fx">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Dónde opera",f.mercado]].map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+     <div class="ben">${c.beneficios.slice(0,3).map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div></div>${slideFoot("")}</div>`); });
+  const mail = P.area ? AREAS[P.area] : "info@neix.com.ar";
+  out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><div class="pad" style="justify-content:flex-end"><h2 style="font-size:92px">Hablemos.</h2>
+   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:44px;font-size:19px">${P.asesor?`<div><div class="ey">Tu asesor</div><div style="margin-top:8px">${esc(P.asesor)}</div></div>`:""}<div><div class="ey">Contacto</div><div style="margin-top:8px">(011) 4859-1552<br>${esc(mail)}</div></div><div><div class="ey">Oficinas</div><div style="margin-top:8px">Don Francisco 3345, piso 5<br>San Fernando · www.neix.com.ar</div></div></div>
+   <p style="font-size:12px;color:#A9A196;margin-top:40px">${esc(LEYENDA)}</p></div></div>`);
+  return out;
+}
+function refreshDeck(){
+  const d = $("#deck"); if (!d) return;
+  if (!S.pz.items.length) { d.innerHTML = `<div class="empty" style="background:var(--surface)">Elegí productos o empezá con una de las selecciones sugeridas.</div>`; const n=$("#pzCount"); if(n) n.textContent="Vista previa"; return; }
+  const sl = deckSlides(); d.innerHTML = sl.map(h=>`<div class="slide-wrap">${h}</div>`).join("");
+  const n = $("#pzCount"); if (n) n.textContent = `Vista previa · ${sl.length} diapositivas`;
+  scaleDeck();
+}
+function scaleDeck(){ document.querySelectorAll(".slide-wrap").forEach(w => { const s = w.clientWidth/1280; const el = w.firstElementChild; if (el) el.style.transform = `scale(${s})`; }); }
+window.addEventListener("resize", scaleDeck);
+function loadScript(src){ return new Promise((ok,ko)=>{ if (document.querySelector(`script[src="${src}"]`)) return ok(); const t = document.createElement("script"); t.src = src; t.onload = ok; t.onerror = ko; document.head.appendChild(t); }); }
+async function pzPDF(){
+  if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
+  const b = document.querySelector('[data-act="pzPDF"]'); if (b) { b.disabled = true; b.textContent = "Armando PDF"; }
+  try {
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    try { await document.fonts.ready; } catch(_) {}
+    const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0;width:1280px"; document.body.appendChild(host);
+    const pdf = new window.jspdf.jsPDF({orientation:"landscape", unit:"px", format:[1280,720], hotfixes:["px_scaling"]});
+    const sl = deckSlides();
+    for (let i=0;i<sl.length;i++){ host.innerHTML = sl[i]; const cv = await window.html2canvas(host.firstElementChild, {scale:1.5, backgroundColor:null, useCORS:true, logging:false}); if (i) pdf.addPage([1280,720],"landscape"); pdf.addImage(cv.toDataURL("image/jpeg",.92),"JPEG",0,0,1280,720); }
+    host.remove();
+    const name = `Presentación Neix${S.pz.cliente?" - "+S.pz.cliente:""}.pdf`;
+    await S.dl.save({filename:name, data: pdf.output("blob")}); toast("PDF listo");
+  } catch(e) { if (!(e && e.code === "declined")) toast(e && e.code === "rate_limited" ? "Ya hay una descarga pendiente" : "No pudimos armar el PDF. Probá de nuevo."); }
+  if (b) { b.disabled = false; b.innerHTML = ico("_dl")+"Descargar PDF"; }
+}
+
+/* ── Export ── */
+const EXPORT_HEAD = (title, extra) => `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>:root{--paper:#fff;--paper-2:#F3EFEA;--paper-ink:#33312E;--paper-ink-2:#6A635A;--paper-line:#E3DDD5;--paper-dark:#33312E;--paper-arena:#9A8E7D}
+*{box-sizing:border-box}body{margin:0;background:#E9E4DD;padding:24px 12px}
+.bar{max-width:820px;margin:0 auto 12px;display:flex;justify-content:space-between;align-items:center;font:13px Helvetica,Arial,sans-serif;color:#6A635A}
+.bar button{background:#33312E;color:#fff;border:0;border-radius:6px;padding:8px 14px;font:inherit;cursor:pointer}
+@media print{body{background:#fff;padding:0}.bar{display:none}.pp{max-width:none;border-radius:0}.pp-sec{break-inside:avoid}@page{size:A4;margin:12mm}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+${PP_CSS}${extra||""}</style></head><body><div class="bar"><span>Documento de Neix</span><button onclick="window.print()">Guardar como PDF</button></div>`;
+function onePagerDoc(p){
+  const c = p.cliente, f = c.ficha;
+  const tax = p.impuestos.length && S.imp ? `<div class="pp-sec"><div class="ey">Tratamiento impositivo</div>${["Persona humana","Persona jurídica"].map(per=>p.impuestos.map(k=>{ const t = S.imp.tablas[k]; if(!t) return ""; const rows = t.filas.filter(r=>r[0]===per); if(!rows.length) return ""; return `<p style="margin:12px 0 4px;font-size:12.5px"><b>${esc(t.nombre)}</b> · ${per}</p><table class="pp-glance" style="margin-top:0"><thead><tr><th>Ingreso</th><th>Ganancias</th><th>IVA</th><th>Bienes Pers.</th><th>IIBB CABA</th></tr></thead><tbody>${rows.map(r=>`<tr><td style="font-family:inherit;color:inherit;width:auto">${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${esc(r[5])}</td><td>${esc(r[6])}</td></tr>`).join("")}</tbody></table>`; }).join("")).join("")}<p class="pp-note">Información orientativa. Consultá tu caso con tu asesor impositivo.</p></div>` : "";
+  const contacto = p.unidades.includes("Banca Corporativa") ? "bancacorporativa@neix.com.ar" : "bancaprivada@neix.com.ar";
+  return EXPORT_HEAD(p.nombre+" · Neix") + `<div class="pp"><div class="pp-cover"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="ey">${esc(p.unidades[0])} · ${esc(p.nombre)}</div><h1>${esc(c.titular)}</h1><p style="color:#CFC6B8;max-width:60ch;margin-top:4px">${esc(c.bajada)}</p></div>
+  <div class="pp-body"><div class="pp-sec"><div class="ey">De qué se trata</div><p style="margin-top:8px">${esc(c.queEs)}</p>
+   <div class="pp-facts" style="margin-top:14px">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Monto",f.minimo],["Liquidez",f.liquidez],["Dónde opera",f.mercado]].map(([k,v])=>`<span><b>${k}</b> ${esc(v)}</span>`).join("")}</div></div>
+  <div class="pp-sec"><div class="ey">Lo que te aporta</div><div class="pp-ben">${c.beneficios.map(b=>`<div><h4>${esc(b[0])}</h4><p>${esc(b[1])}</p></div>`).join("")}</div></div>
+  <div class="pp-sec" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px"><div><div class="ey">Para quién es</div><p style="margin-top:8px">${esc(c.paraQuien)}</p></div>
+   <div><div class="ey">Cómo funciona</div><ol style="margin:8px 0 0;padding-left:18px">${c.comoFunciona.map(s=>`<li style="margin-bottom:4px">${esc(s)}</li>`).join("")}</ol></div></div>
+  ${tax}<div class="pp-sec"><div class="ey">Lo que tenés que saber</div><ul style="margin:8px 0 0;padding-left:18px">${c.aTener.map(a=>`<li style="margin-bottom:4px">${esc(a)}</li>`).join("")}</ul>
+   <div class="pp-contact"><div><div class="ey">En Neix</div><p style="margin-top:4px;max-width:52ch">${esc(c.enNeix)}</p></div><div style="font-size:13px">${p.unidades[0]} · ${contacto}<br>(011) 4859-1552 · www.neix.com.ar</div></div>
+   <p class="pp-legal">${esc(LEYENDA)}</p></div></div></div></body></html>`;
+}
+async function download(filename, html){
+  if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
+  try { await S.dl.save({filename, data: html}); toast("Archivo listo"); }
+  catch(e) { if (e && e.code === "declined") return; toast(e && e.code === "rate_limited" ? "Ya hay una descarga pendiente" : "No se pudo descargar en esta vista"); }
+}
+const waOnePager = p => `${p.cliente.titular}\n\n${p.cliente.queEs}\n\n${p.cliente.beneficios.map(b=>"· "+b[0]+": "+b[1]).join("\n")}\n\nSi te interesa, lo vemos con tus números.`;
+function waProp(){ const P = S.prop, it = P.items.map(i=>S.byId[i.id]).filter(Boolean); return `${P.cliente?"Hola "+P.cliente.split(" ")[0]+". ":""}Te comparto las ideas que pensamos a partir de lo que conversamos:\n\n${it.map((p,i)=>`${i+1}. ${p.nombre}: ${p.cliente.titular.charAt(0).toLowerCase()+p.cliente.titular.slice(1)}.${P.items[i].nota?" "+P.items[i].nota:""}`).join("\n")}\n\nTe mando la propuesta completa para que la leas con tiempo. Cuando quieras, la repasamos juntos.`; }
+
+/* ── Gestión ── */
+function vGestion(){
+  const rows = S.productos.map(p=>({p, e:estadoDe(p)})).sort((a,b)=>(a.e.d??999)-(b.e.d??999));
+  const n = k => rows.filter(r=>r.e.k===k).length, pronto = rows.filter(r=>r.e.d!==null && r.e.d>=0 && r.e.d<=30).length, obs = rows.reduce((a,r)=>a+r.p.observaciones.length,0);
+  return `<div class="page-head"><div><div class="eyebrow">Gestión · solo administradores</div><h1>Vigencia de las fichas</h1>
+  <p class="muted">Cada ficha tiene un validador de negocio y una fecha de revisión. Cuando vence, el Hub la marca para que nadie envíe información desactualizada.</p></div></div>
+  <div class="tiles">${stat("Validadas", n("validado"))}${stat("A validar", n("a_validar"))}${stat("Vencen en 30 días", pronto)}${stat("Vencidas", n("vencida"), n("vencida")>0)}${stat("Con one pager oficial", S.productos.filter(p=>p.onePager).length + " de " + S.productos.length)}${stat("Pendientes del relevamiento", obs)}</div>
+  ${S.notas.length?`<div class="panel" style="margin-bottom:18px"><h3>Notas de los asesores <span class="tiny muted">${S.notas.filter(n=>!n.enviada).length} sin enviar por mail</span></h3><div class="stack" style="gap:10px">${S.notas.slice(0,15).map(n=>`<div style="border-top:1px solid var(--line);padding-top:10px"><div class="tiny muted"><a href="#p-${esc(n.producto)}">${esc(n.productoNombre)}</a> · ${esc(S.names[n.autor]||"Asesor")} · ${new Date(n.fecha).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"})}${n.enviada?" · enviada":""}</div><p class="small" style="margin-top:4px;white-space:pre-line">${esc(n.texto)}</p></div>`).join("")}</div></div>`:""}
+  <div class="tw"><table><thead><tr><th>Ficha</th><th>Tipo</th><th>Unidades</th><th>Estado</th><th>One pager</th><th>Validador</th><th>Revisar antes</th><th class="r">Pend.</th><th></th></tr></thead><tbody>
+  ${rows.map(({p,e})=>`<tr><td><a href="#p-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td>${esc(p.validador||"Sin asignar")}</td><td class="num">${fdate(e.vence)}</td><td class="r num">${p.observaciones.length}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+
+/* ── Eventos ── */
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const a = b.dataset.act, v = b.dataset.v, id = b.dataset.id;
+  if (a==="fUnidad"||a==="fCat") { S[a] = S[a]===v && v ? "" : v; render(); }
+  else if (a==="fNeed") { S.fNeed = S.fNeed===v ? "" : v; render(); }
+  else if (a==="goCat") { S.fCat = v; S.fNeed = ""; S.q = ""; }
+  else if (a==="clearF") { S.q=""; S.fUnidad=""; S.fCat=""; S.fEstado=""; S.fNeed=""; render(); }
+  else if (a==="view") { S.view = v; render(); }
+  else if (a==="persona") { S.persona = v; persist(); render(); }
+  else if (a==="toggleProp") { const i = S.prop.items.findIndex(x=>x.id===id); if (i>=0) S.prop.items.splice(i,1); else { S.prop.items.push({id, nota:""}); toast("Sumada a la propuesta"); } persist(); render(); }
+  else if (a==="mv") { const i = +b.dataset.i, d = +b.dataset.d, it = S.prop.items; [it[i], it[i+d]] = [it[i+d], it[i]]; persist(); render(); }
+  else if (a==="copyWA") copy(waOnePager(S.byId[id]));
+  else if (a==="copyText") copy(b.dataset.t);
+  else if (a==="dlPdf") dlPdf(id);
+  else if (a==="upOP") upOP(id);
+  else if (a==="dlOnePager") { const p = S.byId[id]; download(`${p.nombre} - Neix.html`, onePagerDoc(p)); }
+  else if (a==="copyPropWA") copy(waProp());
+  else if (a==="dlProp") download(`Propuesta Neix${S.prop.cliente?" - "+S.prop.cliente:""}.html`, EXPORT_HEAD("Propuesta Neix") + propDoc() + "</body></html>");
+  else if (a==="validar") validar(id);
+  else if (a==="notaMkt") notaMkt(id);
+  else if (a==="save") save(id);
+  else if (a==="cset") { S.cliente[b.dataset.k] = S.cliente[b.dataset.k]===v ? "" : v; persist(); render(); }
+  else if (a==="cmulti") { const arr = S.cliente[b.dataset.k], i = arr.indexOf(v); i>=0 ? arr.splice(i,1) : arr.push(v); persist(); render(); }
+  else if (a==="resetC") { S.cliente = blankCliente(); persist(); render(); }
+  else if (a==="consultar") consultar();
+  else if (a==="sim") { S.sim = v; render(); }
+  else if (a==="pzSug") { PZ_SUG[+v][1].forEach(id=>{ if (S.byId[id] && !S.pz.items.includes(id)) S.pz.items.push(id); }); pzSave(); render(); }
+  else if (a==="pzProp") { S.prop.items.forEach(it=>{ if (!S.pz.items.includes(it.id)) S.pz.items.push(it.id); }); if (S.prop.cliente && !S.pz.cliente) S.pz.cliente = S.prop.cliente; if (S.prop.asesor && !S.pz.asesor) S.pz.asesor = S.prop.asesor; pzSave(); render(); }
+  else if (a==="pzClear") { S.pz.items = []; pzSave(); render(); }
+  else if (a==="pzPDF") pzPDF();
+  else if (a==="openSim") { S.sim = v; }
+  else if (a==="simset") { S.simv[S.sim][b.dataset.k] = v; $("#simForm").innerHTML = simForm(); calcSim(); }
+});
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (t.id==="q") { S.q = t.value; const pos = t.selectionStart; render(); const n = $("#q"); if (n) { n.focus(); try { n.setSelectionRange(pos,pos); } catch(_){} } }
+  else if (t.dataset.s && t.type!=="checkbox" && t.tagName!=="SELECT") { S.simv[S.sim][t.dataset.s] = t.value; calcSim(); }
+  else if (t.dataset.pz) { S.pz[t.dataset.pz] = t.value; pzSave(); refreshDeck(); }
+  else if (t.dataset.pf) { S.prop[t.dataset.pf] = t.value; persist(); refreshPreview(); }
+  else if (t.dataset.pi) { S.prop.items[+t.dataset.pi].nota = t.value; persist(); refreshPreview(); }
+});
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.id==="fEstado") { S.fEstado = t.value; render(); }
+  else if (t.dataset.pzp) { const i = S.pz.items.indexOf(t.dataset.pzp); if (t.checked && i<0) S.pz.items.push(t.dataset.pzp); if (!t.checked && i>=0) S.pz.items.splice(i,1); pzSave(); render(); }
+  else if (t.id==="pz_inst") { S.pz.inst = t.checked; pzSave(); refreshDeck(); }
+  else if (t.id==="pz_area") { S.pz.area = t.value; pzSave(); refreshDeck(); }
+  else if (t.id==="patrimonio") { S.cliente.patrimonio = t.value; persist(); render(); }
+  else if (t.dataset.s && (t.tagName==="SELECT" || t.type==="checkbox")) { S.simv[S.sim][t.dataset.s] = t.type==="checkbox" ? t.checked : +t.value; $("#simForm").innerHTML = simForm(); calcSim(); }
+});
+document.addEventListener("keydown", e => { if (e.key==="Enter" && e.target.id==="comitente") consultar(); });
+
+/* ── Arranque ── */
+function setProductos(list){ S.productos = list.sort((a,b)=>a.nombre.localeCompare(b.nombre,"es")); S.byId = {}; list.forEach(p=>S.byId[p.id]=p); }
+let notasOn = false;
+function watchNotas(){
+  if (notasOn || !S.db) return; notasOn = true;
+  S.db.collection("notas").orderBy("fecha","desc").limit(50).onSnapshot(async snap => {
+    S.notas = snap.docs.map(d=>Object.assign({id:d.id}, d.data()));
+    const ids = [...new Set(S.notas.map(n=>n.autor).filter(Boolean))];
+    if (S.user && ids.length) { try { const ps = await S.user.profiles(ids); ids.forEach(i=>{ S.names[i] = (ps[i] && ps[i].name) || ""; }); } catch(_){} }
+    if (route()==="gestion") softRender();
+  }, ()=>{});
+}
+function softRender(){ const a = document.activeElement; if (a && (a.tagName==="TEXTAREA" || (a.tagName==="INPUT" && a.type!=="checkbox"))) return; render(); }
+async function boot(){
+  const st = document.createElement("style"); st.textContent = PP_CSS; document.head.appendChild(st);
+  render(true);
+  const c = window.claude;
+  if (!c || !c.use) { S.loading = false; S.dbMissing = true; render(); return; }
+  c.use("downloads").then(d => { S.dl = d; });
+  c.use("assets").then(a => { S.assets = a; if (location.hash.startsWith("#editar-")) softRender(); });
+  c.use("user").then(async u => { if (!u) return; S.user = u; try { S.canEdit = !!(await u.canEdit()); S.uid = await u.id(); } catch(_){} render(); if (S.canEdit && S.db) watchNotas(); });
+  const db = await c.use("db");
+  if (!db) { S.loading = false; S.dbMissing = true; render(); return; }
+  S.db = db;
+  if (S.canEdit) watchNotas();
+  const timer = setTimeout(()=>{ S.slow = true; render(); }, 10000);
+  db.collection("productos").onSnapshot(snap => {
+    setProductos(snap.docs.map(d=>Object.assign({id:d.id}, JSON.parse(JSON.stringify(d.data())))));
+    if (!snap.metadata.fromCache) { clearTimeout(timer); S.loading = false; S.slow = false; }
+    softRender();
+  }, () => { clearTimeout(timer); S.loading = false; render(); });
+  db.collection("validaciones").onSnapshot(snap => { const v = {}; snap.docs.forEach(d=>v[d.id]=d.data()); S.vals = v; if (S.productos.length) softRender(); }, ()=>{});
+  db.doc("config/impuestos").onSnapshot(d => { S.imp = d.exists ? d.data() : null; if (S.productos.length) softRender(); }, ()=>{});
+}
+boot();
+})();
+</script>
+
+</body></html>
