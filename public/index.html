@@ -239,6 +239,7 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 .drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}.drop .op-ic{opacity:.85}.drop.ok .op-ic{opacity:1}
 .drop-t{flex:1;min-width:0}.drop-t b{display:block;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.drop-t small{display:block;font-size:12px;color:var(--ink-3)}
 .drop-b{pointer-events:none;flex:none}
+.xfoot{margin-top:56px!important;padding-bottom:0!important}.xfoot-min{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:18px 22px!important;font-size:12.5px;color:var(--dark-2)}.xfoot-min img{height:12px;width:auto}.xfoot-ses{margin-left:auto}
 .dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
 .busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
 @media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
@@ -694,20 +695,17 @@ function render(anim){
   if (r === "propuesta") refreshPreview();
   if (r === "presentaciones") refreshDeck();
 }
+/* Pie interno: solo la sesión (quién entró y Salir). El "Hablemos" con datos de contacto no hace falta en una herramienta interna. */
 function footer(r){
   const f = $("#xfoot"); if (!f) return;
-  const p = r.startsWith("p-") ? S.byId[r.slice(2)] : null;
-  const corp = p && p.unidades.includes("Banca Corporativa") && !p.unidades.includes("Banca Privada");
-  const mail = p ? (corp ? "bancacorporativa@neix.com.ar" : "bancaprivada@neix.com.ar") : "bancaprivada@neix.com.ar · bancacorporativa@neix.com.ar";
-  f.innerHTML = `<div class="in"><div class="top"><div><h2>Hablemos.</h2><img src="${LOGO_LIGHT}" alt="NEIX"></div>
-   <dl><div><dt>Teléfono</dt><dd>(011) 4859-1552</dd></div><div><dt>Email</dt><dd>${esc(mail)}</dd></div><div><dt>Oficinas</dt><dd>Don Francisco 3345, piso 5, San Fernando</dd></div><div><dt>Web</dt><dd><a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></dd></div></dl></div>
-   <p class="legal">${esc(LEYENDA)}</p>${sesionLink()}</div>`;
+  const ses = sesionLink();
+  f.innerHTML = `<div class="in xfoot-min"><img src="${LOGO_LIGHT}" alt="NEIX"><span>Hub de Productos · uso interno</span>${ses ? `<span class="xfoot-ses">${ses}</span>` : ""}</div>`;
 }
 /* Acceso de editores: al pie de cada página (solo con Firebase). */
 function sesionLink(){
-  if (S.me) return `<p class="legal" style="margin-top:10px">Ingresaste como ${esc(S.me.nombre || S.me.email)}${S.me.editor ? " · editor" : ""} · <a href="/api/auth/logout" style="color:inherit">Salir</a></p>`;
+  if (S.me) return `Ingresaste como ${esc(S.me.nombre || S.me.email)}${S.me.editor ? " · editor" : ""} · <a href="/api/auth/logout" style="color:inherit">Salir</a>`;
   const ses = S.ses; if (!ses) return "";
-  return `<p class="legal" style="margin-top:10px">${ses.editor ? `Editando como ${esc(ses.editor.email)} · <a href="#" data-act="logout" style="color:inherit">Salir</a>` : `<a href="#ingresar" style="color:inherit">Acceso editores</a>`}</p>`;
+  return ses.editor ? `Editando como ${esc(ses.editor.email)} · <a href="#" data-act="logout" style="color:inherit">Salir</a>` : `<a href="#ingresar" style="color:inherit">Acceso editores</a>`;
 }
 function stateMsg(t, d){ return `<div class="page-head"><div><div class="eyebrow">Hub de Productos</div><h1>${esc(t)}</h1><p>${esc(d)}</p></div></div>`; }
 
