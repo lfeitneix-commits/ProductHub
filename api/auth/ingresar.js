@@ -11,5 +11,6 @@ export default function handler(req, res) {
     texto: "Entrá con tu cuenta de Neix para consultar las fichas, analizar carteras y armar propuestas.",
     boton: { href: "/api/auth/login?next=" + encodeURIComponent(destino), texto: "Entrar con Microsoft", microsoft: true },
     nota: "Usá tu cuenta @neix.com.ar. La sesión queda abierta en este navegador.",
+    links: [{ href: "/api/auth/login?cuenta=1&next=" + encodeURIComponent(destino), texto: "Entrar con otra cuenta" }],
   });
 }
