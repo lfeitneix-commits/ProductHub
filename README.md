@@ -123,3 +123,15 @@ Quién entra: solo cuentas del directorio de Neix (@neix.com.ar), y si `HABILITA
 Si alguien sale de `HABILITADOS`, pierde el acceso en la próxima publicación aunque tenga la sesión abierta;
 si Sistemas da de baja su cuenta de Microsoft, ya no puede volver a iniciar sesión.
 El secreto de Microsoft vence: anotá la fecha y renovalo antes (paso 1).
+
+## Notas de las fichas en Teams
+"¿Algo para corregir o sumar?" publica la nota en un canal de Teams, con el nombre y mail de quien la escribió
+(sale de su sesión de Microsoft), el producto y un botón para abrir la ficha. Función: `api/nota.js`.
+
+Configuración (una vez):
+1. En Teams, en el canal donde quieran recibirlas (por ejemplo "Hub – Notas"): **⋯ › Workflows**
+   › plantilla **"Post to a channel when a webhook request is received"** › elegir el equipo y el canal › **Add workflow**.
+2. Copiar la URL que muestra al terminar.
+3. Vercel › Settings › Environments › Production › Environment Variables › `TEAMS_WEBHOOK_URL` = esa URL › Save › Redeploy.
+
+La URL funciona como una clave: no la compartas ni la pegues en el repo.

@@ -849,20 +849,19 @@ async function upOP(id){
     await S.db.doc("productos/"+id).update({onePager: op}); toast("One pager cargado"); go("editar-"+id);
   } catch(e) { toast("No se pudo subir. Revisá el archivo y probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Subir one pager"; } }
 }
-/* Las notas de las fichas llegan por mail a estas casillas, desde el mail de quien las escribe. */
-const NOTAS_PARA = ["lfeit@neix.com.ar", "info@neix.com.ar"];
+/* Las notas de las fichas se publican en el canal de Teams de Marketing (api/nota.js), con el nombre de quien las escribe. */
 function abrirLink(href, nueva){ const l = document.createElement("a"); l.href = href; if (nueva) { l.target = "_blank"; l.rel = "noopener"; } document.body.appendChild(l); l.click(); l.remove(); }
 async function notaMkt(id){
   const el = $("#mkNota"), t = (el && el.value || "").trim(), p = S.byId[id];
   if (!t) { toast("Escribí la nota antes de enviarla"); return; }
-  const ficha = location.origin + location.pathname + "#p-" + id;
-  abrirLink(`mailto:${NOTAS_PARA.join(",")}?subject=${encodeURIComponent("Hub de Productos · Nota sobre " + (p ? p.nombre : id))}&body=${encodeURIComponent(t + "\n\nFicha: " + ficha)}`);
-  if (!S.db) { if (el) el.value = ""; return; }
-  const b = document.querySelector('[data-act="notaMkt"]'); if (b) { b.disabled = true; b.textContent = "Enviando"; }
-  try { const nid = Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-    await S.db.doc("notas/"+nid).set({producto:id, productoNombre:p?p.nombre:id, texto:t.slice(0,2000), fecha:new Date().toISOString(), autor:S.uid||"", enviada:false});
-    el.value = ""; toast("Se abrió tu mail con la nota. Revisala y tocá enviar."); }
-  catch(e) { if (el) el.value = ""; toast("Se abrió tu mail con la nota. Revisala y tocá enviar."); }
+  const b = document.querySelector('[data-act="notaMkt"]'); if (b) { b.disabled = true; b.textContent = "Enviando…"; }
+  try {
+    const r = await fetch("api/nota", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({producto:id, productoNombre: p ? p.nombre : id, texto: t.slice(0, 2000)})});
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    if (el) el.value = "";
+    S.notas.unshift({id: Date.now().toString(36), producto:id, productoNombre: p ? p.nombre : id, texto:t, fecha:new Date().toISOString(), autor: S.me ? S.me.email : "", enviada:true});
+    toast("Nota enviada. ¡Gracias!");
+  } catch(e) { toast("No pudimos enviar la nota. Probá de nuevo en un rato."); }
   if (b) { b.disabled = false; b.textContent = "Enviar"; }
 }
 async function validar(id){
