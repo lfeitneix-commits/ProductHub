@@ -16,8 +16,8 @@
         "Diversificás respecto de los bonos del Estado."
       ],
       [
-        "Exentas para persona humana",
-        "Intereses y venta exentos de Ganancias y Bienes Personales (persona humana)."
+        "Exentas para persona física",
+        "Intereses y venta exentos de Ganancias y Bienes Personales (persona física)."
       ]
     ],
     "comoFunciona": [
@@ -48,7 +48,7 @@
     "objeciones": [
       [
         "Prefiero el plazo fijo en dólares.",
-        "Una ON de primera línea paga más, es exenta para persona humana y se puede vender cualquier día."
+        "Una ON de primera línea paga más, es exenta para persona física y se puede vender cualquier día."
       ]
     ],
     "operativa": [
@@ -60,7 +60,7 @@
       "Clientes que buscan renta en USD",
       "Jubilados o rentistas"
     ],
-    "pitch": "Renta en dólares de empresas como YPF, Pampa o Vista, exenta de Ganancias y Bienes Personales para persona humana.",
+    "pitch": "Renta en dólares de empresas como YPF, Pampa o Vista, exenta de Ganancias y Bienes Personales para persona física.",
     "preguntas": [
       "¿Buscás que la cartera te pague una renta periódica?",
       "¿En qué moneda gastás?"

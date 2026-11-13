@@ -531,7 +531,7 @@ const ico = (k, cls) => `<svg class="ico ${cls||""}" viewBox="0 0 24 24" aria-hi
 
 /* ── Diccionarios ── */
 const UNI = {"Banca Corporativa":"BC", "Banca Privada":"BP", "Financial Advisors":"FAs", "Mercado de Capitales":"MdC"};
-const TIPO = {persona:"Persona humana", pyme:"Empresa pyme", grande:"Empresa grande", fa:"Cliente de FA"};
+const TIPO = {persona:"Persona física", pyme:"Empresa pyme", grande:"Empresa grande", fa:"Cliente de FA"};
 const PERFIL = {conservador:"Conservador", moderado:"Moderado", agresivo:"Agresivo"};
 const PERFIL_MAX = {conservador:2, moderado:3, agresivo:5};
 const HORIZ = {corto:"Menos de 1 año", medio:"1 a 3 años", largo:"Más de 3 años"};
@@ -567,7 +567,7 @@ const S = {
   productos: [], byId: {}, vals: {}, imp: null,
   db: null, uid: null, canEdit: false, dl: null, assets: null, user: null, notas: [], names: {},
   loading: true, slow: false, dbMissing: false,
-  view: "interno", persona: "Persona humana",
+  view: "interno", persona: "Persona física",
   q: "", fUnidad: "", fCat: "", fEstado: "", fNeeds: [],
   cliente: blankCliente(),
   prop: {cliente:"", asesor:"", mail:"", tel:"", mensaje:"", items:[]},
@@ -580,7 +580,7 @@ const S = {
   }
 };
 const LS = "neix-hub-v2";
-try { const sv = JSON.parse(localStorage.getItem(LS) || "null"); if (sv) { if (sv.prop) S.prop = Object.assign(S.prop, sv.prop); if (sv.cliente) S.cliente = Object.assign(blankCliente(), sv.cliente, {consultando:false}); if (sv.persona) S.persona = sv.persona; } } catch(e) {}
+try { const sv = JSON.parse(localStorage.getItem(LS) || "null"); if (sv) { if (sv.prop) S.prop = Object.assign(S.prop, sv.prop); if (sv.cliente) S.cliente = Object.assign(blankCliente(), sv.cliente, {consultando:false}); if (sv.persona) S.persona = sv.persona === "Persona humana" ? "Persona física" : sv.persona; } } catch(e) {}
 function persist(){ try { localStorage.setItem(LS, JSON.stringify({prop:S.prop, cliente:S.cliente, persona:S.persona})); } catch(e) {} }
 
 /* ── Utilidades ── */
@@ -786,7 +786,7 @@ function onePager(p){
    <section class="xsplit"><h2>De qué se trata</h2><div class="t"><p>${esc(c.queEs)}</p><p class="small"><b style="color:var(--ink);font-weight:500">Monto</b> ${esc(f.minimo)} · <b style="color:var(--ink);font-weight:500">Liquidez</b> ${esc(f.liquidez)}</p></div></section>
    <section class="xbox"><div><span class="ic">${ico(p.categoria)}</span><h2>Ventajas</h2></div><div class="xben">${c.beneficios.map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div></section>
    <section class="xsplit"><h2>Cómo funciona</h2><ol class="xsteps">${c.comoFunciona.map(s=>`<li><span>${esc(s)}</span></li>`).join("")}</ol></section>
-   ${p.impuestos.length && S.imp ? `<section class="xtax"><div class="xtax-h"><h2>Tratamiento impositivo</h2><div><p class="small muted" style="margin-bottom:10px">Por instrumento, tipo de persona e ingreso.</p><div class="seg">${["Persona humana","Persona jurídica"].map(x=>`<button data-act="persona" data-v="${x}" aria-pressed="${S.persona===x}">${x}</button>`).join("")}</div></div></div>
+   ${p.impuestos.length && S.imp ? `<section class="xtax"><div class="xtax-h"><h2>Tratamiento impositivo</h2><div><p class="small muted" style="margin-bottom:10px">Por instrumento, tipo de persona e ingreso.</p><div class="seg">${["Persona física","Persona jurídica"].map(x=>`<button data-act="persona" data-v="${x}" aria-pressed="${S.persona===x}">${x}</button>`).join("")}</div></div></div>
      ${p.impuestos.map(k=>taxTable(k, S.persona, true)).join("")}<p class="tiny muted" style="margin-top:12px">Información orientativa. Consultá tu caso con tu asesor impositivo.</p></section>` : ""}
    <section class="xsplit"><h2>Lo que tenés que saber</h2><div class="t"><ul class="clean" style="font-size:14.5px">${c.aTener.map(a=>`<li>${esc(a)}</li>`).join("")}</ul><div class="xneix"><div class="eyebrow" style="margin-bottom:6px">En Neix</div>${esc(c.enNeix)}</div></div></section>
   </div>`;
@@ -1784,7 +1784,7 @@ const EXPORT_HEAD = (title, extra) => `<!doctype html><html lang="es"><head><met
 ${PP_CSS}${extra||""}</style></head><body><div class="bar"><span>Documento de Neix</span><button onclick="window.print()">Guardar como PDF</button></div>`;
 function onePagerDoc(p){
   const c = p.cliente, f = c.ficha;
-  const tax = p.impuestos.length && S.imp ? `<div class="pp-sec"><div class="ey">Tratamiento impositivo</div>${["Persona humana","Persona jurídica"].map(per=>p.impuestos.map(k=>{ const t = S.imp.tablas[k]; if(!t) return ""; const rows = t.filas.filter(r=>r[0]===per); if(!rows.length) return ""; return `<p style="margin:12px 0 4px;font-size:12.5px"><b>${esc(t.nombre)}</b> · ${per}</p><table class="pp-glance" style="margin-top:0"><thead><tr><th>Ingreso</th><th>Ganancias</th><th>IVA</th><th>Bienes Pers.</th><th>IIBB CABA</th></tr></thead><tbody>${rows.map(r=>`<tr><td style="font-family:inherit;color:inherit;width:auto">${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${esc(r[5])}</td><td>${esc(r[6])}</td></tr>`).join("")}</tbody></table>`; }).join("")).join("")}<p class="pp-note">Información orientativa. Consultá tu caso con tu asesor impositivo.</p></div>` : "";
+  const tax = p.impuestos.length && S.imp ? `<div class="pp-sec"><div class="ey">Tratamiento impositivo</div>${["Persona física","Persona jurídica"].map(per=>p.impuestos.map(k=>{ const t = S.imp.tablas[k]; if(!t) return ""; const rows = t.filas.filter(r=>r[0]===per); if(!rows.length) return ""; return `<p style="margin:12px 0 4px;font-size:12.5px"><b>${esc(t.nombre)}</b> · ${per}</p><table class="pp-glance" style="margin-top:0"><thead><tr><th>Ingreso</th><th>Ganancias</th><th>IVA</th><th>Bienes Pers.</th><th>IIBB CABA</th></tr></thead><tbody>${rows.map(r=>`<tr><td style="font-family:inherit;color:inherit;width:auto">${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${esc(r[5])}</td><td>${esc(r[6])}</td></tr>`).join("")}</tbody></table>`; }).join("")).join("")}<p class="pp-note">Información orientativa. Consultá tu caso con tu asesor impositivo.</p></div>` : "";
   const contacto = p.unidades.includes("Banca Corporativa") ? "bancacorporativa@neix.com.ar" : "bancaprivada@neix.com.ar";
   return EXPORT_HEAD(p.nombre+" · Neix") + `<div class="pp"><div class="pp-cover"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="ey">${esc(p.unidades[0])} · ${esc(p.nombre)}</div><h1>${esc(c.titular)}</h1><p style="color:#CFC6B8;max-width:60ch;margin-top:4px">${esc(c.bajada)}</p></div>
   <div class="pp-body"><div class="pp-sec"><div class="ey">De qué se trata</div><p style="margin-top:8px">${esc(c.queEs)}</p>

@@ -3,7 +3,7 @@
   "cliente": {
     "aTener": [
       "Su valor depende de la acción y del tipo de cambio.",
-      "Los dividendos tributan en escala progresiva para persona humana."
+      "Los dividendos tributan en escala progresiva para persona física."
     ],
     "bajada": "Invertí en Apple, Microsoft o en un ETF del S&P 500 operando en pesos o en dólares, sin abrir una cuenta afuera.",
     "beneficios": [
@@ -16,7 +16,7 @@
         "Su precio sigue al dólar CCL."
       ],
       [
-        "Eficiencia para persona humana",
+        "Eficiencia para persona física",
         "La venta está exenta de Ganancias; las acciones compradas afuera tributan 15%."
       ]
     ],
