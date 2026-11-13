@@ -1356,7 +1356,7 @@ const normNom = t => String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"
 const findAsesor = n => { const k = normNom(n); return k ? (S.asesores||[]).find(a=>normNom(a.nombre)===k) || null : null; };
 const asesoresList = () => `<datalist id="asesoresList">${(S.asesores||[]).map(a=>`<option value="${esc(a.nombre)}">${esc(a.area||"")}</option>`).join("")}</datalist>`;
 const AREAS = {"Banca Privada":"bancaprivada@neix.com.ar","Banca Corporativa":"bancacorporativa@neix.com.ar","Financial Advisors":"fas@neix.com.ar","Mesa · Mercado de Capitales":"info@neix.com.ar","Estrategia":"info@neix.com.ar"};
-const PZ_SUG = [["Tesorería corporativa",["cauciones","fci","fondo-dedicado","echeq-tesoreria"]],["Financiamiento pyme",["cheques","pagares","avales-sgr","facturas-fce"]],["Cobertura cambiaria",["futuros-dolar","bonos-cer-dl","pricing-fx"]],["Dolarizar e invertir afuera",["t-bills","cedears","cuentas-offshore","operatoria-internacional"]]];
+const PZ_SUG = [["Tesorería corporativa",["cauciones","fci","fondo-dedicado"]],["Financiamiento pyme",["cheques","pagares","avales-sgr","facturas-fce"]],["Cobertura cambiaria",["futuros-dolar","bonos-cer-dl","pricing-fx"]],["Dolarizar e invertir afuera",["t-bills","cedears","cuentas-offshore","operatoria-internacional"]]];
 S.pz = {titulo:"Soluciones de inversión y financiamiento", bajada:"Banca Corporativa · Banca Privada · Financial Advisors", cliente:"", inst:true, asesor:"", mail:"", tel:"", area:"", items:[]};
 try { const sv = JSON.parse(localStorage.getItem("neix-hub-pz")||"null"); if (sv) Object.assign(S.pz, sv); } catch(e) {}
 function pzSave(){ try { localStorage.setItem("neix-hub-pz", JSON.stringify(S.pz)); } catch(e) {} }
