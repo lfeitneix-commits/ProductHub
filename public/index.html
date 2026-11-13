@@ -1161,16 +1161,26 @@ function vSimuladores(){
   <div class="seg" style="margin-bottom:16px">${tabs.map(([k,t])=>`<button data-act="sim" data-v="${k}" aria-pressed="${S.sim===k}">${t}</button>`).join("")}</div>
   <div class="sim"><div class="panel stack" id="simForm">${simForm()}</div><div id="simOut" style="min-width:0"></div></div>`;
 }
+/* Montos en pesos: se escriben con puntos de miles (80.000.000) y se guardan como número. */
+const moneyF = (id, l, v, hint) => `<label class="f" for="s_${id}">${l}<input class="input num" id="s_${id}" data-s="${id}" data-money="1" type="text" inputmode="numeric" autocomplete="off" value="${fmt(+v||0)}">${hint?`<span class="hint">${hint}</span>`:""}</label>`;
+function formatearMonto(t){
+  const pos = t.selectionStart || 0, digAntes = t.value.slice(0, pos).replace(/\D/g, "").length;
+  const dig = t.value.replace(/\D/g, "").replace(/^0+(?=\d)/, "").slice(0, 15);
+  t.value = dig ? fmt(+dig) : "";
+  let i = 0, n = 0; while (i < t.value.length && n < digAntes) { if (/\d/.test(t.value[i])) n++; i++; }
+  try { t.setSelectionRange(i, i); } catch(_) {}
+  return dig ? +dig : 0;
+}
 const numF = (id, l, v, hint, step) => `<label class="f" for="s_${id}">${l}<input class="input num" id="s_${id}" data-s="${id}" type="number" inputmode="decimal" step="${step||"any"}" value="${v}">${hint?`<span class="hint">${hint}</span>`:""}</label>`;
 function simForm(){
   const v = S.simv[S.sim];
   if (S.sim === "cpd") return cpdForm(v);
   if (S.sim === "caucion") return `<div class="seg">${[["colocar","Colocar fondos"],["tomar","Tomar fondos"]].map(([k,t])=>`<button data-act="simset" data-k="modo" data-v="${k}" aria-pressed="${v.modo===k}">${t}</button>`).join("")}</div>
-   ${v.modo==="colocar" ? numF("monto","Monto a colocar ($)",v.monto) : numF("garantia","Cartera en garantía ($)",v.garantia) + `<label class="f" for="s_aforo">Aforo del título<select class="input" id="s_aforo" data-s="aforo">${[[85,"AL30 · 85%"],[80,"Acciones Galicia · 80%"],[93,"T-Bills · 93%"],[70,"Otro · 70%"]].map(([a,t])=>`<option value="${a}" ${Number(v.aforo)===a?"selected":""}>${t}</option>`).join("")}</select><span class="hint">Aforos de ejemplo. Los fija el mercado.</span></label>`}
+   ${v.modo==="colocar" ? moneyF("monto","Monto a colocar ($)",v.monto) : moneyF("garantia","Cartera en garantía ($)",v.garantia) + `<label class="f" for="s_aforo">Aforo del título<select class="input" id="s_aforo" data-s="aforo">${[[85,"AL30 · 85%"],[80,"Acciones Galicia · 80%"],[93,"T-Bills · 93%"],[70,"Otro · 70%"]].map(([a,t])=>`<option value="${a}" ${Number(v.aforo)===a?"selected":""}>${t}</option>`).join("")}</select><span class="hint">Aforos de ejemplo. Los fija el mercado.</span></label>`}
    ${numF("tna","TNA (%)",v.tna,"Valor de ejemplo")}${numF("dias","Plazo (días)",v.dias,"De 1 a 30 días",1)}${numF("arancel","Aranceles y derechos (% anual)",v.arancel,"Valor de ejemplo")}`;
-  if (S.sim === "descuento") return `<p class="small muted">Cheques de pago diferido, pagarés y facturas de crédito electrónicas.</p>${numF("vn","Valor del documento ($)",v.vn)}${numF("dias","Días al vencimiento",v.dias,"",1)}${numF("tna","Tasa de descuento (TNA %)",v.tna,"Valor de ejemplo")}${numF("comision","Comisiones y aranceles (% del nominal)",v.comision,"Valor de ejemplo")}
+  if (S.sim === "descuento") return `<p class="small muted">Cheques de pago diferido, pagarés y facturas de crédito electrónicas.</p>${moneyF("vn","Valor del documento ($)",v.vn)}${numF("dias","Días al vencimiento",v.dias,"",1)}${numF("tna","Tasa de descuento (TNA %)",v.tna,"Valor de ejemplo")}${numF("comision","Comisiones y aranceles (% del nominal)",v.comision,"Valor de ejemplo")}
    <label class="f" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="s_aval" data-s="aval" ${v.aval?"checked":""}> Con aval de SGR</label>${v.aval?numF("sgr","Costo del aval (TNA %)",v.sgr,"Aprox. 4% según one pager"):""}`;
-  return `${numF("emp","Empleados con más de 12 meses",v.emp,"",1)}${numF("sal","Salario bruto promedio ($)",v.sal)}
+  return `${numF("emp","Empleados con más de 12 meses",v.emp,"",1)}${moneyF("sal","Salario bruto promedio ($)",v.sal)}
    <div class="q"><h4>Tipo de empresa</h4><div class="seg">${[["pyme","Micro y pyme · 2,5%"],["grande","Grande · 1%"]].map(([k,t])=>`<button data-act="simset" data-k="tipo" data-v="${k}" aria-pressed="${v.tipo===k}">${t}</button>`).join("")}</div></div>
    <div class="q"><h4>Fondo</h4><div class="seg">${[["I","Multiempleador I · 23%"],["II","Multiempleador II · 28%"]].map(([k,t])=>`<button data-act="simset" data-k="fondo" data-v="${k}" aria-pressed="${v.fondo===k}">${t}</button>`).join("")}</div><span class="tiny muted">TNA esperada bruta, Vinci Compass, octubre 2026.</span></div>
    ${numF("aj","Ajuste salarial anual estimado (%)",v.aj)}${numF("rot","Desvinculaciones por año (% de la nómina)",v.rot)}${numF("ant","Antigüedad promedio (años)",v.ant)}${numF("meses","Horizonte (meses)",v.meses,"",1)}`;
@@ -1238,7 +1248,7 @@ function cpdForm(v){
   return `<p class="small muted">Comparativo del descuento de un cheque de pago diferido en el mercado con Neix contra un banco. Fórmulas de la planilla "CPD con fórmulas".</p>
    <label class="f" for="s_cliente">Cliente (para el one pager)<input class="input" id="s_cliente" data-s="cliente" value="${esc(v.cliente||"")}" placeholder="Razón social"></label>
    <label class="f" for="s_asesor">Asesor<input class="input" id="s_asesor" data-s="asesor" value="${esc(v.asesor||"")}" placeholder="Tu nombre" list="asesoresList" autocomplete="off"></label>${asesoresList()}
-   ${numF("precio","Monto del cheque ($)",v.precio)}
+   ${moneyF("precio","Monto del cheque ($)",v.precio)}
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${numF("tasaNeix","Tasa Neix (TNA %)",v.tasaNeix)}${numF("tasaBanco","Tasa banco (TNA %)",v.tasaBanco)}</div>
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${numF("diasNeix","Plazo Neix (días)",v.diasNeix,"",1)}${numF("diasBanco","Plazo banco (días)",v.diasBanco,"",1)}</div>
    <details class="fold"><summary>Parámetros editables</summary><div class="in stack">${numF("comNeg","Comisión de negociación (TNA %)",v.comNeg)}${numF("comMer","Comisión de mercado (% del cheque)",v.comMer)}</div></details>`;
@@ -1663,6 +1673,13 @@ async function enviar(b){
 document.addEventListener("keydown", e => { if (e.key === "Escape" && S.envio) cerrarEnvio(); });
 /* Tampoco cambian con las flechas del teclado ni con la rueda del mouse. */
 document.addEventListener("keydown", e => { if ((e.key === "ArrowUp" || e.key === "ArrowDown") && e.target.matches && e.target.matches('input[type="number"]')) e.preventDefault(); });
+/* En los montos, borrar al lado de un punto de miles borra el número, no el punto. */
+document.addEventListener("keydown", e => {
+  const t = e.target; if (!t.dataset || !t.dataset.money || t.selectionStart !== t.selectionEnd) return;
+  const p = t.selectionStart;
+  if (e.key === "Backspace" && t.value[p-1] === ".") t.setSelectionRange(p-1, p-1);
+  if (e.key === "Delete" && t.value[p] === ".") t.setSelectionRange(p+1, p+1);
+});
 document.addEventListener("wheel", e => { const t = e.target; if (t.matches && t.matches('input[type="number"]') && document.activeElement === t) e.preventDefault(); }, {passive:false});
 function loadScript(src){ return new Promise((ok,ko)=>{ if (document.querySelector(`script[src="${src}"]`)) return ok(); const t = document.createElement("script"); t.src = src; t.onload = ok; t.onerror = ko; document.head.appendChild(t); }); }
 async function pzPDF(){
@@ -1778,6 +1795,7 @@ document.addEventListener("click", e => {
 document.addEventListener("input", e => {
   const t = e.target;
   if (t.id==="q") { S.q = t.value; const pos = t.selectionStart; render(); const n = $("#q"); if (n) { n.focus(); try { n.setSelectionRange(pos,pos); } catch(_){} } }
+  else if (t.dataset.money) { S.simv[S.sim][t.dataset.s] = formatearMonto(t); calcSim(); }
   else if (t.dataset.s && t.type!=="checkbox" && t.tagName!=="SELECT") { S.simv[S.sim][t.dataset.s] = t.value; calcSim(); }
   else if (t.dataset.pz) { S.pz[t.dataset.pz] = t.value;
     if (t.dataset.pz==="asesor") { const a = findAsesor(t.value); if (a && t.value !== a.nombre) { t.value = S.pz.asesor = a.nombre; } if (a) { S.pz.mail = a.mail || ""; S.pz.tel = a.tel || ""; const m = $("#pz_mail"), te = $("#pz_tel"); if (m) m.value = S.pz.mail; if (te) te.value = S.pz.tel; } if (a && AREAS[a.area]) { S.pz.area = a.area; const sel = $("#pz_area"); if (sel) sel.value = a.area; } }
