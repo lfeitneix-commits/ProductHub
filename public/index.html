@@ -210,6 +210,12 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .stack{display:grid;gap:12px}
 .ia-box{margin-bottom:18px;border-color:var(--line-2)}.ia-head{display:flex;align-items:center;gap:10px;justify-content:space-between}
 .ia-res{font-size:15px;line-height:1.55;margin:12px 0 4px}.ia-h{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:18px 0 8px}
+.ia-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:14px 0 4px}.ia-kpi{background:var(--surface-2);border-radius:10px;padding:10px 12px;display:grid;gap:2px}.ia-kpi b{font-size:20px;font-weight:500}.ia-kpi b small{font-size:12px;color:var(--ink-3)}.ia-kpi span{font-size:11.5px;color:var(--ink-2)}.ia-kpi em{font-style:normal;font-size:11px;color:var(--ink-3)}
+@media (max-width:760px){.ia-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ia-rot{border:1px solid var(--line);border-left:3px solid #476785;border-radius:10px;padding:10px 12px}.ia-rot-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ia-rot-h .n{width:22px;height:22px;border-radius:50%;background:#476785;color:#fff;display:grid;place-items:center;font-size:11.5px;font-weight:600}.ia-rot-h .de{font-size:13.5px}.ia-rot-h .fl{color:var(--ink-3)}.ia-rot-h .a{font-weight:600;font-size:13.5px;color:inherit;text-decoration:none}.ia-rot-h .m{margin-left:auto;font-variant-numeric:tabular-nums}
+.ia-tab td,.ia-tab th{font-size:13px}.ia-pitch{margin:6px 0 0;font-size:13px;font-style:italic;color:var(--ink);border-left:2px solid var(--line-2);padding-left:8px}
+.ia-obj{border:1px solid var(--line);border-radius:8px;padding:8px 12px}.ia-obj summary{cursor:pointer;font-size:13.5px;font-weight:500}
+.ia-next{margin-top:16px;background:var(--ink);color:#fff;border-radius:10px;padding:12px 14px;font-size:13.5px;display:grid;gap:2px}.ia-next b{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
 .ia-diag{border-radius:8px;padding:9px 12px;font-size:13px;background:var(--surface-2);display:grid;gap:2px}.ia-diag b{font-size:13.5px}.ia-diag b span{font-size:11px;font-weight:600;margin-left:6px;opacity:.75}
 .ia-diag.ok{background:var(--ok-bg)}.ia-diag.warn{background:var(--warn-bg)}.ia-diag.opp{background:#E6EDF3}
 .ia-paso{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:start;border:1px solid var(--line);border-radius:10px;padding:10px 12px}.ia-paso .n{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12.5px;font-weight:600}.ia-paso a{text-decoration:none;color:inherit}
@@ -899,53 +905,163 @@ function buscaHTML(){
 }
 /* ── Análisis con IA ──
    Misma estructura de respuesta en los dos modos (ver api/analisis.js):
-   { resumen, diagnostico:[{titulo, detalle, nivel:"ok"|"alerta"|"oportunidad"}],
-     estrategia:[{producto_id, prioridad, por_que}], riesgos:[...], preguntas:[...] }
-   Modo en public/js/ia-config.js: "simulacion" (arma el análisis en el navegador) o "api" (POST /api/analisis con Claude). */
+   { resumen, metricas:{riesgo_ponderado, riesgo_objetivo, dolarizacion_pct, riesgo_argentino_pct, liquidez_inmediata_pct, posiciones_efectivas},
+     asignacion:[{clase, actual_pct, modelo_pct, propuesto_pct}],
+     diagnostico:[{titulo, detalle, nivel:"ok"|"alerta"|"oportunidad"}],
+     rotaciones:[{desde, hacia_producto_id, monto_usd, motivo, impacto}],
+     estrategia:[{producto_id, prioridad, por_que, argumento}],
+     objeciones:[{objecion, respuesta}], preguntas:[...], proximo_paso }
+   Modo en public/js/ia-config.js: "simulacion" (reglas en el navegador) o "api" (POST /api/analisis con Claude). */
 const iaModo = () => (window.NEIX_IA && window.NEIX_IA.modo) || "simulacion";
+/* Características de cada tipo de activo de la tenencia (para métricas y rotaciones). */
+const ACT = {
+  soberanos:    {riesgo:3, usd:true,  arg:true,  liq:false, nombre:"bonos soberanos"},
+  on:           {riesgo:2, usd:true,  arg:true,  liq:false, nombre:"ONs"},
+  cedears:      {riesgo:4, usd:true,  arg:false, liq:false, nombre:"CEDEARs"},
+  acciones:     {riesgo:5, usd:false, arg:true,  liq:false, nombre:"acciones argentinas"},
+  internacional:{riesgo:2, usd:true,  arg:false, liq:false, nombre:"renta fija global"},
+  tbills:       {riesgo:1, usd:true,  arg:false, liq:false, nombre:"T-Bills"},
+  caucion:      {riesgo:1, usd:false, arg:true,  liq:true,  nombre:"caución"},
+  fci:          {riesgo:1, usd:false, arg:true,  liq:true,  nombre:"money market"},
+  dl:           {riesgo:2, usd:false, arg:true,  liq:false, nombre:"dólar linked"},
+  cer:          {riesgo:2, usd:false, arg:true,  liq:false, nombre:"bonos CER"}
+};
+const RIESGO_OBJ = {conservador:1.8, moderado:2.7, agresivo:3.6};
+/* Producto de Neix que cubre cada clase cuando está subponderada (según perfil). */
+const DESTINO = {
+  "Internacional": c => c.perfil === "agresivo" ? "fondos-offshore" : "t-bills",
+  "Renta variable": c => "cedears",
+  "Cobertura (CER / DL)": c => "bonos-cer-dl",
+  "Renta fija en dólares": c => "obligaciones-negociables",
+  "Liquidez en pesos": c => c.tipo === "pyme" || c.tipo === "grande" ? "fci" : "cauciones"
+};
+/* Clase de activo del producto destino (para recalcular la asignación después de rotar). */
+const DEST_TAG = {"obligaciones-negociables":"on", "bonos-iliquidos":"on", "fondos-offshore":"internacional", "t-bills":"tbills", "cedears":"cedears", "bonos-cer-dl":"dl", "fci":"fci", "cauciones":"caucion"};
+const r5 = n => Math.max(5000, Math.round(n / 5000) * 5000);
+const pctf = n => Math.round(n);
+function metricasCartera(c){
+  const h = c.tenencia || [], tot = h.reduce((a,x)=>a+x.usd,0);
+  if (!tot) return null;
+  const w = x => x.usd / tot, sum = f => h.reduce((a,x)=>a + (f(ACT[x.tag]||{}) ? w(x) : 0), 0);
+  const riesgo = h.reduce((a,x)=>a + w(x) * ((ACT[x.tag]||{}).riesgo || 3), 0);
+  const hhi = h.reduce((a,x)=>a + w(x) ** 2, 0);
+  return {tot, riesgo_ponderado: Math.round(riesgo*10)/10, riesgo_objetivo: RIESGO_OBJ[c.perfil] || null,
+    dolarizacion_pct: pctf(sum(a=>a.usd)*100), riesgo_argentino_pct: pctf(sum(a=>a.arg)*100),
+    liquidez_inmediata_pct: pctf(sum(a=>a.liq)*100), posiciones_efectivas: Math.round(1/hhi*10)/10};
+}
 function datosIA(){
-  const c = S.cliente, R = resultados();
+  const c = S.cliente, R = resultados(), m = metricasCartera(c);
   return {
     cliente: {
       nombre: c.nombre || "", tipo: TIPO[c.tipo] || "", perfil: PERFIL[c.perfil] || "", horizonte: HORIZ[c.horizonte] || "",
       patrimonio: c.patrimonio ? ((PATRI.find(([v])=>v===c.patrimonio)||[])[1] || "") : "",
-      tenencia: (c.tenencia||[]).map(h=>({activo:h.activo, usd:h.usd})),
+      tenencia: (c.tenencia||[]).map(h=>({activo:h.activo, tipo:h.tag, clase:CLASE[h.tag]||"Otros", usd:h.usd})),
       busca: c.objetivos.map(k=>OBJ[k]||k), situacion: c.eventos.map(k=>EVT[k]||k),
       ya_tiene: R.tiene.map(r=>r.p.nombre)
     },
+    metricas: m, cartera_modelo: modeloDe(c),
     recomendados_por_reglas: R.rec.map(r=>r.p.id),
-    catalogo: S.productos.map(p=>({id:p.id, nombre:p.nombre, categoria:p.categoria, riesgo:RISK_TXT[p.riesgoNivel]||"", para_que:p.cliente.titular, unidades:p.unidades}))
+    catalogo: S.productos.map(p=>({id:p.id, nombre:p.nombre, categoria:p.categoria, riesgo:RISK_TXT[p.riesgoNivel]||"", para_que:p.cliente.titular,
+      pitch:p.interno.pitch||"", senales:p.interno.senales||[], perfiles:p.match.perfiles||[], unidades:p.unidades}))
   };
 }
-/* Simulación: arma un análisis plausible con reglas, para probar la pantalla sin la API. */
+/* Simulación: análisis armado con reglas de asesoría, con la misma estructura que devuelve la API. */
 function simularIA(){
-  const c = S.cliente, R = resultados(), ten = c.tenencia || [], tot = ten.reduce((a,h)=>a+h.usd,0);
-  const pct = n => tot ? Math.round(n/tot*100) : 0;
-  const enPesos = ten.filter(h=>["caucion","fci"].includes(h.tag)).reduce((a,h)=>a+h.usd,0);
-  const mayor = ten.slice().sort((a,b)=>b.usd-a.usd)[0];
-  const diag = [];
-  if (mayor && pct(mayor.usd) >= 40) diag.push({titulo:"Cartera concentrada", detalle:`${mayor.activo} explica el ${pct(mayor.usd)}% de la tenencia. Conviene repartir el riesgo entre más emisores o plazos.`, nivel:"alerta"});
-  else if (ten.length) diag.push({titulo:"Diversificación razonable", detalle:`Ningún activo supera el 40% de la cartera (el mayor es ${mayor.activo}, con ${pct(mayor.usd)}%).`, nivel:"ok"});
-  if (ten.length && pct(enPesos) >= 30) diag.push({titulo:"Mucha liquidez en pesos", detalle:`El ${pct(enPesos)}% está en caución o money market. Si no la necesita en el corto plazo, puede rendir más o cubrirse.`, nivel:"oportunidad"});
-  if (c.eventos.includes("excedente_liquidez")) diag.push({titulo:"Liquidez sin invertir", detalle:"Marcaste que tiene excedentes: es el momento de proponer dónde colocarlos según el plazo en que los necesite.", nivel:"oportunidad"});
-  if (c.perfil && PERFIL_MAX[c.perfil] <= 2 && ten.some(h=>["acciones","cedears"].includes(h.tag))) diag.push({titulo:"Renta variable con perfil conservador", detalle:"Tiene acciones o CEDEARs y su perfil es conservador. Revisá que el peso sea acotado y que lo tenga claro.", nivel:"alerta"});
-  if (!diag.length) diag.push({titulo:"Sin tenencia para analizar", detalle:"El análisis se basa en lo que busca y su situación. Leé la cuenta comitente para sumar el diagnóstico de cartera.", nivel:"ok"});
-  const elegidos = R.rec.concat(R.pos).slice(0, 4);
-  const estrategia = elegidos.map((r, i) => ({
-    producto_id: r.p.id, prioridad: i + 1,
-    por_que: `${r.p.cliente.titular}.${r.why.length ? " Responde a: " + r.why.slice(0,3).join(", ").toLowerCase() + "." : ""}${r.cond.length ? " Ojo: " + r.cond[0].toLowerCase() + "." : ""}`
-  }));
-  const riesgos = elegidos.slice(0, 3).map(r => r.p.cliente.aTener && r.p.cliente.aTener[0] ? `${r.p.nombre}: ${r.p.cliente.aTener[0]}` : "").filter(Boolean);
-  if (mayor && pct(mayor.usd) >= 40) riesgos.push(`Bajar la concentración en ${mayor.activo} de a poco, sin forzar ventas con pérdida.`);
-  const preguntas = [
-    "¿Qué parte de este dinero puede necesitar en los próximos 3 a 6 meses?",
-    c.objetivos.length ? `De lo que busca (${c.objetivos.map(k=>(OBJ[k]||k).toLowerCase()).join(", ")}), ¿qué es lo más urgente?` : "¿Qué espera lograr con esta inversión en el próximo año?",
-    "¿Tiene inversiones en otras entidades que debamos considerar?",
-    c.tipo === "pyme" || c.tipo === "grande" ? "¿Cómo viene el flujo de cobros y pagos de la empresa en los próximos meses?" : "¿Hay algún gasto o evento importante previsto (viaje, compra, herencia)?"
-  ];
-  const resumen = `${c.nombre || "El cliente"}${c.perfil ? ", perfil " + (PERFIL[c.perfil]||"").toLowerCase() : ""}${c.horizonte ? " y horizonte de " + (HORIZ[c.horizonte]||"").toLowerCase() : ""}${tot ? ", tiene " + usd(tot) + " en " + ten.length + " activos" : ""}. `
-    + (estrategia.length ? `Proponemos empezar por ${estrategia.slice(0,2).map(e=>S.byId[e.producto_id].nombre).join(" y ")}, que responden a lo que busca sin salirse de su perfil.` : "Marcá qué busca y su situación para sumar productos a la estrategia.");
-  return {resumen, diagnostico: diag, estrategia, riesgos, preguntas};
+  const c = S.cliente, R = resultados(), m = metricasCartera(c), ten = c.tenencia || [];
+  const tot = m ? m.tot : 0, perfil = c.perfil || "moderado", mod = modeloDe(c), emp = mod === MODELO_EMPRESA;
+  const nombreModelo = emp ? "de tesorería para empresas" : PERFIL[perfil].toLowerCase();
+  const enUSD = c.objetivos.includes("preservar_usd") || c.objetivos.includes("internacional"); // no pasar dólares a pesos
+  const diag = [], rot = [];
+  /* 1. Asignación actual vs modelo */
+  const act = {}; ten.forEach(x => { const k = CLASE[x.tag] || "Otros"; act[k] = (act[k]||0) + x.usd; });
+  const clases = [...new Set(Object.keys(mod).concat(Object.keys(act)))];
+  const gap = {}; clases.forEach(k => gap[k] = (act[k]||0) - (mod[k]||0) / 100 * tot);   // USD de más (+) o de menos (-)
+  /* 2. Concentración en una posición: rotar el exceso sobre 25% */
+  const orden = ten.slice().sort((a,b)=>b.usd-a.usd), top = orden[0];
+  const usados = {};
+  const mover = (de, a, monto) => { if (de) gap[de] = (gap[de]||0) - monto; if (a) gap[a] = (gap[a]||0) + monto; };
+  if (top && top.usd / tot > .30 && !(ACT[top.tag]||{}).liq) {
+    const exceso = top.usd - .25 * tot, hacia = top.tag === "soberanos" ? "obligaciones-negociables" : top.tag === "on" ? "bonos-iliquidos" : top.tag === "cedears" || top.tag === "acciones" ? "fondos-offshore" : "t-bills";
+    const kd = CLASE[DEST_TAG[hacia]], cabe = kd && kd !== CLASE[top.tag] ? Math.max(0, -gap[kd] + .05 * tot) : exceso;
+    if (S.byId[hacia] && Math.min(exceso, cabe) >= .03 * tot) {
+      const montoC = r5(Math.min(exceso, cabe));
+      rot.push({desde: top.activo, hacia_producto_id: hacia, monto_usd: montoC,
+        motivo: `${top.activo} pesa ${pctf(top.usd/tot*100)}% de la cartera: un solo emisor define el resultado.`,
+        impacto: top.tag === "soberanos" ? "Mismo dólar y perfil de renta, pero con riesgo corporativo en lugar de soberano. Se ejecuta como swap, sin salir del mercado." : "Baja la dependencia de una sola posición sin cambiar la moneda."});
+      usados[top.activo] = montoC;
+      mover(CLASE[top.tag], CLASE[DEST_TAG[hacia]], montoC);
+    }
+  }
+  /* 3. Rotaciones entre clases: de la más sobreponderada a la más subponderada */
+  const sobran = clases.filter(k => gap[k] > .05 * tot).sort((a,b)=>gap[b]-gap[a]);
+  const enPesos = k => k === "Liquidez en pesos" || k === "Cobertura (CER / DL)";
+  const faltan = clases.filter(k => gap[k] < -.05 * tot && DESTINO[k]).sort((a,b)=>gap[a]-gap[b]);
+  sobran.forEach(k => {
+    faltan.forEach(f => {
+      if (rot.length >= 3) return;
+      if (enUSD && !enPesos(k) && enPesos(f)) return; // busca preservar dólares: no se rotan dólares a pesos
+      const monto = Math.min(gap[k], -gap[f]); if (monto < .03 * tot) return;
+      const fuente = orden.filter(x => (CLASE[x.tag]||"Otros") === k).map(x => ({x, libre: x.usd - (usados[x.activo]||0)})).sort((a,b)=>b.libre-a.libre)[0];
+      const hacia = DESTINO[f](c); if (!fuente || fuente.libre < 2000 || !S.byId[hacia] || rot.some(r=>r.hacia_producto_id===hacia)) return;
+      const usdRot = r5(Math.min(monto, fuente.libre));
+      rot.push({desde: fuente.x.activo, hacia_producto_id: hacia, monto_usd: usdRot,
+        motivo: `${k} está ${pctf(gap[k]/tot*100)} pp por encima del modelo ${nombreModelo} y ${f.toLowerCase()} ${pctf(-gap[f]/tot*100)} pp por debajo.`,
+        impacto: f === "Internacional" ? "Suma dólares con riesgo Estados Unidos y baja la exposición a Argentina." : f === "Renta variable" ? "Agrega potencial de crecimiento en dólares (vía CCL) con empresas globales." : f === "Cobertura (CER / DL)" ? "Protege los pesos contra inflación o devaluación oficial." : f === "Liquidez en pesos" ? "Deja disponible lo que puede necesitar en el corto plazo." : "Renta en dólares con flujo conocido."});
+      mover(k, f, usdRot); usados[fuente.x.activo] = (usados[fuente.x.activo]||0) + usdRot;
+    });
+  });
+  /* 4. Liquidez en pesos ociosa con objetivo en dólares */
+  const liqARS = ten.filter(x => (ACT[x.tag]||{}).liq).reduce((a,x)=>a+x.usd,0);
+  if (rot.length < 3 && liqARS > .15 * tot && (c.objetivos.includes("preservar_usd") || c.objetivos.includes("cobertura_devaluacion")) && !rot.some(r=>r.hacia_producto_id==="bonos-cer-dl") && S.byId["bonos-cer-dl"]) {
+    const src = orden.find(x => (ACT[x.tag]||{}).liq);
+    mover(CLASE[src.tag], CLASE.dl, r5(liqARS * .5));
+    rot.push({desde: src.activo, hacia_producto_id: "bonos-cer-dl", monto_usd: r5(liqARS * .5),
+      motivo: `Tiene ${pctf(liqARS/tot*100)}% en pesos de corto plazo y busca proteger el valor en dólares.`,
+      impacto: "Mantiene la mitad líquida y cubre el resto contra devaluación sin necesidad de dolarizar."});
+  }
+  /* Diagnóstico */
+  if (m) {
+    const ro = m.riesgo_objetivo;
+    if (ro && m.riesgo_ponderado > ro + .5) diag.push({titulo:"Más riesgo que el que admite su perfil", detalle:`Riesgo ponderado ${fmt(m.riesgo_ponderado,1)} sobre 5, contra ${fmt(ro,1)} esperado para un perfil ${PERFIL[perfil].toLowerCase()}. Conviene bajar exposición antes de sumar productos nuevos.`, nivel:"alerta"});
+    else if (ro && m.riesgo_ponderado < ro - .6) diag.push({titulo:"Cartera más conservadora que su perfil", detalle:`Riesgo ponderado ${fmt(m.riesgo_ponderado,1)} sobre 5, contra ${fmt(ro,1)} esperado. Hay margen para buscar más rendimiento sin salirse del perfil.`, nivel:"oportunidad"});
+    else if (ro) diag.push({titulo:"Riesgo alineado con el perfil", detalle:`Riesgo ponderado ${fmt(m.riesgo_ponderado,1)} sobre 5, en línea con el ${fmt(ro,1)} esperado para su perfil.`, nivel:"ok"});
+    if (m.riesgo_argentino_pct >= 70) diag.push({titulo:"Exposición alta a Argentina", detalle:`El ${m.riesgo_argentino_pct}% depende de emisores o pesos argentinos. Aunque esté en dólares, un evento local le pega a casi toda la cartera.`, nivel:"alerta"});
+    if (m.posiciones_efectivas < 3.5) diag.push({titulo:"Diversificación baja", detalle:`Equivale a ${fmt(m.posiciones_efectivas,1)} posiciones del mismo peso${top ? `; ${top.activo} explica el ${pctf(top.usd/tot*100)}%` : ""}.`, nivel:"alerta"});
+    if (m.liquidez_inmediata_pct >= 25) diag.push({titulo:"Liquidez ociosa", detalle:`${m.liquidez_inmediata_pct}% en caución o money market: rinde poco en términos reales si no la necesita en las próximas semanas.`, nivel:"oportunidad"});
+  }
+  if (c.eventos.includes("excedente_liquidez")) diag.push({titulo:"Tiene liquidez sin invertir", detalle:"Es el disparador de la conversación: proponé la rotación con el destino de esos fondos ya resuelto.", nivel:"oportunidad"});
+  if (!m) diag.push({titulo:"Sin tenencia cargada", detalle:"El análisis se basa en lo que busca y su situación. Leé la cuenta comitente para sumar métricas y rotaciones.", nivel:"ok"});
+  /* Asignación propuesta (después de las rotaciones) */
+  const asignacion = m ? clases.map(k => ({clase:k, actual_pct: pctf((act[k]||0)/tot*100), modelo_pct: mod[k]||0, propuesto_pct: pctf(((mod[k]||0)/100*tot + gap[k])/tot*100)})) : [];
+  /* Estrategia: primero los destinos de las rotaciones, después lo que pide su objetivo */
+  const ids = []; rot.forEach(r => { if (!ids.includes(r.hacia_producto_id)) ids.push(r.hacia_producto_id); });
+  R.rec.concat(R.pos).forEach(r => { if (ids.length < 4 && !ids.includes(r.p.id)) ids.push(r.p.id); });
+  const estrategia = ids.slice(0, 4).map((id, i) => {
+    const p = S.byId[id], ev = evaluar(p, c), ro = rot.find(r => r.hacia_producto_id === id);
+    return {producto_id:id, prioridad:i+1,
+      por_que: ro ? `Destino de la rotación desde ${ro.desde} (${usd(ro.monto_usd)}). ${ro.impacto}` : `${p.cliente.titular}.${ev.why.length ? " Responde a " + ev.why.slice(0,2).join(" y ").toLowerCase() + "." : ""}`,
+      argumento: p.interno.pitch || p.cliente.bajada || p.cliente.titular};
+  });
+  /* Objeciones: las cargadas en las fichas, y las típicas de una rotación */
+  const objeciones = [];
+  estrategia.forEach(e => { const o = (S.byId[e.producto_id].interno.objeciones||[])[0]; if (o && objeciones.length < 3) objeciones.push({objecion:o[0], respuesta:o[1]}); });
+  if (rot.length && objeciones.length < 3) objeciones.push({objecion:"¿Por qué vender algo que me viene rindiendo bien?", respuesta:"No es vender por vender: es tomar parte de la ganancia y repartir el riesgo. Si ese activo sigue subiendo, seguís teniendo la mayor parte; si baja, no te arrastra toda la cartera."});
+  if (rot.some(r => r.hacia_producto_id === "t-bills" || r.hacia_producto_id === "fondos-offshore") && objeciones.length < 3) objeciones.push({objecion:"Los bonos argentinos rinden más que el Tesoro americano.", respuesta:"Rinden más porque tienen más riesgo. La idea es que una parte de tus dólares no dependa de Argentina: es el seguro de la cartera, no la apuesta."});
+  /* Preguntas: de las fichas y del caso */
+  const preguntas = [];
+  if (m && m.liquidez_inmediata_pct > 0) preguntas.push("De lo que tenés en pesos, ¿cuánto vas a necesitar en los próximos 3 meses?");
+  estrategia.forEach(e => { const q = (S.byId[e.producto_id].interno.preguntas||[])[0]; if (q && preguntas.length < 4 && !preguntas.includes(q)) preguntas.push(q); });
+  if (preguntas.length < 4) preguntas.push("¿Tenés inversiones en otras entidades que tengamos que mirar en conjunto?");
+  /* Resumen y próximo paso */
+  const totRot = rot.reduce((a,r)=>a+r.monto_usd,0);
+  const resumen = m
+    ? `${c.nombre || "El cliente"} tiene ${usd(tot)} con riesgo ponderado ${fmt(m.riesgo_ponderado,1)}/5 (perfil ${PERFIL[perfil].toLowerCase()}), ${m.dolarizacion_pct}% dolarizado y ${m.riesgo_argentino_pct}% expuesto a Argentina. `
+      + (rot.length ? `Proponemos ${rot.length} ${rot.length===1?"rotación":"rotaciones"} por ${usd(totRot)} (${pctf(totRot/tot*100)}% de la cartera) para acercarla al modelo ${nombreModelo}, sin cambiar su perfil.` : "La cartera está cerca del modelo: el foco es sumar lo que busca con fondos nuevos.")
+    : `${c.nombre || "El cliente"}: sin tenencia cargada. La estrategia sale de lo que busca y su situación.`;
+  const proximo_paso = rot.length
+    ? `Llamalo esta semana con la rotación 1 (${usd(rot[0].monto_usd)} de ${rot[0].desde} a ${S.byId[rot[0].hacia_producto_id].nombre}) como titular, y mandale la propuesta con ${estrategia.slice(0,2).map(e=>S.byId[e.producto_id].nombre).join(" y ")}.`
+    : estrategia.length ? `Mandale la propuesta con ${estrategia.slice(0,2).map(e=>S.byId[e.producto_id].nombre).join(" y ")} y coordiná una llamada para definir montos.` : "Completá qué busca y su situación para armar la estrategia.";
+  return {resumen, metricas: m ? (({tot, ...x}) => x)(m) : null, asignacion, diagnostico: diag, rotaciones: rot, estrategia, objeciones, preguntas, proximo_paso};
 }
 async function analizarIA(){
   const c = S.cliente;
@@ -963,6 +1079,7 @@ async function analizarIA(){
       data = simularIA();
     }
     data.estrategia = (data.estrategia||[]).filter(e => S.byId[e.producto_id]).sort((a,b)=>a.prioridad-b.prioridad);
+    data.rotaciones = (data.rotaciones||[]).filter(r => S.byId[r.hacia_producto_id]);
     S.ia = {estado:"listo", data, modo: iaModo(), clave: claveIA()};
   } catch(e) { console.error(e); S.ia = {estado:"error", msg: String(e && e.message || e)}; }
   render();
@@ -972,17 +1089,23 @@ function iaHTML(){
   const ia = S.ia; if (!ia) return "";
   if (ia.estado === "cargando") return `<div class="panel ia-box"><div class="ia-load"><span class="ia-dot"></span><span class="ia-dot"></span><span class="ia-dot"></span></div><p class="small muted" style="margin:8px 0 0">Analizando la cartera, lo que busca y su situación…</p></div>`;
   if (ia.estado === "error") return `<div class="panel ia-box"><p class="small" style="color:var(--crit);margin:0">No pudimos hacer el análisis. Probá de nuevo en unos minutos.</p></div>`;
-  const d = ia.data, viejo = ia.clave !== claveIA();
+  const d = ia.data, m = d.metricas, viejo = ia.clave !== claveIA();
   const nivel = {ok:["ok","Bien"], alerta:["warn","Atención"], oportunidad:["opp","Oportunidad"]};
+  const tile = (v, l, s) => `<div class="ia-kpi"><b>${v}</b><span>${l}</span>${s?`<em>${s}</em>`:""}</div>`;
+  const prodN = id => S.byId[id] ? S.byId[id].nombre : id;
   return `<div class="panel ia-box"><div class="ia-head"><h3 style="margin:0">Análisis con IA</h3>${ia.modo !== "api" ? `<span class="demo">Simulación</span>` : ""}</div>
    ${viejo ? `<p class="tiny" style="color:var(--warn);margin:6px 0 0">Cambiaste los datos: volvé a analizar para actualizarlo.</p>` : ""}
    <p class="ia-res">${esc(d.resumen)}</p>
-   <h4 class="ia-h">Diagnóstico de la cartera</h4><div class="stack" style="gap:8px">${(d.diagnostico||[]).map(x=>{ const [cls,txt] = nivel[x.nivel] || nivel.ok; return `<div class="ia-diag ${cls}"><b>${esc(x.titulo)} <span>${txt}</span></b>${esc(x.detalle)}</div>`; }).join("")}</div>
-   ${d.estrategia.length ? `<h4 class="ia-h">Estrategia sugerida</h4><div class="stack" style="gap:8px">${d.estrategia.map(e=>{ const p = S.byId[e.producto_id], inProp = S.prop.items.some(i=>i.id===p.id); return `<div class="ia-paso"><span class="n">${e.prioridad}</span><div style="min-width:0"><a href="#p-${p.id}"><b>${esc(p.nombre)}</b></a><p class="small muted" style="margin:2px 0 0">${esc(e.por_que)}</p></div><button class="btn ${inProp?"":"primary"}" data-act="toggleProp" data-id="${p.id}">${inProp?"Agregado":"Agregar"}</button></div>`; }).join("")}</div>
+   ${m ? `<div class="ia-kpis">${tile(fmt(m.riesgo_ponderado,1)+"<small>/5</small>", "Riesgo ponderado", m.riesgo_objetivo ? "Perfil: "+fmt(m.riesgo_objetivo,1) : "")}${tile(m.dolarizacion_pct+"%", "Dolarizado")}${tile(m.riesgo_argentino_pct+"%", "Riesgo Argentina")}${tile(m.liquidez_inmediata_pct+"%", "Liquidez inmediata")}${tile(fmt(m.posiciones_efectivas,1), "Posiciones efectivas", "Diversificación real")}</div>` : ""}
+   <h4 class="ia-h">Diagnóstico</h4><div class="stack" style="gap:8px">${(d.diagnostico||[]).map(x=>{ const [cls,txt] = nivel[x.nivel] || nivel.ok; return `<div class="ia-diag ${cls}"><b>${esc(x.titulo)} <span>${txt}</span></b>${esc(x.detalle)}</div>`; }).join("")}</div>
+   ${(d.rotaciones||[]).length ? `<h4 class="ia-h">Rotaciones propuestas</h4><div class="stack" style="gap:8px">${d.rotaciones.map((r,i)=>`<div class="ia-rot"><div class="ia-rot-h"><span class="n">${i+1}</span><span class="de">${esc(r.desde)}</span><span class="fl">→</span><a href="#p-${r.hacia_producto_id}" class="a">${esc(prodN(r.hacia_producto_id))}</a><b class="m">${usd(r.monto_usd)}</b></div><p class="small" style="margin:6px 0 0">${esc(r.motivo)}</p><p class="small muted" style="margin:2px 0 0">${esc(r.impacto)}</p></div>`).join("")}</div>` : ""}
+   ${(d.asignacion||[]).length ? `<h4 class="ia-h">Asignación por clase de activo</h4><div class="tw"><table class="cmp ia-tab"><thead><tr><th>Clase</th><th class="r">Hoy</th><th class="r">Con las rotaciones</th><th class="r">Modelo</th></tr></thead><tbody>${d.asignacion.map(a=>`<tr><td>${esc(a.clase)}</td><td class="r">${a.actual_pct}%</td><td class="r"><b>${a.propuesto_pct}%</b></td><td class="r muted">${a.modelo_pct}%</td></tr>`).join("")}</tbody></table></div>` : ""}
+   ${d.estrategia.length ? `<h4 class="ia-h">Productos a ofrecer</h4><div class="stack" style="gap:8px">${d.estrategia.map(e=>{ const p = S.byId[e.producto_id], inProp = S.prop.items.some(i=>i.id===p.id); return `<div class="ia-paso"><span class="n">${e.prioridad}</span><div style="min-width:0"><a href="#p-${p.id}"><b>${esc(p.nombre)}</b></a><p class="small muted" style="margin:2px 0 0">${esc(e.por_que)}</p>${e.argumento?`<p class="ia-pitch">“${esc(e.argumento)}”</p>`:""}</div><button class="btn ${inProp?"":"primary"}" data-act="toggleProp" data-id="${p.id}">${inProp?"Agregado":"Agregar"}</button></div>`; }).join("")}</div>
    <button class="btn" data-act="iaTodo" style="margin-top:10px">${ico("_plus")}Sumar todos a la propuesta</button>` : ""}
-   ${(d.riesgos||[]).length ? `<h4 class="ia-h">Riesgos y puntos a cuidar</h4><ul class="clean small ia-list">${d.riesgos.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-   ${(d.preguntas||[]).length ? `<h4 class="ia-h">Preguntas para la próxima reunión</h4><ul class="clean small ia-list">${d.preguntas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-   <p class="tiny muted" style="margin-top:12px">Sugerencia para el asesor. Validá cada producto con el perfil y la normativa antes de ofrecerlo.</p></div>`;
+   ${(d.objeciones||[]).length ? `<h4 class="ia-h">Si te dice…</h4><div class="stack" style="gap:6px">${d.objeciones.map(o=>`<details class="ia-obj"><summary>“${esc(o.objecion)}”</summary><p class="small" style="margin:6px 0 0">${esc(o.respuesta)}</p></details>`).join("")}</div>` : ""}
+   ${(d.preguntas||[]).length ? `<h4 class="ia-h">Preguntas para la reunión</h4><ul class="clean small ia-list">${d.preguntas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+   ${d.proximo_paso ? `<div class="ia-next"><b>Próximo paso</b>${esc(d.proximo_paso)}</div>` : ""}
+   <p class="tiny muted" style="margin-top:12px">Sugerencia para el asesor, sobre la cartera modelo de referencia. Validá montos, perfil y normativa antes de ofrecerlo.</p></div>`;
 }
 async function consultar(){
   const c = S.cliente, n = ($("#comitente").value||"").trim(); c.comitente = n; c.apiErr = "";
@@ -1169,6 +1292,9 @@ const MODELO = {
   conservador:{"Liquidez en pesos":20,"Renta fija en dólares":55,"Cobertura (CER / DL)":15,"Renta variable":5,"Internacional":5},
   moderado:{"Liquidez en pesos":10,"Renta fija en dólares":45,"Cobertura (CER / DL)":10,"Renta variable":20,"Internacional":15},
   agresivo:{"Liquidez en pesos":5,"Renta fija en dólares":30,"Cobertura (CER / DL)":5,"Renta variable":40,"Internacional":20}};
+/* Empresas (pyme y grande): cartera de tesorería, con más liquidez y cobertura. */
+const MODELO_EMPRESA = {"Liquidez en pesos":45,"Renta fija en dólares":20,"Cobertura (CER / DL)":25,"Renta variable":0,"Internacional":10};
+const modeloDe = c => (c.tipo === "pyme" || c.tipo === "grande") ? MODELO_EMPRESA : (MODELO[c.perfil] || MODELO.moderado);
 const PIE = ["#2F2E2B","#A59A86","#A8243A","#6E675E","#CFC6B8","#4C7558","#8C7F6B","#D9B98C"];
 function donut(parts){
   const tot = parts.reduce((a,p)=>a+p.v,0)||1, R = 60, C = 2*Math.PI*R; let off = 0;
@@ -1177,13 +1303,13 @@ function donut(parts){
 function carteraHTML(c){
   const h = c.tenencia.slice().sort((a,b)=>b.usd-a.usd), tot = h.reduce((a,x)=>a+x.usd,0)||1, top = h[0];
   const conc = top && top.usd/tot >= .35;
-  const perfil = c.perfil || "moderado", mod = MODELO[perfil];
+  const perfil = c.perfil || "moderado", mod = modeloDe(c), emp = mod === MODELO_EMPRESA;
   const act = {}; h.forEach(x=>{ const k = CLASE[x.tag]||"Otros"; act[k] = (act[k]||0) + x.usd/tot*100; });
   const clases = [...new Set(Object.keys(mod).concat(Object.keys(act)))];
   return `<div class="res-sec"><h3>Análisis de la cartera <span class="muted small">${esc(c.nombre)}</span></h3>
   <div class="panel"><div class="cart">${donut(h.map(x=>({v:x.usd})))}<div>${h.map((x,i)=>`<div class="crow"><i style="background:${PIE[i%PIE.length]}"></i><span>${esc(x.activo)}</span><span class="pc">${fmt(x.usd/tot*100,1)}%</span><span class="us">${usd(x.usd)}</span></div>`).join("")}</div></div>
   ${conc?`<div class="alert"><b>Concentración</b>${esc(top.activo)} es el ${fmt(top.usd/tot*100,0)}% de la cartera.</div>`:`<div class="alert okb"><b>Cartera diversificada</b>Ninguna posición supera el 35% del total.</div>`}
-  <details class="fold" style="margin-top:12px"><summary>Comparar con la cartera modelo para perfil ${esc(PERFIL[perfil].toLowerCase())}</summary><div class="in"><div class="tw"><table class="cmp"><thead><tr><th>Clase de activo</th><th class="r">Actual</th><th class="r">Modelo</th><th class="r">Diferencia</th></tr></thead><tbody>
+  <details class="fold" style="margin-top:12px"><summary>Comparar con la cartera modelo ${emp ? "de tesorería para empresas" : "para perfil " + esc(PERFIL[perfil].toLowerCase())}</summary><div class="in"><div class="tw"><table class="cmp"><thead><tr><th>Clase de activo</th><th class="r">Actual</th><th class="r">Modelo</th><th class="r">Diferencia</th></tr></thead><tbody>
    ${clases.map(k=>{ const a = act[k]||0, m = mod[k]||0, d = a-m; return `<tr><td>${esc(k)}</td><td class="r">${fmt(a,0)}%</td><td class="r">${fmt(m,0)}%</td><td class="r ${Math.abs(d)<5?"":d>0?"dif-up":"dif-dn"}">${d>0?"+":""}${fmt(d,0)} pp</td></tr>`; }).join("")}</tbody></table></div>
    <p class="tiny muted" style="margin-top:8px">${c.perfil?"":"Sin perfil cargado: se compara contra la moderada. "}Cartera modelo de referencia, a reemplazar por la que publique Estrategia.</p></div></details></div></div>`;
 }

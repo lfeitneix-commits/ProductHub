@@ -1,6 +1,6 @@
 // Función de Vercel: POST /api/analisis
 // Recibe los datos del cliente que arma el Hub (datosIA en public/index.html) y devuelve el análisis
-// con la misma forma que la simulación: { resumen, diagnostico, estrategia, riesgos, preguntas }.
+// con la misma forma que la simulación: { resumen, metricas, asignacion, diagnostico, rotaciones, estrategia, objeciones, preguntas, proximo_paso }.
 //
 // Requiere la variable de entorno ANTHROPIC_API_KEY en Vercel (Settings › Environment Variables).
 // Para activarla en el Hub: public/js/ia-config.js -> modo: "api".
@@ -8,49 +8,47 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const client = new Anthropic(); // lee ANTHROPIC_API_KEY del entorno
 
-const SCHEMA = {
-  type: "object",
-  properties: {
-    resumen: { type: "string", description: "Dos o tres oraciones: situación del cliente y por dónde empezar." },
-    diagnostico: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          titulo: { type: "string" },
-          detalle: { type: "string" },
-          nivel: { type: "string", enum: ["ok", "alerta", "oportunidad"] },
-        },
-        required: ["titulo", "detalle", "nivel"],
-        additionalProperties: false,
-      },
-    },
-    estrategia: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          producto_id: { type: "string", description: "id exacto de un producto del catálogo" },
-          prioridad: { type: "integer" },
-          por_que: { type: "string" },
-        },
-        required: ["producto_id", "prioridad", "por_que"],
-        additionalProperties: false,
-      },
-    },
-    riesgos: { type: "array", items: { type: "string" } },
-    preguntas: { type: "array", items: { type: "string" } },
-  },
-  required: ["resumen", "diagnostico", "estrategia", "riesgos", "preguntas"],
-  additionalProperties: false,
-};
+const str = { type: "string" };
+const obj = (properties) => ({ type: "object", properties, required: Object.keys(properties), additionalProperties: false });
+const SCHEMA = obj({
+  resumen: { type: "string", description: "Dos o tres oraciones con números: tamaño, riesgo, dolarización, exposición a Argentina y la jugada principal." },
+  metricas: obj({
+    riesgo_ponderado: { type: "number" }, riesgo_objetivo: { type: "number" }, dolarizacion_pct: { type: "number" },
+    riesgo_argentino_pct: { type: "number" }, liquidez_inmediata_pct: { type: "number" }, posiciones_efectivas: { type: "number" },
+  }),
+  asignacion: { type: "array", items: obj({ clase: str, actual_pct: { type: "number" }, modelo_pct: { type: "number" }, propuesto_pct: { type: "number" } }) },
+  diagnostico: { type: "array", items: obj({ titulo: str, detalle: str, nivel: { type: "string", enum: ["ok", "alerta", "oportunidad"] } }) },
+  rotaciones: { type: "array", items: obj({
+    desde: { type: "string", description: "activo de la tenencia que se vende o reduce" },
+    hacia_producto_id: { type: "string", description: "id exacto de un producto del catálogo" },
+    monto_usd: { type: "number" }, motivo: str, impacto: str,
+  }) },
+  estrategia: { type: "array", items: obj({
+    producto_id: { type: "string", description: "id exacto de un producto del catálogo" },
+    prioridad: { type: "integer" }, por_que: str,
+    argumento: { type: "string", description: "frase para decirle al cliente, en segunda persona" },
+  }) },
+  objeciones: { type: "array", items: obj({ objecion: str, respuesta: str }) },
+  preguntas: { type: "array", items: str },
+  proximo_paso: str,
+});
 
-const SYSTEM = `Sos un asistente para los asesores comerciales de Neix, una ALyC argentina.
-Con los datos de un cliente, preparás un análisis breve para que el asesor lo use en la próxima conversación:
-- diagnóstico de la cartera (concentración, moneda, liquidez, coherencia con el perfil de inversor), de 2 a 4 puntos;
-- una estrategia de 2 a 4 productos, solo del catálogo que te pasan (usá el id exacto), ordenados por prioridad, que respeten el perfil de inversor y respondan a lo que busca y a su situación;
-- riesgos o puntos a cuidar, y de 3 a 4 preguntas para la reunión.
-Escribí en español rioplatense, claro y concreto, sin jerga innecesaria. Es una sugerencia para el asesor, no una recomendación al cliente: no prometas rendimientos.`;
+const SYSTEM = `Sos un estratega senior de inversiones de Neix, una ALyC argentina, y preparás el análisis de un cliente para un asesor financiero con experiencia comercial. El asesor sabe vender: necesita un análisis técnico sólido y accionable, no generalidades.
+
+Te pasan la tenencia (con tipo y clase de activo), métricas ya calculadas, la cartera modelo que corresponde (por perfil o de tesorería si es empresa), lo que busca, su situación y el catálogo de productos de Neix con su pitch.
+
+Entregá:
+- resumen: la foto con números y la jugada principal.
+- metricas: devolvé las que te pasan (podés corregirlas si ves un error).
+- diagnostico (3 a 5 puntos): riesgo ponderado contra el perfil, concentración por emisor y por activo, exposición a riesgo argentino (soberano, corporativo, pesos), moneda (MEP, cable, pesos), liquidez ociosa, duration o plazos si se infieren, coherencia con lo que busca.
+- rotaciones (hasta 3): de un activo concreto de la tenencia a un producto del catálogo, con monto en USD redondeado a 5.000, el motivo técnico y el impacto en la cartera. Priorizá bajar concentración y acercarse a la cartera modelo sin cambiar el perfil. Si busca preservar dólares, no rotes dólares a pesos. Si es empresa, cuidá la liquidez operativa.
+- asignacion: por clase de activo, hoy, con las rotaciones aplicadas y el modelo.
+- estrategia (2 a 4 productos del catálogo, id exacto, ordenados): por qué para este cliente y un argumento de venta en segunda persona.
+- objeciones (2 a 3) probables de este cliente y cómo responderlas.
+- preguntas (3 a 4) para la reunión, que destraben la decisión.
+- proximo_paso: la acción concreta para esta semana.
+
+Español rioplatense, directo, con números. No inventes rendimientos ni precios que no estén en los datos. Es material interno para el asesor, no una recomendación al cliente.`;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") { res.setHeader("Allow", "POST"); return res.status(405).json({ error: "Usá POST" }); }
@@ -65,7 +63,7 @@ export default async function handler(req, res) {
       // Si el modelo declina por seguridad, la API reintenta sola con el modelo de respaldo recomendado.
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
-      output_config: { effort: "medium", format: { type: "json_schema", schema: SCHEMA } },
+      output_config: { effort: "high", format: { type: "json_schema", schema: SCHEMA } },
       system: SYSTEM,
       messages: [{ role: "user", content: "Datos del cliente y catálogo de productos de Neix (JSON):\n" + JSON.stringify(datos) }],
     });
@@ -78,6 +76,7 @@ export default async function handler(req, res) {
     // Solo productos que existen en el catálogo.
     const ids = new Set(datos.catalogo.map((p) => p.id));
     analisis.estrategia = analisis.estrategia.filter((e) => ids.has(e.producto_id));
+    analisis.rotaciones = analisis.rotaciones.filter((r) => ids.has(r.hacia_producto_id));
     return res.status(200).json(analisis);
   } catch (error) {
     if (error instanceof Anthropic.RateLimitError) return res.status(429).json({ error: "Muchas consultas juntas. Probá en un minuto." });
