@@ -1223,20 +1223,19 @@ function abrirEnvio(canal, tipo, id){
   const cel = puedeCompartir(), wa = canal === "wa";
   const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
   div.innerHTML = `<div class="box" role="dialog" aria-modal="true" aria-labelledby="shT"><h3 id="shT">${wa?"Enviar por WhatsApp":"Enviar por mail"}</h3>
-    ${`<label class="f" for="shTo">${wa?"Celular":"Para"}<input class="input" id="shTo" type="${wa?"tel":"email"}" placeholder="${wa?"+54 9 11 …":"nombre@empresa.com"}" autocomplete="off"></label>`}
     <label class="f" for="shMsg">Mensaje<textarea class="input" id="shMsg">${esc(msg)}</textarea></label>
     <div class="att" id="shAtt">Preparando el archivo…</div>
-    <p class="tiny muted" style="margin:0"><b>Enviar</b>: abre ${wa?"WhatsApp":"tu mail"} con ${wa?"el número":"la dirección"} y el mensaje${tipo==="op"&&p&&p.onePager?", con el link al PDF":""}. El PDF también se descarga, por si querés arrastrarlo.${cel?` <b>Compartir con PDF</b>: abre el menú para compartir con el PDF adjunto; ahí elegís el contacto. El mensaje queda copiado: si no aparece, pegalo con Ctrl+V.`:""}</p>
-    <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button>${cel?`<button class="btn" id="shShare" data-act="shShare" disabled>${ico("_dl")}Compartir con PDF</button>`:""}<button class="btn primary" id="shSend" data-act="shSend" disabled>${wa?ico("_wa"):ico("_mail")}Enviar</button></div></div>`;
+    <p class="tiny muted" style="margin:0">${cel ? `Al tocar Enviar se abre el menú para compartir con el PDF adjunto: elegí ${wa?"WhatsApp":"Outlook"} y el contacto. El mensaje queda copiado; si no aparece, pegalo con Ctrl+V.` : `Este navegador no permite adjuntar archivos: se abre ${wa?"WhatsApp":"tu mail"} con el mensaje${tipo==="op"&&p&&p.onePager?" y el link al PDF":""}, y el PDF se descarga para arrastrarlo. Para adjuntarlo directo, usá Chrome o Edge.`}</p>
+    <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button><button class="btn primary" id="shSend" data-act="shSend" disabled>${wa?ico("_wa"):ico("_mail")}Enviar</button></div></div>`;
   document.body.appendChild(div);
-  const f = $("#shTo") || $("#shMsg"); if (f) f.focus();
+  const f = $("#shSend"); if (f) f.focus();
 }
 function cerrarEnvio(){ const m = $("#shm"); if (m) m.remove(); S.envio = null; }
 function telWA(t){ let d = String(t||"").replace(/\D/g, ""); if (!d) return ""; if (d.startsWith("0")) d = d.slice(1); if (d.length === 10) d = "549" + d; else if (d.length === 11 && d.startsWith("9")) d = "54" + d; return d; }
 async function enviar(b){
   const E = S.envio; if (!E) return;
   const to = (($("#shTo")||{}).value || "").trim(), msg = ($("#shMsg")||{}).value || "", wa = E.canal === "wa";
-  if (b && b.id === "shShare" && E.archivo && navigator.canShare && navigator.canShare({files:[E.archivo]})) {
+  if (E.archivo && navigator.canShare && navigator.canShare({files:[E.archivo]})) {
     /* WhatsApp y Outlook suelen ignorar el texto cuando hay un archivo: el mensaje queda copiado para pegarlo. */
     const copiado = navigator.clipboard ? navigator.clipboard.writeText(msg).then(()=>true, ()=>false) : Promise.resolve(false);
     try { await navigator.share({files:[E.archivo], text: msg, title: E.asunto}); cerrarEnvio(); if (await copiado) toast("Si el mensaje no aparece, pegalo con Ctrl+V: ya está copiado"); }
