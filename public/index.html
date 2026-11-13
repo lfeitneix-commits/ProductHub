@@ -1204,7 +1204,7 @@ function calcSim(){
 }
 /* ── Cheques: Neix vs. banco ──
    Copia literal de "CPD con fórmulas.xlsx" (Hoja1). Cada línea indica la celda del Excel.
-   Entradas: C3 precio del cheque, C7/D7 tasa de descuento, C9/D9 plazo, G17 comisión de negociación (TNA), G19 comisión de mercado (% cheque). */
+   Entradas: C3 monto del cheque, C7/D7 tasa de descuento, C9/D9 plazo, G17 comisión de negociación (TNA), G19 comisión de mercado (% cheque). */
 function cpdCalc(v){
   const C3 = +v.precio, C7 = +v.tasaNeix/100, D7 = +v.tasaBanco/100, G17 = +v.comNeg/100, G19 = +v.comMer/100;
   const C9 = +v.diasNeix, D9 = +v.diasBanco;                 // VALUE(SUBSTITUTE(C9," días",""))
@@ -1236,7 +1236,7 @@ function cpdForm(v){
   return `<p class="small muted">Comparativo del descuento de un cheque de pago diferido en el mercado con Neix contra un banco. Fórmulas de la planilla "CPD con fórmulas".</p>
    <label class="f" for="s_cliente">Cliente (para el one pager)<input class="input" id="s_cliente" data-s="cliente" value="${esc(v.cliente||"")}" placeholder="Razón social"></label>
    <label class="f" for="s_asesor">Asesor<input class="input" id="s_asesor" data-s="asesor" value="${esc(v.asesor||"")}" placeholder="Tu nombre" list="asesoresList" autocomplete="off"></label>${asesoresList()}
-   ${numF("precio","Precio del cheque ($)",v.precio)}
+   ${numF("precio","Monto del cheque ($)",v.precio)}
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${numF("tasaNeix","Tasa Neix (TNA %)",v.tasaNeix)}${numF("tasaBanco","Tasa banco (TNA %)",v.tasaBanco)}</div>
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${numF("diasNeix","Plazo Neix (días)",v.diasNeix,"",1)}${numF("diasBanco","Plazo banco (días)",v.diasBanco,"",1)}</div>
    <details class="fold"><summary>Parámetros editables</summary><div class="in stack">${numF("comNeg","Comisión de negociación (TNA %)",v.comNeg)}${numF("comMer","Comisión de mercado (% del cheque)",v.comMer)}</div></details>`;
@@ -1275,10 +1275,10 @@ function cpdDoc(v){
    <h1>Neix vs. banco: cuánto acreditás por tu cheque</h1>
    <p>${v.cliente ? "Simulación para " + esc(v.cliente) + " · " : ""}${fecha}. Comparamos el neto que recibís descontando un cheque de pago diferido en el mercado con Neix y en un banco.</p></div>
   <div class="opx-body">
-   <div class="opx-facts"><div><b>Valor del cheque</b><span>${ars2(r.C3)}</span></div><div><b>Plazo</b><span>${plazo}</span></div><div><b>Tasa de descuento</b><span>${tasa}</span></div><div class="hl"><b>${favor >= 0 ? "A favor de Neix" : "A favor del banco"}</b><span>${ars2(Math.abs(favor))}</span></div></div>
+   <div class="opx-facts"><div><b>Monto del cheque</b><span>${ars2(r.C3)}</span></div><div><b>Plazo</b><span>${plazo}</span></div><div><b>Tasa de descuento</b><span>${tasa}</span></div><div class="hl"><b>${favor >= 0 ? "A favor de Neix" : "A favor del banco"}</b><span>${ars2(Math.abs(favor))}</span></div></div>
    <div class="opx-sec"><h2>Resultado</h2><div>
     <div class="opx-res"><div><b>Neto acreditado con Neix</b><span class="v">${ars2(r.C6)}</span></div><div><b>Neto acreditado en el banco</b><span class="v">${ars2(r.D6)}</span></div></div>
-    <p class="opx-dif">Diferencia directa <strong>${pct(r.D24,2)}</strong> del valor del cheque · Diferencia en TNA <strong>${pct(r.D25,2)}</strong></p></div></div>
+    <p class="opx-dif">Diferencia directa <strong>${pct(r.D24,2)}</strong> del monto del cheque · Diferencia en TNA <strong>${pct(r.D25,2)}</strong></p></div></div>
    <div class="opx-box"><h2>Detalle de la operación</h2><table><thead><tr><th></th><th class="r">Neix</th><th class="r">Banco</th></tr></thead><tbody>
     ${fila("Tasa de descuento", pct(r.C7), pct(r.D7))}${fila("Intereses", r.C8, r.D8)}
     ${fila("IVA sobre intereses", r.C11, r.D11)}${fila("IVA RIN", r.C12, r.D12)}${fila("I.I.B.B.", r.C13, r.D13)}${fila("Impuesto a los créditos", r.C14, r.D14)}
