@@ -520,12 +520,12 @@ const LEYENDA = "NEIX S.A. ALyC Propio registrado bajo el N° 145 de la CNV y Ag
 
 /* API de tenencias SIMULADA. En producción: NEIX Connect por número de comitente. */
 const API_DEMO = {
-  "10234": {nombre:"Familia Etchart", tipo:"persona", perfil:"moderado", tenencia:[
+  "10234": {nombre:"Familia Etchart", tipo:"persona", perfil:"moderado", horizonte:"medio", patrimonio:"300000", tenencia:[
     {activo:"GD30 · Bono soberano USD", tag:"soberanos", usd:182400}, {activo:"ON YPF 2027 · USD", tag:"on", usd:118900},
     {activo:"CEDEAR SPY", tag:"cedears", usd:61250}, {activo:"Fondo offshore renta fija global", tag:"internacional", usd:40000}, {activo:"Caución colocadora ARS", tag:"caucion", usd:24800}, {activo:"FCI money market ARS", tag:"fci", usd:15300}]},
-  "20871": {nombre:"Metalúrgica del Plata S.A.", tipo:"pyme", perfil:"conservador", tenencia:[
+  "20871": {nombre:"Metalúrgica del Plata S.A.", tipo:"pyme", perfil:"conservador", horizonte:"corto", patrimonio:"300000", tenencia:[
     {activo:"FCI money market ARS", tag:"fci", usd:221500}, {activo:"Caución colocadora ARS", tag:"caucion", usd:89700}, {activo:"Bono dólar linked", tag:"dl", usd:64000}]},
-  "31555": {nombre:"Lucía Mendizábal", tipo:"persona", perfil:"agresivo", tenencia:[
+  "31555": {nombre:"Lucía Mendizábal", tipo:"persona", perfil:"agresivo", horizonte:"largo", patrimonio:"50000", tenencia:[
     {activo:"AL30 · Bono soberano USD", tag:"soberanos", usd:41200}, {activo:"Acciones GGAL · PAMP · YPFD", tag:"acciones", usd:33800}, {activo:"FCI renta fija ARS", tag:"fci", usd:9600}]}
 };
 
@@ -852,8 +852,6 @@ async function validar(id){
 /* ── Cliente ── */
 function vCliente(){
   const c = S.cliente, filled = c.tipo || c.objetivos.length || c.eventos.length || c.tenencia, R = filled ? resultados() : null;
-  const sel = (k, map) => `<div class="chips">${Object.entries(map).map(([v,t])=>`<button class="chip" data-act="cset" data-k="${k}" data-v="${v}" aria-pressed="${c[k]===v}">${t}</button>`).join("")}</div>`;
-  const multi = (k, map) => `<div class="chips">${Object.entries(map).map(([v,t])=>`<button class="chip" data-act="cmulti" data-k="${k}" data-v="${v}" aria-pressed="${c[k].includes(v)}">${t}</button>`).join("")}</div>`;
   const tot = (c.tenencia||[]).reduce((a,h)=>a+h.usd,0);
   return `<div class="page-head"><div><div class="eyebrow">Cliente</div><h1>¿Qué le ofrecemos?</h1>
   <p class="muted">Leé su tenencia con el número de comitente, marcá qué busca y el Hub te muestra qué le aplica, qué ya tiene y qué conviene sumar.</p></div>
@@ -866,11 +864,8 @@ function vCliente(){
     ${c.tenencia?`<div style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><b>${esc(c.nombre)}</b><span class="num small">${usd(tot)}</span></div><p class="tiny muted" style="margin:2px 0 6px">Tenencia valorizada al ${new Date().toLocaleDateString("es-AR")}</p>
      ${c.tenencia.map(h=>`<div class="hold-row"><span>${esc(h.activo)}</span><span class="num">${usd(h.usd)}</span></div>`).join("")}</div>`:""}</div>
    <div class="panel stack"><h3 style="margin:0">Perfil</h3>
-    <div class="q"><h4>Tipo de cliente</h4>${sel("tipo",TIPO)}</div><div class="q"><h4>Perfil de inversor</h4>${c.perfil ? `<div class="dato">${esc(PERFIL[c.perfil]||c.perfil)}</div><span class="tiny muted">Dato de la cuenta (test del inversor). No se modifica desde el Hub.</span>` : `<div class="dato vacio">Se completa al leer la cuenta comitente</div>`}</div><div class="q"><h4>Horizonte</h4>${sel("horizonte",HORIZ)}</div>
-    <label class="f">Patrimonio o liquidez disponible<select class="input" id="patrimonio">${PATRI.map(([v,t])=>`<option value="${v}" ${c.patrimonio===v?"selected":""}>${t}</option>`).join("")}</select></label></div>
-   <div class="panel"><h3>Qué busca</h3>${multi("objetivos",OBJ)}</div>
-   <div class="panel"><h3>Situación actual</h3>${multi("eventos",EVT)}</div>
-  </div><div style="min-width:0">${c.tenencia ? carteraHTML(c) : ""}${R ? resultadosHTML(R) : `<div class="empty"><h3 style="font-size:19px;margin-bottom:6px">Las recomendaciones aparecen acá</h3><p>Leé una cuenta comitente o marcá el tipo de cliente y lo que busca.</p></div>`}</div></div>`;
+    ${c.tenencia ? [["Tipo de cliente", TIPO[c.tipo]], ["Perfil de inversor", PERFIL[c.perfil]], ["Horizonte", HORIZ[c.horizonte]], ["Patrimonio o liquidez disponible", c.patrimonio ? (PATRI.find(([v])=>v===c.patrimonio)||[])[1] : ""]].map(([k,v])=>`<div class="q"><h4>${k}</h4>${v?`<div class="dato">${esc(v)}</div>`:`<div class="dato vacio">Sin dato en la cuenta</div>`}</div>`).join("") + `<span class="tiny muted">Datos de la cuenta comitente. No se modifican desde el Hub.</span>` : `<div class="dato vacio">Se completa al leer la cuenta comitente</div>`}</div>
+  </div><div style="min-width:0">${c.tenencia ? carteraHTML(c) : ""}${buscaHTML()}${R ? resultadosHTML(R) : `<div class="empty"><h3 style="font-size:19px;margin-bottom:6px">Las recomendaciones aparecen acá</h3><p>Leé una cuenta comitente y marcá qué busca y su situación.</p></div>`}</div></div>`;
 }
 function resHTML(r, extra){
   const inProp = S.prop.items.some(i=>i.id===r.p.id);
@@ -881,16 +876,16 @@ function resHTML(r, extra){
 function resultadosHTML(R){
   const sec = (t, n, body, d) => `<div class="res-sec"><h3>${t} <span class="muted small">${n}</span></h3>${d?`<p class="small muted">${d}</p>`:""}${body}</div>`;
   return (R.rec.length ? sec("Recomendados", R.rec.length, R.rec.map(r=>resHTML(r)).join(""), "Coinciden con lo que busca y con su perfil.") : sec("Recomendados", 0, `<div class="empty small">Sumá objetivos o situaciones para afinar la recomendación.</div>`))
-   + buscaHTML()
+
    + (R.pos.length ? sec("También pueden aplicar", R.pos.length, R.pos.map(r=>resHTML(r)).join("")) : "")
    + (R.tiene.length ? sec("Ya los tiene", R.tiene.length, R.tiene.map(r=>`<div class="res"><span class="ic">${ico(r.p.categoria)}</span><div><h4><a href="#p-${r.p.id}">${esc(r.p.nombre)}</a></h4><div class="small muted">Detectado en su tenencia. Oportunidad de up selling: revisá montos y plazos.</div></div></div>`).join("")) : "")
    + (R.no.length ? `<details class="fold"><summary>No aplican (${R.no.length})</summary><div class="in">${R.no.map(r=>resHTML(r)).join("")}</div></details>` : "");
 }
 /* Qué busca y situación actual, con análisis en Claude (se abre con los datos del cliente cargados). */
 function buscaHTML(){
-  const c = S.cliente, chips = (arr, map) => arr.length ? `<div class="chips">${arr.map(k=>`<span class="tag">${esc(map[k]||k)}</span>`).join("")}</div>` : `<p class="small muted" style="margin:0">Sin marcar</p>`;
-  return `<div class="res-sec"><h3>Qué busca y situación actual</h3>
-   <div class="busca"><div><h4>Qué busca</h4>${chips(c.objetivos, OBJ)}</div><div><h4>Situación actual</h4>${chips(c.eventos, EVT)}</div></div>
+  const c = S.cliente, multi = (k, map) => `<div class="chips">${Object.entries(map).map(([v,t])=>`<button class="chip" data-act="cmulti" data-k="${k}" data-v="${v}" aria-pressed="${c[k].includes(v)}">${t}</button>`).join("")}</div>`;
+  return `<div class="panel" style="margin-bottom:18px"><h3>Qué busca y situación actual</h3>
+   <div class="busca"><div><h4>Qué busca</h4>${multi("objetivos", OBJ)}</div><div><h4>Situación actual</h4>${multi("eventos", EVT)}</div></div>
    <button class="btn primary" data-act="iaCliente">${ico("_sol")}Analizalo con IA</button>
    <p class="tiny muted" style="margin-top:8px">Abre Claude en otra pestaña con el perfil, la tenencia, lo que busca y su situación, para que proponga una estrategia con productos de Neix.</p></div>`;
 }
@@ -929,7 +924,7 @@ async function consultar(){
   await new Promise(r=>setTimeout(r, 600));
   const d = API_DEMO[n]; c.consultando = false;
   if (!d) { c.apiErr = "No encontramos esa cuenta en la API de prueba. Usá 10234, 20871 o 31555."; c.tenencia = null; }
-  else { c.nombre = d.nombre; c.tenencia = d.tenencia; c.tipo = d.tipo; c.perfil = d.perfil; if (!S.prop.cliente) S.prop.cliente = d.nombre; }
+  else { c.nombre = d.nombre; c.tenencia = d.tenencia; c.tipo = d.tipo; c.perfil = d.perfil; c.horizonte = d.horizonte || ""; c.patrimonio = d.patrimonio || ""; if (!S.prop.cliente) S.prop.cliente = d.nombre; }
   persist(); render();
 }
 
