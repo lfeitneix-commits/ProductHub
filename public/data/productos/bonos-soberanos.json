@@ -38,7 +38,7 @@
     "queEs": "Son títulos de deuda emitidos por el Estado nacional, provincial o municipal. Pagan intereses periódicos y devuelven el capital al vencimiento o en cuotas. Sus condiciones de pago se conocen desde la emisión. Además de la renta, su precio puede subir si mejora la percepción de riesgo del país.",
     "titular": "Renta en dólares con la curva argentina"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager · Bonos soberanos",
   "impuestos": [
     "tp_usd",
@@ -106,11 +106,11 @@
   ],
   "riesgoNivel": 3,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

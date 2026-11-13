@@ -38,7 +38,7 @@
     "queEs": "Los T-Bills son letras de corto plazo que emite el gobierno de Estados Unidos. No pagan cupón: se compran a descuento y al vencimiento cobrás el valor nominal completo. La diferencia es tu rendimiento. Son considerados uno de los activos más seguros del mundo.",
     "titular": "La forma más segura de que tus dólares rindan"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager · T-Bills",
   "impuestos": [
     "tp_ext"
@@ -111,11 +111,11 @@
   ],
   "riesgoNivel": 1,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

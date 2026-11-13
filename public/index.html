@@ -597,7 +597,7 @@ async function dlPdf(id){
   catch(e) { if (e && e.code === "declined") return; toast(e && e.code === "rate_limited" ? "Ya hay una descarga pendiente" : "No pudimos descargar el PDF. Usá Abrir PDF."); }
 }
 function estadoDe(p){
-  const v = S.vals[p.id];
+  const v = S.vals[p.id] || (p.estado === "validado" ? {estado:"validado", fecha:p.ultimaRevision, vence:p.vence, por:p.validador} : null); // validación cargada en la ficha
   const vence = v && v.vence ? v.vence : p.vence;
   const d = daysTo(vence);
   if (d !== null && d < 0) return {k:"vencida", txt:"Vencida", cls:"crit", vence, d, v};

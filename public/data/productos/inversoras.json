@@ -38,7 +38,7 @@
     "queEs": "Inversoras es un plan integral que ordena tu patrimonio, tu familia y tu legado. Parte de un diagnóstico de tus activos y se arma según tu momento: construir, ordenar, transformar (un divorcio, una viudez, una herencia o la venta de una empresa) o transferir.",
     "titular": "Un plan para tu patrimonio, pensado para cada etapa"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "Deck Inversoras (presentación Canva)",
   "impuestos": [],
   "interno": {
@@ -99,10 +99,10 @@
   ],
   "riesgoNivel": 2,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

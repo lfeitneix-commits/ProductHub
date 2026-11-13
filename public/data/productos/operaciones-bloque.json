@@ -37,7 +37,7 @@
     "queEs": "Cuando una operación es muy grande para la liquidez del mercado, ejecutarla de a poco puede mover el precio en tu contra. En acciones y CEDEARs, la Mesa resuelve operaciones de más de ARS 450 millones en bloque, con un precio acordado y ejecución eficiente.",
     "titular": "Movimientos grandes, ejecutados sin mover el precio"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "Relevamiento Mesa (nov 2026) · sin one pager",
   "impuestos": [
     "acciones",
@@ -104,13 +104,13 @@
   ],
   "riesgoNivel": 2,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Mercado de Capitales",
     "Banca Privada",
     "Banca Corporativa",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

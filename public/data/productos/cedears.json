@@ -5,7 +5,7 @@
       "Su valor depende de la acción y del tipo de cambio.",
       "Los dividendos tributan en escala progresiva para persona humana."
     ],
-    "bajada": "Invertí en Apple, Microsoft o en un ETF del S\u0026P 500 operando en pesos o en dólares, sin abrir una cuenta afuera.",
+    "bajada": "Invertí en Apple, Microsoft o en un ETF del S&P 500 operando en pesos o en dólares, sin abrir una cuenta afuera.",
     "beneficios": [
       [
         "Acceso global",
@@ -38,7 +38,7 @@
     "queEs": "Un CEDEAR es un certificado que representa acciones o ETFs extranjeros y cotiza en la Bolsa local. Su precio sigue al activo de afuera, ajustado por el dólar contado con liquidación. Por eso, además de exposición global, te da una cobertura frente a la devaluación del peso.",
     "titular": "Las compañías más grandes del mundo, desde la Bolsa argentina"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 4 · CEDEARs",
   "impuestos": [
     "cedears"
@@ -64,7 +64,7 @@
       "Inversores jóvenes o que recién empiezan a dolarizar",
       "Clientes que no llegan al mínimo de off shore"
     ],
-    "pitch": "La forma más simple de tener Apple o el S\u0026P 500 en tu cartera, con cobertura de dólar y venta exenta de Ganancias.",
+    "pitch": "La forma más simple de tener Apple o el S&P 500 en tu cartera, con cobertura de dólar y venta exenta de Ganancias.",
     "preguntas": [
       "¿Qué compañías del mundo conocés y seguís?"
     ],
@@ -111,11 +111,11 @@
   ],
   "riesgoNivel": 4,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

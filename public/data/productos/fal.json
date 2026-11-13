@@ -42,7 +42,7 @@
     "queEs": "Los Fondos de Asistencia Laboral son cuentas individuales por empleador, creadas por la Ley 27.802, con patrimonio separado e inembargable. Sirven para financiar indemnizaciones por despido sin causa, acuerdos de desvinculación o fallecimiento. La contribución mensual es de 2,5% de la masa salarial para micro y pymes y de 1% para grandes empresas, y se compensa con una reducción equivalente de contribuciones patronales: no implica un costo adicional.",
     "titular": "Una reserva propia para las indemnizaciones, financiada con lo que tu empresa ya aporta"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "FAL · Guía informativa para empresas (marzo 2026) + FAL Neix Carteras Vinci Compass (octubre 2026)",
   "impuestos": [],
   "interno": {
@@ -117,11 +117,11 @@
   ],
   "riesgoNivel": 1,
   "simulador": "fal",
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

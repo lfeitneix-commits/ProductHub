@@ -38,7 +38,7 @@
     "queEs": "Desde tu cuenta en Neix podés invertir en activos del exterior, sobre todo renta variable de Estados Unidos: acciones, ETFs y letras del Tesoro (T-Bills). Es la alternativa para quien está abriendo su cuenta afuera, no llega al mínimo de una cuenta internacional o prefiere tener todo en un solo lugar. Las compras se hacen con dólares cable, que podés transferir desde el exterior o conseguir con una operación de contado con liquidación.",
     "titular": "Invertí en Estados Unidos sin abrir una cuenta afuera"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 12 · Operatoria internacional + relevamiento Mesa (nov 2026)",
   "impuestos": [
     "tp_ext",
@@ -119,12 +119,12 @@
   ],
   "riesgoNivel": 3,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada",
     "Mercado de Capitales",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

@@ -38,7 +38,7 @@
     "queEs": "Las SGR son entidades que avalan a las pymes: garantizan que el instrumento que emitís se va a pagar. Con ese respaldo, el inversor asume el riesgo de la SGR y no el de tu empresa, y por eso conseguís tasas y plazos que de otra forma serían difíciles. El costo del aval ronda el 4% TNA.",
     "titular": "Financiate con las condiciones de una empresa grande"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 6 · Avales con Sociedades de Garantía Recíproca (incluye checklist de documentación)",
   "id": "avales-sgr",
   "impuestos": [],
@@ -114,10 +114,10 @@
   ],
   "riesgoNivel": 2,
   "simulador": null,
-  "ultimaRevision": "2026-11-11",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

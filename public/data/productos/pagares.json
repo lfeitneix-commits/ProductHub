@@ -37,7 +37,7 @@
     "queEs": "El pagaré bursátil es un instrumento con el que tu empresa emite deuda a corto, mediano o largo plazo, y la ofrece a inversores del mercado. Se puede emitir en pesos o en dólares, lo que lo hace muy útil para empresas vinculadas al comercio exterior.",
     "titular": "Financiamiento a tu medida, en pesos o en dólares"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "Capacitación financiamiento (no tiene one pager propio)",
   "impuestos": [
     "cpd_pagare_ars",
@@ -104,10 +104,10 @@
   ],
   "riesgoNivel": 3,
   "simulador": "descuento",
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

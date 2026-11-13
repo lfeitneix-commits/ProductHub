@@ -39,7 +39,7 @@
     "queEs": "El cheque de pago diferido es la forma más usada por las pymes para financiar capital de trabajo. En lugar de esperar al vencimiento, lo negociás en el mercado: un inversor te adelanta el dinero hoy y cobra el cheque cuando vence. La diferencia entre lo que recibís y el valor del cheque es tu costo de financiamiento.",
     "titular": "Convertí tus cheques en liquidez en 24 horas"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 1 · Cheques de pago diferidos y avalados + Capacitación financiamiento",
   "id": "cheques",
   "impuestos": [
@@ -126,10 +126,10 @@
   ],
   "riesgoNivel": 3,
   "simulador": "descuento",
-  "ultimaRevision": "2026-11-11",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

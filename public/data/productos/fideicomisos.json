@@ -38,7 +38,7 @@
     "queEs": "Una empresa (el fiduciante) separa activos o flujos futuros, por ejemplo una cartera de créditos o cobranzas, y los pone en un patrimonio aparte. Sobre esa base se emiten títulos que compran los inversores. Si invertís en un título de deuda, cobrás intereses y amortizaciones. Si invertís en un certificado de participación, cobrás según los resultados del fideicomiso.",
     "titular": "Invertí en flujos concretos, con un patrimonio que los respalda"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 5 · Fideicomisos financieros",
   "impuestos": [
     "ff_deuda_ars",
@@ -105,11 +105,11 @@
   ],
   "riesgoNivel": 3,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

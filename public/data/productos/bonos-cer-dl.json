@@ -38,7 +38,7 @@
     "queEs": "Los bonos CER ajustan su capital todos los días por el Coeficiente de Estabilización de Referencia, que sigue la inflación. Los dólar linked ajustan por el tipo de cambio oficial mayorista. Los dos pagan una tasa baja sobre ese capital ajustado y te sirven para proteger el poder de compra de tus pesos.",
     "titular": "Cubrí tus pesos de la inflación o de la devaluación"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager · Bonos CER y Dólar Linked",
   "impuestos": [
     "tp_pesos_ajuste"
@@ -106,12 +106,12 @@
   "padre": "bonos-soberanos",
   "riesgoNivel": 3,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada",
     "Banca Corporativa",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

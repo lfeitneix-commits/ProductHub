@@ -38,7 +38,7 @@
     "queEs": "Una acción es una participación en una empresa. Invertir en acciones argentinas te expone al crecimiento de compañías locales de energía, bancos, servicios e industria. Su precio se mueve con los resultados de cada empresa y con el contexto del país, por eso tiene más volatilidad.",
     "titular": "Sé parte del crecimiento de las compañías líderes del país"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 10 · Acciones argentinas",
   "impuestos": [
     "acciones"
@@ -100,11 +100,11 @@
   ],
   "riesgoNivel": 5,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

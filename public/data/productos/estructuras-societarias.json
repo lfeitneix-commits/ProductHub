@@ -43,7 +43,7 @@
     "queEs": "Las estructuras societarias son vehículos legales, como sociedades en el exterior, LLC o trusts, que se usan para ordenar la tenencia de activos y planificar su transmisión. Si tenés activos en Estados Unidos a tu nombre (acciones, ETFs, cuentas, inmuebles), al fallecer se activa el Estate Tax, con una tasa de hasta 40% por encima de USD 60.000. Una sociedad como titular evita ese impuesto y que los activos pasen por un proceso sucesorio: solo cambia la titularidad de las acciones.",
     "titular": "Ordená tu patrimonio para hoy y para los que vienen"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 8 · Estructuras societarias + Deck BP Planificación Patrimonial Eficiente + Inversoras",
   "impuestos": [],
   "interno": {
@@ -119,10 +119,10 @@
   ],
   "riesgoNivel": 1,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

@@ -38,7 +38,7 @@
     "queEs": "En una licitación primaria, una empresa o un gobierno emite un bono nuevo. Muchas de las emisiones del exterior se licitan afuera y requieren dólar cable. Si tenés pesos o dólares MEP, la Mesa licita el bono, lo compra y te lo vende localmente en la moneda que tengas. En licitaciones locales, si tu empresa es importadora y necesita cuidar su acceso al MULC, la Mesa compra los bonos en dólares y te los vende en pesos dentro de la normativa.",
     "titular": "Participá de las emisiones nuevas, en la moneda que tengas"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "Relevamiento Mesa (nov 2026) · sin one pager",
   "impuestos": [
     "on_usd",
@@ -106,13 +106,13 @@
   ],
   "riesgoNivel": 3,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Mercado de Capitales",
     "Banca Privada",
     "Banca Corporativa",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

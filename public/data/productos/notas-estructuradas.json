@@ -38,7 +38,7 @@
     "queEs": "Una nota estructurada combina un instrumento de renta fija con derivados para lograr un resultado específico: por ejemplo, participar de la suba de un índice con el capital protegido total o parcialmente, o cobrar un cupón alto mientras un activo se mantenga en un rango. El emisor es un banco internacional.",
     "titular": "Una estrategia diseñada para tu visión de mercado"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 7 · Notas estructuradas",
   "impuestos": [
     "tp_ext"
@@ -105,11 +105,11 @@
   ],
   "riesgoNivel": 4,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

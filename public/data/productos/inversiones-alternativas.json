@@ -34,7 +34,7 @@
     "queEs": "Las inversiones alternativas son activos o estrategias distintos de los instrumentos tradicionales: capital privado, bienes raíces, fondos de cobertura, materias primas, infraestructura, entre otros. Su valor está en que suelen comportarse distinto que las acciones y los bonos.",
     "titular": "Más allá de acciones y bonos"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 9 · Inversiones alternativas",
   "impuestos": [],
   "interno": {
@@ -90,10 +90,10 @@
   ],
   "riesgoNivel": 5,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

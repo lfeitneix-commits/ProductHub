@@ -39,7 +39,7 @@
     "queEs": "Cuando una pyme le factura a una empresa grande, esa factura de crédito electrónica (FCE), una vez aceptada, se transforma en un título ejecutivo que se puede negociar en el mercado. Vos la vendés hoy por un monto algo menor, y el inversor cobra el total al vencimiento. Lo que definís es la tasa implícita.",
     "titular": "Cobrá hoy lo que tu cliente te paga a 90 días"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 3 · Descuento de Facturas Electrónicas + Capacitación financiamiento (plataforma Neix-MAV)",
   "impuestos": [
     "cpd_pagare_ars"
@@ -116,10 +116,10 @@
   ],
   "riesgoNivel": 3,
   "simulador": "descuento",
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

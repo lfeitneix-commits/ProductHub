@@ -38,7 +38,7 @@
     "queEs": "Una caución es un préstamo de corto plazo con garantía, que se hace dentro del mercado. Quien coloca presta su dinero y cobra una tasa. Quien toma recibe ese dinero y deja títulos (bonos o acciones) en garantía. El mercado actúa como garante de la operación.",
     "titular": "Tu liquidez trabajando desde el primer día"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 2 · Cauciones bursátiles",
   "impuestos": [
     "caucion_ars",
@@ -122,12 +122,12 @@
   ],
   "riesgoNivel": 1,
   "simulador": "caucion",
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa",
     "Banca Privada",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

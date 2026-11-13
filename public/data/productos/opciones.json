@@ -38,7 +38,7 @@
     "queEs": "Una opción es un contrato que le da a quien la compra el derecho de comprar (call) o vender (put) un activo a un precio determinado (strike) hasta una fecha. Por ese derecho se paga una prima. Se usan para proteger una cartera de una caída, para generar renta extra sobre acciones que ya tenés o para tomar una posición con capital acotado.",
     "titular": "Protegé tu cartera o expresá una visión con capital acotado"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 6 · Opciones",
   "impuestos": [
     "opc_fut"
@@ -99,12 +99,12 @@
   ],
   "riesgoNivel": 5,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada",
     "Banca Corporativa",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

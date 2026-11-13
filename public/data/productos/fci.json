@@ -38,7 +38,7 @@
     "queEs": "Un fondo común de inversión reúne el dinero de muchos inversores con un mismo objetivo y lo administra un equipo profesional. Comprás cuotapartes y el fondo invierte por vos. Hay fondos para cada necesidad: de liquidez inmediata (money market), de renta fija en pesos o dólares, de acciones o mixtos.",
     "titular": "Gestión profesional para tu liquidez y tu cartera"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 5 · FCI",
   "impuestos": [
     "fci_tp_ars",
@@ -116,12 +116,12 @@
   ],
   "riesgoNivel": 2,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada",
     "Banca Corporativa",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

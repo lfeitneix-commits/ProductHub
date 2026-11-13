@@ -38,7 +38,7 @@
     "queEs": "Las obligaciones negociables (ON) son bonos que emiten las empresas para financiar sus actividades. Al comprarlas, le prestás a la compañía y cobrás intereses y capital según un cronograma fijo. Muchas pagan en dólares y son de empresas con muy buena calidad crediticia.",
     "titular": "Renta en dólares con el respaldo de las empresas líderes"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 11 · ON's",
   "impuestos": [
     "on_usd",
@@ -114,11 +114,11 @@
   ],
   "riesgoNivel": 2,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada",
     "Financial Advisors"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

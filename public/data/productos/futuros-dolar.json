@@ -38,7 +38,7 @@
     "queEs": "Un futuro de dólar es un contrato que fija hoy el precio al que vas a comprar o vender dólares en una fecha futura. Si sos importador y tenés que pagar en tres meses, te asegura el tipo de cambio de ese pago. Si exportás, protege el valor de tus cobros. Se liquida por diferencias en pesos, sin necesidad de mover los dólares.",
     "titular": "Fijá hoy el tipo de cambio de tus próximos pagos o cobros"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "Relevamiento Mesa (nov 2026) · sin one pager",
   "impuestos": [
     "opc_fut"
@@ -111,11 +111,11 @@
   ],
   "riesgoNivel": 3,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Mercado de Capitales",
     "Banca Corporativa"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

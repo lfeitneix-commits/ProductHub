@@ -43,7 +43,7 @@
     "queEs": "Es un fondo común de inversión constituido en exclusiva para tu compañía. A diferencia de un fondo abierto a cualquier inversor, su política de inversión, su liquidez y su administración responden solo a tu tesorería. Vinci Compass es la Sociedad Gerente y Neix diseña la estrategia.",
     "titular": "Un fondo diseñado solo para la tesorería de tu compañía"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "Fondo Dedicado · One Page cliente (nuevo formato) + one pager anterior",
   "impuestos": [
     "fci_tp_ars",
@@ -116,11 +116,11 @@
   ],
   "riesgoNivel": 2,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa",
     "Banca Privada"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

@@ -39,7 +39,7 @@
     "queEs": "Las obligaciones negociables (ON) son títulos de deuda que emiten las empresas para obtener financiamiento en el mercado de capitales. La empresa coloca la ON entre inversores y paga intereses y capital según las condiciones de emisión. Los fondos suelen destinarse a inversión en infraestructura para el desarrollo del negocio o a capital de trabajo. La calificación crediticia de la empresa es clave para definir la tasa.",
     "titular": "Financiá el crecimiento de tu empresa en el mercado de capitales"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager · Obligaciones negociables (Banca Corporativa)",
   "impuestos": [
     "on_usd",
@@ -118,10 +118,10 @@
   ],
   "riesgoNivel": 2,
   "simulador": null,
-  "ultimaRevision": "2026-11-11",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa"
   ],
-  "validador": "",
+  "validador": "lfeit@neix.com.ar",
   "vence": "2027-02-11"
 }

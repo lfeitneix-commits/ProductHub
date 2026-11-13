@@ -39,7 +39,7 @@
     "queEs": "Abrimos tu cuenta de inversión internacional con custodia en Pershing (BNY). Desde ahí podés invertir en acciones globales, ETFs, ADRs, fondos mutuos, bonos corporativos y soberanos, opciones y futuros, con el acompañamiento de tu asesor en Neix.",
     "titular": "Tu patrimonio, custodiado por el custodio más grande del mundo"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "Instructivo 3 · Apertura off shore + Inversoras (custodia Pershing)",
   "impuestos": [
     "tp_ext",
@@ -126,10 +126,10 @@
   ],
   "riesgoNivel": 2,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Privada"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

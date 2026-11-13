@@ -1,0 +1,111 @@
+{
+  "categoria": "Ejecución y acceso a mercado",
+  "cliente": {
+    "aTener": [
+      "Los informes e ideas son de carácter informativo y no constituyen una recomendación personalizada."
+    ],
+    "bajada": "Un servicio personalizado del equipo de Estrategia para tomar decisiones rápidas y fundamentadas.",
+    "beneficios": [
+      [
+        "Precios e ideas cada semana",
+        "Precios relevantes del mercado, ideas de trading y oportunidades tácticas, con análisis fundamental y contexto macro."
+      ],
+      [
+        "Acceso al equipo de Estrategia",
+        "Neix Talks semanales y el desayuno mensual Neix Advisory Meeting con nuestros especialistas."
+      ],
+      [
+        "Mejor timing",
+        "Información seleccionada e ideas concretas de entrada o salida para operar con más agilidad."
+      ]
+    ],
+    "comoFunciona": [
+      "Te sumamos a los envíos de precios e ideas (semanal).",
+      "Participás de los Neix Talks (semanal) y del Neix Advisory Meeting (mensual).",
+      "Si sos asesor independiente, recibís además la lista de difusión diaria."
+    ],
+    "enNeix": "Un equipo de Estrategia propio que sigue el mercado local e internacional todos los días.",
+    "ficha": {
+      "liquidez": "No aplica",
+      "mercado": "Local e internacional",
+      "minimo": "Sin mínimo",
+      "moneda": "No aplica",
+      "plazo": "Diario, semanal y mensual",
+      "riesgo": "No aplica (servicio de información)"
+    },
+    "paraQuien": "Inversores institucionales y clientes que operan activamente en los mercados y buscan optimizar sus decisiones con señales ágiles y analizadas. También asesores financieros independientes.",
+    "queEs": "Research es el servicio del equipo de Estrategia de Neix: envíos semanales con precios relevantes del mercado, ideas de trading y oportunidades tácticas de inversión, con análisis fundamental y contexto macroeconómico, más espacios para conversar con el equipo.",
+    "titular": "El equipo de Estrategia de Neix, a tu servicio"
+  },
+  "estado": "validado",
+  "fuente": "One pager Estrategia (nov 2026)",
+  "impuestos": [],
+  "interno": {
+    "objeciones": [
+      [
+        "Ya leo informes de otros lados.",
+        "La diferencia es que acá tenés ideas concretas, con precio y momento de entrada, y acceso directo al equipo que las arma."
+      ]
+    ],
+    "operativa": [
+      "Alta en los envíos semanales de precios e ideas.",
+      "Invitación a Neix Talks y Neix Advisory Meeting.",
+      "FAs: alta en la lista de difusión diaria."
+    ],
+    "perfiles": [
+      "Inversores institucionales",
+      "Clientes que operan activamente",
+      "Asesores financieros independientes"
+    ],
+    "pitch": "Te sumamos a lo que arma nuestro equipo de Estrategia: precios, ideas concretas y un espacio para charlar el contexto con ellos.",
+    "preguntas": [
+      "¿Con qué frecuencia seguís el mercado?",
+      "¿Te sirve recibir ideas concretas de entrada y salida?"
+    ],
+    "relacionados": [
+      "trade-ideas",
+      "swaps",
+      "operaciones-bloque"
+    ],
+    "senales": [
+      "Opera seguido",
+      "Pide opinión sobre el mercado",
+      "Es institucional o asesor independiente"
+    ],
+    "video": ""
+  },
+  "match": {
+    "eventos": [],
+    "horizonte": [
+      "corto",
+      "medio"
+    ],
+    "minimoUSD": null,
+    "objetivos": [
+      "crecimiento",
+      "renta"
+    ],
+    "perfiles": [
+      "moderado",
+      "agresivo"
+    ],
+    "tenencia": [],
+    "tipos": [
+      "persona",
+      "grande",
+      "fa"
+    ]
+  },
+  "nombre": "Research",
+  "observaciones": [],
+  "riesgoNivel": null,
+  "simulador": null,
+  "ultimaRevision": "2026-11-13",
+  "unidades": [
+    "Financial Advisors",
+    "Banca Privada",
+    "Banca Corporativa"
+  ],
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
+}
