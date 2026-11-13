@@ -11,6 +11,7 @@ const pagina = (res, status, titulo, texto) => {
 };
 
 export default async function handler(req, res) {
+  if (!CFG.clientSecret || !CFG.sessionSecret) { res.statusCode = 503; res.setHeader("Content-Type", "text/plain; charset=utf-8"); return res.end("Falta configurar el acceso (AZURE_CLIENT_SECRET y SESSION_SECRET en Vercel)."); }
   const url = new URL(req.url, "https://x");
   const estado = await verificar(leerCookie(req.headers.cookie, ESTADO));
   if (url.searchParams.get("error")) return pagina(res, 400, "No pudimos iniciar sesión", "Microsoft no confirmó el ingreso. Probá de nuevo.");

@@ -2,6 +2,7 @@
 import { CFG, ESTADO, firmar, azar, cookie, origen } from "../../lib/auth.js";
 
 export default async function handler(req, res) {
+  if (!CFG.clientSecret || !CFG.sessionSecret) { res.statusCode = 503; res.setHeader("Content-Type", "text/plain; charset=utf-8"); return res.end("Falta configurar el acceso (AZURE_CLIENT_SECRET y SESSION_SECRET en Vercel)."); }
   const url = new URL(req.url, "https://x");
   let destino = url.searchParams.get("next") || "/";
   if (!destino.startsWith("/") || destino.startsWith("//")) destino = "/"; // solo rutas del propio Hub
