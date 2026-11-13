@@ -1316,6 +1316,7 @@ function cpdDoc(v){
     ${fila("Comisión de negociación (" + comLabel(r) + ")", r.C17, r.D17)}${fila("IVA (comisión)", r.C18, r.D18)}${fila("Derecho de mercado", r.C19, r.D19)}${fila("IVA (derecho de mercado)", r.C20, r.D20)}
     ${fila("Total costos", r.C21, r.D21, "t")}${fila("Neto acreditado", r.C6, r.D6, "t")}</tbody></table>
     <div class="opx-dif2"><div><b>${favor >= 0 ? "Diferencia a favor de Neix" : "Diferencia a favor del banco"}</b><span>${ars2(Math.abs(favor))}</span></div><div><b>Diferencia directa</b><span>${pct(r.D24,2)}</span></div><div><b>Diferencia en TNA</b><span>${pct(r.D25,2)}</span></div></div></div>
+   <div class="opx-why"><h2>Por qué Neix</h2><div class="opx-four"><div>Asesoramiento personalizado con especialistas.</div><div>Soluciones integradas en tipo de cambio y commodities.</div><div>Top 5 en ByMA y top 10 en A3.</div><div>Seguridad operativa y altos estándares normativos.</div></div></div>
   </div>
   <div class="opx-foot">
    <div class="opx-foot-top"><div>${hayAsesor ? `<b>Asesor · ${esc(v.asesor)}</b><span>${[v.tel, v.mail].filter(Boolean).map(esc).join(" · ")}</span>` : `<b>Contacto · Banca Corporativa</b><span>(011) 4859-1552 · bancacorporativa@neix.com.ar</span>`}<span>Don Francisco 3345, piso 5, San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></span></div>
@@ -1323,24 +1324,39 @@ function cpdDoc(v){
    <p>${esc(LEGAL_CPD(fLarga(v.fNeg)))}</p></div></div>`;
 }
 const OPX_CSS = `.opx{width:794px;height:1123px;display:flex;flex-direction:column;background:#fff;color:#2A2927;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;overflow:hidden}
-.opx-hero{background:radial-gradient(75% 95% at 50% 125%,rgba(196,178,148,.6),transparent 62%) #262523;color:#F3F0EB;padding:26px 48px 34px}
-.opx-top{display:flex;align-items:center;gap:22px;font-size:11px;color:#E8E3DB;margin-bottom:44px}.opx-top img{height:15px;margin-right:auto}
-.opx-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border-radius:999px;padding:5px 11px;font-size:10.5px;margin-bottom:16px}.opx-pill i{width:6px;height:6px;border-radius:50%;background:#CFC6B8}
+.opx-hero{background:#262523 no-repeat center/100% 100%;color:#F3F0EB;padding:26px 48px 32px}
+.opx-top{display:flex;align-items:center;gap:22px;font-size:11px;color:#E8E3DB;margin-bottom:32px}.opx-top img{height:15px;margin-right:auto}
+.opx-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);color:#F3F0EB;border-radius:999px;padding:6px 12px;font-size:10.5px;margin-bottom:18px}.opx-pill i{width:6px;height:6px;border-radius:50%;background:#CFC6B8}
 .opx h1{font-family:"Playfair Display",Georgia,serif;font-weight:400;margin:0}
-.opx-hero h1{font-size:46px;line-height:1.08;margin-bottom:14px}.opx-baj{font-size:12.5px;line-height:1.6;color:#D9D3CA;max-width:66ch;margin:0}
-.opx-body{padding:24px 48px 18px;display:grid;gap:18px}
+.opx-hero h1{font-size:58px;line-height:1.04;letter-spacing:-.005em;margin-bottom:16px}.opx-baj{font-size:13px;line-height:1.6;color:#E6E1D9;max-width:62ch;margin:0}
+.opx-body{padding:18px 48px 14px;display:grid;gap:12px}
 .opx-facts{display:grid;grid-template-columns:repeat(4,1fr)}.opx-facts div{padding:0 14px;border-left:1px solid #E7E3DD}.opx-facts div:first-child{padding-left:0;border-left:0}
 .opx-facts b{display:block;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:#8C7F6B;font-weight:600;margin-bottom:6px}.opx-facts span{font-family:"Playfair Display",Georgia,serif;font-size:20px;line-height:1.2}.opx-facts .hl span{color:#004836}
 .opx-txt{font-size:13px;line-height:1.6;margin:0;color:#2A2927}.opx-txt strong{color:#004836}
-.opx-box{background:#F4F2EF;border-radius:12px;padding:16px 20px}
+.opx-box{background:#F4F2EF;border-radius:12px;padding:12px 20px 14px}
 .opx table{width:100%;border-collapse:collapse;font-size:11px}.opx th{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:#8C7F6B;font-weight:600;text-align:left;padding:4px 0;border-bottom:1px solid #2A2927}
-.opx td{padding:5px 0;border-bottom:1px solid #E2DDD5}.opx .r{text-align:right;width:140px}.opx tr.t td{font-weight:700;border-bottom:0;padding-top:8px}
-.opx-dif2{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid #2A2927}.opx-dif2 b{display:block;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:#8C7F6B;font-weight:600;margin-bottom:4px}.opx-dif2 span{font-family:"Playfair Display",Georgia,serif;font-size:20px;color:#004836}
-.opx-foot{margin-top:auto;background:radial-gradient(60% 140% at 85% 120%,rgba(196,178,148,.35),transparent 60%) #262523;color:#E8E3DB;padding:20px 48px 22px}
-.opx-foot-top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:14px}
+.opx td{padding:3px 0;border-bottom:1px solid #E2DDD5}.opx .r{text-align:right;width:140px}.opx tr.t td{font-weight:700;border-bottom:0;padding-top:8px}
+.opx-dif2{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px;padding-top:9px;border-top:1px solid #2A2927}.opx-dif2 b{display:block;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:#8C7F6B;font-weight:600;margin-bottom:4px}.opx-dif2 span{font-family:"Playfair Display",Georgia,serif;font-size:20px;color:#004836}
+.opx-why h2{font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:21px;margin:0 0 8px}
+.opx-four{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;font-size:10.5px;line-height:1.5;color:#3D3D3D}.opx-four div{border-top:1px solid #C9C2B7;padding-top:8px}
+.opx-foot{margin-top:auto;background:radial-gradient(60% 140% at 85% 120%,rgba(196,178,148,.35),transparent 60%) #262523;color:#E8E3DB;padding:16px 48px 18px}
+.opx-foot-top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:10px}
 .opx-foot b{display:block;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:#CFC6B8;margin-bottom:8px}.opx-foot span{display:block;font-size:10.5px;line-height:1.6}
 .opx-foot em{font-family:"Playfair Display",Georgia,serif;font-style:normal;font-size:15px;color:#F3F0EB;white-space:nowrap}
-.opx-foot p{font-size:7.6px;line-height:1.55;color:#A9A196;margin:0;padding-top:12px;border-top:1px solid rgba(255,255,255,.12)}`;
+.opx-foot p{font-size:7.3px;line-height:1.5;color:#A9A196;margin:0;padding-top:10px;border-top:1px solid rgba(255,255,255,.12)}`;
+/* Halo arena de la banda: se dibuja como imagen (elipse ancha pegada al borde inferior, como en las fichas oficiales),
+   porque el conversor a PDF no respeta los degradados ovalados. */
+function aplicarHalo(root){
+  root.querySelectorAll(".opx-hero").forEach(h => {
+    const w = h.offsetWidth, ht = h.offsetHeight, c = document.createElement("canvas"); c.width = w * 2; c.height = ht * 2;
+    const g = c.getContext("2d"), rx = 0.78 * w * 2, ry = 0.78 * ht * 2, s = ry / rx;
+    g.setTransform(1, 0, 0, s, 0, 0);
+    const cx = 0.47 * w * 2, cy = (ht * 2 * 1.1) / s, grad = g.createRadialGradient(cx, cy, 0, cx, cy, rx);
+    grad.addColorStop(0, "rgba(226,214,192,1)"); grad.addColorStop(0.3, "rgba(182,169,147,0.72)"); grad.addColorStop(0.6, "rgba(104,97,86,0.26)"); grad.addColorStop(1, "rgba(38,37,35,0)");
+    g.fillStyle = grad; g.fillRect(0, 0, c.width, c.height / s);
+    h.style.backgroundImage = `url(${c.toDataURL("image/png")})`;
+  });
+}
 async function cpdFuentes(){
   if (!document.getElementById("opxFont")) { const l = document.createElement("link"); l.id = "opxFont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap"; document.head.appendChild(l); }
   if (!document.getElementById("opxCss")) { const st = document.createElement("style"); st.id = "opxCss"; st.textContent = OPX_CSS; document.head.appendChild(st); }
@@ -1354,7 +1370,7 @@ async function cpdPDF(b){
     await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
     await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
     const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0"; host.innerHTML = cpdDoc(S.simv.cpd); document.body.appendChild(host);
-    const links = linksDe(host.firstElementChild);
+    aplicarHalo(host); const links = linksDe(host.firstElementChild);
     const cv = await window.html2canvas(host.firstElementChild, {scale:2, backgroundColor:"#ffffff", useCORS:true, logging:false}); host.remove();
     const pdf = new window.jspdf.jsPDF({unit:"pt", format:"a4"}); pdf.addImage(cv.toDataURL("image/jpeg", .93), "JPEG", 0, 0, 595.28, 841.89);
     const k = 595.28 / 794; links.forEach(l => pdf.link(l.x*k, l.y*k, l.w*k, l.h*k, {url: l.url}));
@@ -1367,7 +1383,7 @@ async function cpdVer(){
   await cpdFuentes();
   const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
   div.innerHTML = `<div style="max-height:92vh;overflow:auto;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.35)"><div style="transform-origin:top left;width:794px">${cpdDoc(S.simv.cpd)}</div></div>`;
-  document.body.appendChild(div); S.envio = {ver:true};
+  document.body.appendChild(div); aplicarHalo(div); S.envio = {ver:true};
 }
 function falCalc(v){
   const tasa = v.tipo==="pyme" ? .025 : .01, tna = v.fondo==="I" ? .23 : .28, gm = Math.pow(1+(+v.aj)/100, 1/12);
