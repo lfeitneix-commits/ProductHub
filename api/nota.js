@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   if (!texto || !id) return res.status(400).json({ error: "Falta la nota o el producto" });
 
   const quien = s.nombre ? `${s.nombre} (${s.email})` : s.email;
-  const ficha = `${origen(req)}/#p-${id}`;
+  const gestion = `${origen(req)}/#editar-${id}`; // edición de la ficha en Gestión
   const card = {
     type: "AdaptiveCard", $schema: "http://adaptivecards.io/schemas/adaptive-card.json", version: "1.4",
     body: [
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
       { type: "TextBlock", text: texto, wrap: true, spacing: "Medium" },
       { type: "FactSet", facts: [{ title: "Producto", value: nombre }, { title: "Quién", value: quien }, { title: "Fecha", value: new Date().toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" }) }] },
     ],
-    actions: [{ type: "Action.OpenUrl", title: "Abrir la ficha", url: ficha }],
+    actions: [{ type: "Action.OpenUrl", title: "Editar en Gestión", url: gestion }],
   };
   try {
     const r = await fetch(url, {

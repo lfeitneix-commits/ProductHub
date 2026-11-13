@@ -126,7 +126,7 @@ El secreto de Microsoft vence: anotá la fecha y renovalo antes (paso 1).
 
 ## Notas de las fichas en Teams
 "¿Algo para corregir o sumar?" publica la nota en un canal de Teams, con el nombre y mail de quien la escribió
-(sale de su sesión de Microsoft), el producto y un botón para abrir la ficha. Función: `api/nota.js`.
+(sale de su sesión de Microsoft), el producto y un botón para editar la ficha en Gestión. Función: `api/nota.js`.
 
 Configuración (una vez):
 1. En Teams, en el canal donde quieran recibirlas (por ejemplo "Hub – Notas"): **⋯ › Workflows**
