@@ -713,7 +713,7 @@ function vProducto(id){
    <div style="min-width:0"><div class="units" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px">${units(p)}</div><p class="lead">${esc(p.cliente.titular)}<span>${esc(p.cliente.bajada)}</span></p>
    <div class="btn-row"><button class="btn" data-act="toggleProp" data-id="${p.id}">${ico(inProp?"_check":"_plus")}${inProp?"En la propuesta":"Agregar a propuesta"}</button></div></div></div>
   <div class="p-bar"><div class="seg" role="tablist">${tabs.map(([k,t])=>`<button role="tab" data-act="view" data-v="${k}" aria-pressed="${S.view===k}">${t}</button>`).join("")}</div>
-   <div class="btn-row">${p.onePager?`<button class="btn" data-act="dlPdf" data-id="${p.id}">${ico("_dl")}One pager PDF</button>`:`<button class="btn" data-act="dlOnePager" data-id="${p.id}">${ico("_dl")}One pager</button>`}<button class="btn" data-act="share" data-v="wa" data-k="op" data-id="${p.id}">${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="op" data-id="${p.id}">${ico("_mail")}Mail</button>${p.simulador?`<a class="btn" href="#simuladores" data-act="openSim" data-v="${p.simulador}">${ico("_calc")}Simular</a>`:""}</div></div>
+   <div class="btn-row">${p.onePager?`<button class="btn" data-act="dlPdf" data-id="${p.id}">${ico("_dl")}One pager PDF</button>`:`<button class="btn" data-act="dlOnePager" data-id="${p.id}">${ico("_dl")}One pager PDF</button>`}<button class="btn" data-act="share" data-v="wa" data-k="op" data-id="${p.id}">${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="op" data-id="${p.id}">${ico("_mail")}Mail</button>${p.simulador?`<a class="btn" href="#simuladores" data-act="openSim" data-v="${p.simulador}">${ico("_calc")}Simular</a>`:""}</div></div>
   ${S.view==="cliente" ? `<div class="p-grid full"><div style="min-width:0">${clienteView(p)}</div></div>` : `<div class="p-grid"><div style="min-width:0">${S.view==="interno"?playbook(p):operativa(p)}</div>${aside(p,e)}</div>`}`;
 }
 function aside(p, e){
@@ -778,8 +778,8 @@ function setP(o, path, v){ const ks = path.split("."); let a = o; ks.slice(0,-1)
 function vEditar(id){
   const p = S.byId[id]; if (!p) return stateMsg("No encontramos esa ficha", "");
   if (!puedeGestionar()) return stateMsg("Solo Marketing edita las fichas", "Si ves algo para corregir, dejá una nota al validar la ficha.");
-  return `<div class="crumb"><a href="#gestion">Gestión</a><span>/</span><a href="#p-${id}">${esc(p.nombre)}</a></div><div class="page-head"><div><div class="eyebrow">Editar ficha</div><h1>${esc(p.nombre)}</h1></div>
-  <div class="btn-row"><a class="btn" href="#p-${id}">Cancelar</a><button class="btn primary" data-act="save" data-id="${id}">Guardar cambios</button></div></div>
+  return `<div class="crumb"><a href="#gestion">Gestión</a><span>/</span><span>${esc(p.nombre)}</span></div><div class="page-head"><div><div class="eyebrow">Editar ficha</div><h1>${esc(p.nombre)}</h1></div>
+  <div class="btn-row"><a class="btn" href="#gestion">Volver a Gestión</a><button class="btn primary" data-act="save" data-id="${id}">Guardar cambios</button></div></div>
   <form id="editForm" class="stack" onsubmit="return false"><div class="panel"><h3>One pager oficial</h3>${p.onePager?`<p class="small" style="margin-bottom:10px">Cargado el ${fdate(p.onePager.fecha)}: ${esc(p.onePager.archivo||"PDF")}. Subí uno nuevo para reemplazarlo.</p>`:`<p class="small muted" style="margin-bottom:10px">Todavía no tiene el PDF oficial.</p>`}
    ${S.assets?`<div class="upl"><label class="f" for="up_pdf">PDF del one pager<input class="input" id="up_pdf" type="file" accept="application/pdf"></label><label class="f" for="up_img">Imagen de vista previa (opcional)<input class="input" id="up_img" type="file" accept="image/jpeg,image/png,image/webp"><span class="hint">Una captura del one pager completo. Se muestra en la pestaña Para el cliente.</span></label><button class="btn" type="button" data-act="upOP" data-id="${id}">Subir one pager</button></div>`:`<p class="tiny muted">Solo los editores del Hub pueden subir archivos.</p>`}</div>${EDIT_FIELDS.map(([g,fs])=>`<div class="panel"><h3>${g}</h3><div class="stack">${fs.map(([k,l,t])=>{
     const v = getP(p,k); let val = v;
@@ -797,7 +797,7 @@ async function save(id){
   });
   p.ultimaRevision = todayISO();
   const b = document.querySelector('[data-act="save"]'); if (b) { b.disabled = true; b.textContent = "Guardando"; }
-  try { await S.db.doc("productos/"+id).set(p); toast("Ficha guardada"); go("p-"+id); }
+  try { await S.db.doc("productos/"+id).set(p); toast("Ficha guardada"); go("gestion"); }
   catch(e) { toast(e && e.code === "permission_denied" ? "No tenés permiso para editar fichas" : "No se pudo guardar. Probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Guardar cambios"; } }
 }
 async function upOP(id){
@@ -808,7 +808,7 @@ async function upOP(id){
   try {
     const a = await S.assets.upload(pdf), i = img ? await S.assets.upload(img) : null, p = S.byId[id];
     const op = {pdf:a.id, archivo: p.nombre+" - Neix.pdf", fecha: todayISO()}; if (i) op.img = i.id; else if (p.onePager && p.onePager.img) op.img = p.onePager.img;
-    await S.db.doc("productos/"+id).update({onePager: op}); toast("One pager cargado"); go("p-"+id);
+    await S.db.doc("productos/"+id).update({onePager: op}); toast("One pager cargado"); go("editar-"+id);
   } catch(e) { toast("No se pudo subir. Revisá el archivo y probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Subir one pager"; } }
 }
 /* Las notas de las fichas llegan por mail a estas casillas, desde el mail de quien las escribe. */
@@ -1140,11 +1140,14 @@ function refreshDeck(){
 function scaleDeck(){ document.querySelectorAll(".slide-wrap").forEach(w => { const s = w.clientWidth/1280; const el = w.firstElementChild; if (el) el.style.transform = `scale(${s})`; }); }
 window.addEventListener("resize", scaleDeck);
 /* ── PDF de la propuesta (A4, cortes entre secciones) ── */
-async function propPDFBlob(){
+async function propPDFBlob(){ return docPDFBlob(propDoc()); }
+/* One pager sin PDF oficial: se arma en PDF con el mismo formato que la descarga. */
+function onePagerPDFBlob(p){ const head = EXPORT_HEAD(p.nombre+" · Neix"); return docPDFBlob(onePagerDoc(p).slice(head.length).replace("</body></html>","")); }
+async function docPDFBlob(html){
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
   try { await document.fonts.ready; } catch(_) {}
-  const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0;width:820px;background:#fff"; host.innerHTML = propDoc(); document.body.appendChild(host);
+  const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0;width:820px;background:#fff"; host.innerHTML = html; document.body.appendChild(host);
   try {
     const root = host.firstElementChild, SC = 2, top0 = root.getBoundingClientRect().top;
     const cortes = [...root.querySelectorAll(".pp-sec,.pp-item,.pp-body")].map(el => Math.round((el.getBoundingClientRect().top - top0) * SC)).sort((a,b)=>a-b);
@@ -1160,6 +1163,13 @@ async function propPDFBlob(){
     }
     return pdf.output("blob");
   } finally { host.remove(); }
+}
+async function dlOnePagerPDF(b, p){
+  if (!p || !S.dl) return;
+  const txt = b.innerHTML; b.disabled = true; b.textContent = "Armando PDF";
+  try { await S.dl.save({filename: `${p.nombre} - Neix.pdf`, data: await onePagerPDFBlob(p)}); toast("PDF listo"); }
+  catch(e) { toast("No pudimos armar el PDF. Probá de nuevo."); }
+  b.disabled = false; b.innerHTML = txt;
 }
 const propNombre = () => `Propuesta Neix${S.prop.cliente?" - "+S.prop.cliente:""}.pdf`;
 async function dlPropPDF(b){
@@ -1180,7 +1190,7 @@ async function archivoOP(p){
     const r = await fetch(blobUrl(p.onePager.pdf), {cache:"no-store"}); if (!r.ok) throw new Error("pdf");
     return new File([await r.blob()], p.onePager.archivo || (p.nombre+" - Neix.pdf"), {type:"application/pdf"});
   }
-  return new File([onePagerDoc(p)], `${p.nombre} - Neix.html`, {type:"text/html"});
+  return new File([await onePagerPDFBlob(p)], `${p.nombre} - Neix.pdf`, {type:"application/pdf"});
 }
 function abrirEnvio(canal, tipo, id){
   const p = tipo === "op" ? S.byId[id] : null; if (tipo === "op" && !p) return;
@@ -1286,7 +1296,7 @@ function vGestion(){
   <div class="tiles">${stat("Validadas", n("validado"))}${stat("A validar", n("a_validar"))}${stat("Vencen en 30 días", pronto)}${stat("Vencidas", n("vencida"), n("vencida")>0)}${stat("Con one pager oficial", S.productos.filter(p=>p.onePager).length + " de " + S.productos.length)}${stat("Pendientes del relevamiento", obs)}</div>
   ${S.notas.length?`<div class="panel" style="margin-bottom:18px"><h3>Notas de los asesores <span class="tiny muted">${S.notas.filter(n=>!n.enviada).length} sin enviar por mail</span></h3><div class="stack" style="gap:10px">${S.notas.slice(0,15).map(n=>`<div style="border-top:1px solid var(--line);padding-top:10px"><div class="tiny muted"><a href="#p-${esc(n.producto)}">${esc(n.productoNombre)}</a> · ${esc(S.names[n.autor]||"Asesor")} · ${new Date(n.fecha).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"})}${n.enviada?" · enviada":""}</div><p class="small" style="margin-top:4px;white-space:pre-line">${esc(n.texto)}</p></div>`).join("")}</div></div>`:""}
   <div class="tw"><table><thead><tr><th>Ficha</th><th>Tipo</th><th>Unidades</th><th>Estado</th><th>One pager</th><th>Validador</th><th>Revisar antes</th><th class="r">Pend.</th><th></th></tr></thead><tbody>
-  ${rows.map(({p,e})=>`<tr><td><a href="#p-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td>${esc(p.validador||"Sin asignar")}</td><td class="num">${fdate(e.vence)}</td><td class="r num">${p.observaciones.length}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`).join("")}
+  ${rows.map(({p,e})=>`<tr><td><a href="#editar-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td>${esc(p.validador||"Sin asignar")}</td><td class="num">${fdate(e.vence)}</td><td class="r num">${p.observaciones.length}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`).join("")}
   </tbody></table></div>`;
 }
 
@@ -1306,7 +1316,7 @@ document.addEventListener("click", e => {
   else if (a==="copyText") copy(b.dataset.t);
   else if (a==="dlPdf") dlPdf(id);
   else if (a==="upOP") upOP(id);
-  else if (a==="dlOnePager") { const p = S.byId[id]; download(`${p.nombre} - Neix.html`, onePagerDoc(p)); }
+  else if (a==="dlOnePager") dlOnePagerPDF(b, S.byId[id]);
   else if (a==="copyPropWA") copy(waProp());
   else if (a==="dlProp") dlPropPDF(b);
   else if (a==="share") abrirEnvio(v, b.dataset.k, id);
