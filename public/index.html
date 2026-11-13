@@ -215,6 +215,7 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .ia-rot{border:1px solid var(--line);border-left:3px solid #476785;border-radius:10px;padding:10px 12px}.ia-rot-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ia-rot-h .n{width:22px;height:22px;border-radius:50%;background:#476785;color:#fff;display:grid;place-items:center;font-size:11.5px;font-weight:600}.ia-rot-h .de{font-size:13.5px}.ia-rot-h .fl{color:var(--ink-3)}.ia-rot-h .a{font-weight:600;font-size:13.5px;color:inherit;text-decoration:none}.ia-rot-h .m{margin-left:auto;font-variant-numeric:tabular-nums}
 .ia-tab td,.ia-tab th{font-size:13px}.ia-pitch{margin:6px 0 0;font-size:13px;font-style:italic;color:var(--ink);border-left:2px solid var(--line-2);padding-left:8px}
 .ia-obj{border:1px solid var(--line);border-radius:8px;padding:8px 12px}.ia-obj summary{cursor:pointer;font-size:13.5px;font-weight:500}
+.ia-prop{margin-top:16px;border:1px solid var(--line-2);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.ia-prop>div{display:grid;gap:2px;max-width:62ch}.ia-prop>div b{font-size:14px}.ia-prop>div span{font-size:12.5px;color:var(--ink-2)}
 .ia-next{margin-top:16px;background:var(--ink);color:#fff;border-radius:10px;padding:12px 14px;font-size:13.5px;display:grid;gap:2px}.ia-next b{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
 .ia-diag{border-radius:8px;padding:9px 12px;font-size:13px;background:var(--surface-2);display:grid;gap:2px}.ia-diag b{font-size:13.5px}.ia-diag b span{font-size:11px;font-weight:600;margin-left:6px;opacity:.75}
 .ia-diag.ok{background:var(--ok-bg)}.ia-diag.warn{background:var(--warn-bg)}.ia-diag.opp{background:#E6EDF3}
@@ -1084,6 +1085,32 @@ async function analizarIA(){
   } catch(e) { console.error(e); S.ia = {estado:"error", msg: String(e && e.message || e)}; }
   render();
 }
+/* Versión del análisis para el cliente (la que va en la propuesta). */
+function analisisAPropuesta(){
+  const ia = S.ia; if (!ia || !ia.data || !ia.data.metricas) return;
+  const c = S.cliente, d = ia.data, m = d.metricas, tot = (c.tenencia||[]).reduce((a,h)=>a+h.usd,0);
+  const totRot = (d.rotaciones||[]).reduce((a,r)=>a+r.monto_usd,0), perfilTxt = c.perfil ? (PERFIL[c.perfil]||"").toLowerCase() : "";
+  const resumen = `Tu cartera de ${usd(tot)} está ${m.dolarizacion_pct}% en dólares y ${m.riesgo_argentino_pct}% expuesta a riesgo argentino. `
+    + ((d.rotaciones||[]).length ? `Te proponemos ${d.rotaciones.length} ${d.rotaciones.length===1?"movimiento":"movimientos"} por ${usd(totRot)} para diversificarla${perfilTxt ? " y acercarla a una cartera de perfil " + perfilTxt : ""}, sin cambiar tu nivel de riesgo.` : "Está bien armada: la idea es sumar lo que buscás con fondos nuevos.");
+  const diag = (d.diagnostico||[]).filter(x => !/disparador|proponé|ofrecer/i.test(x.detalle)).slice(0, 4).map(x => ({titulo:x.titulo, detalle:x.detalle, nivel:x.nivel}));
+  S.prop.analisis = {fecha: todayISO(), resumen, metricas: m, diagnostico: diag,
+    rotaciones: (d.rotaciones||[]).map(r => ({desde:r.desde, hacia: S.byId[r.hacia_producto_id] ? S.byId[r.hacia_producto_id].nombre : r.hacia_producto_id, monto_usd:r.monto_usd, impacto:r.impacto})),
+    asignacion: (d.asignacion||[]).map(a => ({clase:a.clase, actual_pct:a.actual_pct, propuesto_pct:a.propuesto_pct}))};
+  if (!S.prop.cliente && c.nombre) S.prop.cliente = c.nombre;
+  const faltan = (d.estrategia||[]).filter(e => !S.prop.items.some(i=>i.id===e.producto_id)).length;
+  persist(); render();
+  toast(faltan ? "Análisis sumado. Sumá también los productos con «Sumar todos»." : "Análisis sumado a la propuesta");
+}
+function analisisDoc(A){
+  if (!A) return "";
+  const nivel = {ok:"Bien", alerta:"A revisar", oportunidad:"Oportunidad"}, m = A.metricas || {};
+  return `<div class="pp-sec"><div class="ey">Análisis de tu cartera</div><p style="margin-top:8px">${esc(A.resumen)}</p>
+   <div class="pp-kpis"><div><b>${m.dolarizacion_pct}%</b>en dólares</div><div><b>${m.riesgo_argentino_pct}%</b>riesgo argentino</div><div><b>${m.liquidez_inmediata_pct}%</b>liquidez inmediata</div><div><b>${fmt(m.posiciones_efectivas,1)}</b>posiciones efectivas</div></div>
+   ${(A.diagnostico||[]).length ? `<div class="pp-diag">${A.diagnostico.map(x=>`<div class="${x.nivel}"><b>${esc(x.titulo)}<span>${nivel[x.nivel]||""}</span></b>${esc(x.detalle)}</div>`).join("")}</div>` : ""}
+   ${(A.rotaciones||[]).length ? `<h4 class="pp-h4">Movimientos sugeridos</h4><table class="pp-tab"><thead><tr><th>Desde</th><th>Hacia</th><th class="r">Monto</th></tr></thead><tbody>${A.rotaciones.map(r=>`<tr><td>${esc(r.desde)}</td><td><b>${esc(r.hacia)}</b><br><span style="color:var(--paper-ink-2)">${esc(r.impacto)}</span></td><td class="r" style="white-space:nowrap">${usd(r.monto_usd)}</td></tr>`).join("")}</tbody></table>` : ""}
+   ${(A.asignacion||[]).length ? `<h4 class="pp-h4">Cómo queda tu cartera</h4><table class="pp-tab"><thead><tr><th>Clase de activo</th><th class="r">Hoy</th><th class="r">Con los cambios</th></tr></thead><tbody>${A.asignacion.map(a=>`<tr><td>${esc(a.clase)}</td><td class="r">${a.actual_pct}%</td><td class="r"><b>${a.propuesto_pct}%</b></td></tr>`).join("")}</tbody></table>` : ""}
+   <p class="pp-note">Análisis al ${fdate(A.fecha)} sobre la tenencia en Neix. Montos orientativos: los definimos juntos antes de operar.</p></div>`;
+}
 const claveIA = () => JSON.stringify([S.cliente.comitente, S.cliente.objetivos, S.cliente.eventos]);
 function iaHTML(){
   const ia = S.ia; if (!ia) return "";
@@ -1104,6 +1131,7 @@ function iaHTML(){
    <button class="btn" data-act="iaTodo" style="margin-top:10px">${ico("_plus")}Sumar todos a la propuesta</button>` : ""}
    ${(d.objeciones||[]).length ? `<h4 class="ia-h">Si te dice…</h4><div class="stack" style="gap:6px">${d.objeciones.map(o=>`<details class="ia-obj"><summary>“${esc(o.objecion)}”</summary><p class="small" style="margin:6px 0 0">${esc(o.respuesta)}</p></details>`).join("")}</div>` : ""}
    ${(d.preguntas||[]).length ? `<h4 class="ia-h">Preguntas para la reunión</h4><ul class="clean small ia-list">${d.preguntas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+   ${m ? `<div class="ia-prop"><div><b>${S.prop.analisis ? "El análisis está en la propuesta" : "Sumá el análisis a la propuesta"}</b><span>Va la versión para el cliente: indicadores, diagnóstico, movimientos sugeridos y asignación. Lo interno (argumentos, objeciones, preguntas) no se incluye.</span></div>${S.prop.analisis ? `<span class="btn-row"><a class="btn" href="#propuesta">Ver propuesta</a><button class="btn ghost" data-act="iaPropQuitar">Quitar</button></span>` : `<button class="btn primary" data-act="iaProp">${ico("_prop")}Agregar a la propuesta</button>`}</div>` : ""}
    ${d.proximo_paso ? `<div class="ia-next"><b>Próximo paso</b>${esc(d.proximo_paso)}</div>` : ""}
    <p class="tiny muted" style="margin-top:12px">Sugerencia para el asesor, sobre la cartera modelo de referencia. Validá montos, perfil y normativa antes de ofrecerlo.</p></div>`;
 }
@@ -1211,6 +1239,10 @@ const PP_CSS = `
 .pp-msg{font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:300;font-size:19px;line-height:1.5;white-space:pre-line;max-width:62ch}
 .pp-firma{margin-top:10px;font-size:13px;color:var(--paper-ink-2)}
 .pp-obj{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.pp-obj span{font-size:12px;border:1px solid var(--paper-line);border-radius:999px;padding:4px 10px}
+.pp-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}.pp-kpis div{border-top:1px solid var(--paper-ink);padding-top:8px;font-size:12px;color:var(--paper-ink-2)}.pp-kpis b{display:block;font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:300;font-size:22px;color:var(--paper-ink)}
+.pp-diag{display:grid;gap:8px;margin-top:14px}.pp-diag div{background:var(--paper-2);border-radius:6px;padding:9px 12px;font-size:12.5px;display:grid;gap:2px}.pp-diag b{font-size:13px}.pp-diag b span{font-size:10.5px;font-weight:600;margin-left:8px;color:var(--paper-ink-2);text-transform:uppercase;letter-spacing:.06em}
+.pp-h4{font-family:"Inter","Helvetica Neue",Arial,sans-serif;font-weight:400;font-size:15px;margin:18px 0 0}.pp-tab{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}.pp-tab th{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-arena);text-align:left;font-weight:600;padding:8px 10px 8px 0;border-bottom:1px solid var(--paper-ink)}.pp-tab td{padding:9px 10px 9px 0;border-bottom:1px solid var(--paper-line);vertical-align:top;color:var(--paper-ink)}.pp-tab .r{text-align:right;padding-right:0;white-space:nowrap}.pp-tab td:first-child{width:34%}
+@media (max-width:600px){.pp-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .pp-glance{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
 .pp-glance th{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-arena);text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--paper-ink)}
 .pp-glance td{padding:10px;border-bottom:1px solid var(--paper-line);vertical-align:top}
@@ -1246,6 +1278,7 @@ function vPropuesta(){
   <p class="muted">Sumá productos, contá por qué tienen sentido para este cliente y exportala lista para enviar.</p></div>
   <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
   <div class="pr-grid"><div class="stack">
+   ${P.analisis ? `<div class="panel ia-prop" style="margin:0"><div><b>Incluye el análisis de cartera</b><span>Hecho el ${fdate(P.analisis.fecha)} desde Cliente. Va antes de los productos.</span></div><button class="btn ghost" data-act="iaPropQuitar">Quitar</button></div>` : ""}
    <div class="panel stack"><h3 style="margin:0">Para quién</h3>
     <label class="f" for="pr_cliente">Cliente<input class="input" id="pr_cliente" data-pf="cliente" value="${esc(P.cliente)}" placeholder="Nombre o razón social"></label>
     <label class="f" for="pr_asesor">Asesor<input class="input" id="pr_asesor" data-pf="asesor" value="${esc(P.asesor)}" placeholder="Tu nombre" list="asesoresList" autocomplete="off"></label>${asesoresList()}
@@ -1271,6 +1304,7 @@ function propDoc(){
    ${P.mensaje||objs.length?`<div class="pp-sec">${P.mensaje?`<p class="pp-msg">${esc(P.mensaje)}</p>${P.asesor?`<p class="pp-firma">${esc(P.asesor)}</p>`:""}`:""}${objs.length?`<div style="margin-top:${P.mensaje?"16px":"0"}"><div class="ey">Lo que buscás</div><div class="pp-obj">${objs.map(o=>`<span>${esc(o)}</span>`).join("")}</div></div>`:""}</div>`:""}
    <div class="pp-sec pp-neix"><div class="ey">Quiénes somos</div><p style="margin-top:8px">Neix es una ALyC boutique que acompaña a familias, empresas e inversores desde hace 18 años. Trabajamos con cuatro equipos especializados (Banca Privada, Banca Corporativa, Financial Advisors y Mercado de Capitales) y una misma forma de hacer las cosas: atención cercana, mirada de largo plazo y ejecución propia en el mercado.</p>
     <div class="pp-nums"><div><b>18</b>años en el mercado de capitales</div><div><b>Top 5</b>en ByMA</div><div><b>Top 10</b>en A3 Mercados</div><div><b>7°</b>año consecutivo Great Place to Work</div></div></div>
+   ${analisisDoc(P.analisis)}
    <div class="pp-sec"><div class="ey">Tu propuesta en una mirada</div><table class="pp-glance"><thead><tr><th></th><th>Producto</th><th class="hide-s">Moneda</th><th class="hide-s">Plazo</th><th>Riesgo</th></tr></thead><tbody>
     ${items.map(({p},i)=>`<tr><td>${String(i+1).padStart(2,"0")}</td><td><b>${esc(p.nombre)}</b><br><span style="color:var(--paper-ink-2)">${esc(p.cliente.titular)}</span></td><td class="hide-s">${esc(p.cliente.ficha.moneda)}</td><td class="hide-s">${esc(p.cliente.ficha.plazo)}</td><td>${esc(RISK_TXT[p.riesgoNivel])}</td></tr>`).join("")}</tbody></table></div>
    ${items.map(({it,p},i)=>`<div class="pp-sec pp-item"><div class="pp-n">${String(i+1).padStart(2,"0")}</div><div><div class="ey">${esc(p.nombre)}</div><h3>${esc(p.cliente.titular)}</h3>
@@ -1389,7 +1423,7 @@ async function docPDFBlob(html){
   const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0;width:820px;background:#fff"; host.innerHTML = html; document.body.appendChild(host);
   try {
     const root = host.firstElementChild, SC = 2, top0 = root.getBoundingClientRect().top;
-    const cortes = [...root.querySelectorAll(".pp-sec,.pp-item,.pp-body")].map(el => Math.round((el.getBoundingClientRect().top - top0) * SC)).sort((a,b)=>a-b);
+    const cortes = [...root.querySelectorAll(".pp-sec,.pp-item,.pp-body,.pp-h4,.pp-kpis,.pp-diag > div,.pp-tab tbody tr")].map(el => Math.round((el.getBoundingClientRect().top - top0) * SC)).sort((a,b)=>a-b);
     const cv = await window.html2canvas(root, {scale:SC, backgroundColor:"#ffffff", useCORS:true, logging:false});
     const pdf = new window.jspdf.jsPDF({unit:"pt", format:"a4"}), W = 595.28, H = 841.89, k = cv.width / W, alto = Math.floor(H * k);
     for (let y = 0, i = 0; y < cv.height - 2; i++) {
@@ -1570,6 +1604,8 @@ document.addEventListener("click", e => {
   else if (a==="shSend" || a==="shShare") enviar(b);
   else if (a==="back") volver();
   else if (a==="iaCliente") analizarIA();
+  else if (a==="iaProp") { analisisAPropuesta(); }
+  else if (a==="iaPropQuitar") { delete S.prop.analisis; persist(); render(); toast("Análisis quitado de la propuesta"); }
   else if (a==="iaTodo" && S.ia && S.ia.data) { S.ia.data.estrategia.forEach(e=>{ if (!S.prop.items.some(i=>i.id===e.producto_id)) S.prop.items.push({id:e.producto_id, nota:e.por_que}); }); persist(); render(); toast("Sumados a la propuesta"); }
   else if (a==="validar") validar(id);
   else if (a==="notaMkt") notaMkt(id);
