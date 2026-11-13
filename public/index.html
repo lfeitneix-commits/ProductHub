@@ -240,6 +240,9 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 .drop-t{flex:1;min-width:0}.drop-t b{display:block;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.drop-t small{display:block;font-size:12px;color:var(--ink-3)}
 .drop-b{pointer-events:none;flex:none}
 .xfoot{margin-top:56px!important;padding-bottom:0!important}.xfoot-min{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:18px 22px!important;font-size:12.5px;color:var(--dark-2)}.xfoot-min img{height:12px;width:auto}.xfoot-ses{margin-left:auto}
+.nueva-ver{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:70;display:flex;align-items:center;gap:14px;background:var(--sel);color:var(--sel-ink);padding:10px 12px 10px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:13.5px;max-width:calc(100% - 32px)}
+.nueva-ver .btn.primary{background:#fff;color:#1F1E1C;border-color:#fff}
+@media (min-width:900px){.nueva-ver{bottom:24px}}
 .dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
 .busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
 @media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
@@ -1972,6 +1975,20 @@ async function boot(){
 }
 rutaActual = route();
 boot();
+/* Aviso de versión nueva: si se publicó un cambio mientras la pestaña está abierta, ofrece recargar
+   (si no, se siguen usando las funciones de la versión anterior, por ejemplo al armar un PDF). */
+(function(){
+  let firma = null, avisado = false;
+  const leer = () => fetch(location.pathname, {method:"HEAD", cache:"no-store", credentials:"same-origin"}).then(r => r.ok ? (r.headers.get("etag") || r.headers.get("last-modified") || "") : null).catch(() => null);
+  const revisar = async () => {
+    if (avisado || document.hidden) return;
+    const f = await leer(); if (!f) return;
+    if (firma === null) { firma = f; return; }
+    if (f !== firma) { avisado = true; const d = document.createElement("div"); d.className = "nueva-ver"; d.setAttribute("role", "status");
+      d.innerHTML = `<span>Hay una versión nueva del Hub.</span><button class="btn primary" type="button" onclick="location.reload()">Actualizar</button>`; document.body.appendChild(d); }
+  };
+  revisar(); setInterval(revisar, 120000); document.addEventListener("visibilitychange", revisar);
+})();
 })();
 </script>
 
