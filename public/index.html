@@ -98,7 +98,8 @@ label.f .hint{font-size:11.5px;color:var(--ink-3);font-weight:400}
 .pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.crit{background:var(--crit-bg);color:var(--crit)}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none} .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.crit{background:var(--crit)}
 .risk{display:inline-flex;gap:6px;align-items:center;font-size:11.5px;color:var(--ink-2);white-space:nowrap} .risk i{width:9px;height:9px;border-radius:50%;flex:none} .risk.r-lo i{background:#2E9E5B} .risk.r-mid i{background:#E3B02B} .risk.r-hi i{background:#D2453B}
-.utag::before,.uchip::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px;background:var(--u,#999)}
+.uchip::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:0;background:var(--u,#999)}
+.utag[style]{background:var(--u);color:#fff}.p-hero .units .utag[style]{background:var(--u);color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
 .shm{position:fixed;inset:0;background:rgba(20,19,18,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:60}
 .shm .box{background:var(--surface);color:var(--ink);border-radius:14px;padding:22px;width:min(480px,100%);display:grid;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
 .shm h3{margin:0;font-size:19px}.shm textarea{min-height:110px}.shm .att{font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border-radius:8px;padding:8px 10px}
@@ -560,8 +561,8 @@ const risk = n => RISK_TXT[n] ? `<span class="risk ${n<=2?"r-lo":n===3?"r-mid":"
 /* Gestión (one pagers y vigencia): abierta a todos hasta definir accesos (Marketing y responsables). Para cerrarla: false. */
 const GESTION_ABIERTA = true;
 const puedeGestionar = () => S.canEdit || GESTION_ABIERTA;
-/* Color de cada área (tarjetas, fichas y filtros). */
-const UNI_COLOR = {"Banca Corporativa":"#2F6FD0", "Banca Privada":"#B08A4F", "Financial Advisors":"#7A55B8", "Mercado de Capitales":"#2C8C8C"};
+/* Color de cada área (tarjetas, fichas y filtros), de la paleta secundaria de Neix. */
+const UNI_COLOR = {"Banca Corporativa":"#003F61" /* Azul profundo */, "Banca Privada":"#004836" /* Verde inglés */, "Financial Advisors":"#9A8E7D" /* Arena */, "Mercado de Capitales":"#476785" /* Azul acero */};
 const units = p => p.unidades.map(u=>`<span class="utag" style="--u:${UNI_COLOR[u]||"#999"}" title="${esc(u)}">${UNI[u]||esc(u)}</span>`).join("");
 
 const blobUrl = id => /^(https?:|blob:|\/|onepagers\/)/.test(String(id)) ? id : "/_blob/" + id;
