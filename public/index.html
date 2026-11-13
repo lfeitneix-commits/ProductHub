@@ -1378,7 +1378,8 @@ async function cpdPDF(b){
     const pdf = new window.jspdf.jsPDF({unit:"pt", format:"a4"}); pdf.addImage(cv.toDataURL("image/jpeg", .93), "JPEG", 0, 0, 595.28, 841.89);
     const k = 595.28 / 794; links.forEach(l => pdf.link(l.x*k, l.y*k, l.w*k, l.h*k, {url: l.url}));
     const v = S.simv.cpd;
-    await S.dl.save({filename: `Descuento de cheques Neix vs banco${v.cliente ? " - " + v.cliente : ""}.pdf`, data: pdf.output("blob")}); toast("PDF listo");
+    const razon = String(v.cliente || "").replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim(); // sin caracteres que Windows no acepta en nombres de archivo
+    await S.dl.save({filename: razon ? `${razon} - Descuento de cheques Neix.pdf` : "Descuento de cheques Neix.pdf", data: pdf.output("blob")}); toast("PDF listo");
   } catch(e) { console.error(e); toast("No pudimos armar el PDF. Probá de nuevo."); }
   b.disabled = false; b.innerHTML = txt;
 }
