@@ -758,7 +758,7 @@ function aside(p, e){
   return `<aside class="aside"><div class="panel"><h3 class="ph">¿Algo para corregir o sumar?</h3><p class="small muted" style="margin-bottom:12px">Dejá una nota sobre esta ficha.</p>
    <div style="display:grid;gap:8px"><textarea class="input" id="mkNota" placeholder="Ej.: cambió el mínimo, falta un dato, un cliente preguntó por…" aria-label="Nota sobre esta ficha"></textarea>
    <button class="btn" data-act="notaMkt" data-id="${p.id}">Enviar</button>
-   ${puedeGestionar()?`<a class="btn ghost" href="#editar-${p.id}">Editar contenido</a>`:""}</div></div>
+   </div></div>
    ${S.canEdit && p.observaciones.length?`<details class="warnbox"><summary>${p.observaciones.length} pendientes del relevamiento</summary><ul class="clean small">${p.observaciones.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></details>`:""}</aside>`;
 }
 function facts(f){ return `<dl class="facts">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Monto",f.minimo],["Liquidez",f.liquidez],["Dónde opera",f.mercado]].map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`; }
