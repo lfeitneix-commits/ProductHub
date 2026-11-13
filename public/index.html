@@ -1185,6 +1185,10 @@ async function dlPropPDF(b){
    Compu: se descarga el PDF y se abre el mail o WhatsApp Web con el destinatario y el mensaje
    (el navegador no permite adjuntar archivos a un mail o a WhatsApp por su cuenta). */
 const esCelular = () => matchMedia("(pointer:coarse)").matches && matchMedia("(max-width:900px)").matches;
+/* ¿El navegador puede compartir archivos? (Chrome y Edge en Windows/Mac, Safari, celulares). Ahí el PDF va adjunto de verdad. */
+const puedeCompartir = () => { try { return !!(navigator.canShare && navigator.canShare({files:[new File(["%PDF-"], "x.pdf", {type:"application/pdf"})]})); } catch(_) { return false; } };
+/* Link público al one pager oficial (para el plan B, cuando no se puede adjuntar). */
+const linkOP = p => p && p.onePager && /^https?:/.test(location.protocol) ? new URL(blobUrl(p.onePager.pdf), location.href).href : "";
 async function archivoOP(p){
   if (p.onePager) {
     const r = await fetch(blobUrl(p.onePager.pdf), {cache:"no-store"}); if (!r.ok) throw new Error("pdf");
@@ -1205,13 +1209,13 @@ function abrirEnvio(canal, tipo, id){
   (tipo === "op" ? archivoOP(p) : propPDFBlob().then(b => new File([b], propNombre(), {type:"application/pdf"})))
     .then(f => { E.archivo = f; listo("Adjunto: " + f.name); })
     .catch(() => listo("No pudimos preparar el archivo. Se envía solo el mensaje."));
-  const cel = esCelular(), wa = canal === "wa";
+  const cel = puedeCompartir(), wa = canal === "wa";
   const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
   div.innerHTML = `<div class="box" role="dialog" aria-modal="true" aria-labelledby="shT"><h3 id="shT">${wa?"Enviar por WhatsApp":"Enviar por mail"}</h3>
     ${cel ? "" : `<label class="f" for="shTo">${wa?"Celular":"Para"}<input class="input" id="shTo" type="${wa?"tel":"email"}" placeholder="${wa?"+54 9 11 …":"nombre@empresa.com"}" autocomplete="off"></label>`}
     <label class="f" for="shMsg">Mensaje<textarea class="input" id="shMsg">${esc(msg)}</textarea></label>
     <div class="att" id="shAtt">Preparando el archivo…</div>
-    <p class="tiny muted" style="margin:0">${cel ? `Se abre el menú para compartir del celular con el archivo adjunto: elegí ${wa?"WhatsApp":"tu app de mail"} y el contacto.` : `Se descarga el archivo y se abre ${wa?"WhatsApp Web":"tu mail"} con el mensaje. Arrastrá el archivo descargado para adjuntarlo.`}</p>
+    <p class="tiny muted" style="margin:0">${cel ? `Al tocar Enviar se abre el menú para compartir con el PDF adjunto. Elegí ${wa?"WhatsApp":"Outlook o tu app de mail"} y el contacto.` : `Este navegador no permite adjuntar archivos. Se abre ${wa?"WhatsApp Web":"tu mail"} con el mensaje${tipo==="op"&&p&&p.onePager?" y el link al PDF":""}, y el PDF se descarga para que lo arrastres. Para adjuntarlo directo, usá Chrome o Edge.`}</p>
     <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button><button class="btn primary" id="shSend" data-act="shSend" disabled>${wa?ico("_wa"):ico("_mail")}Enviar</button></div></div>`;
   document.body.appendChild(div);
   const f = $("#shTo") || $("#shMsg"); if (f) f.focus();
@@ -1221,16 +1225,18 @@ function telWA(t){ let d = String(t||"").replace(/\D/g, ""); if (!d) return ""; 
 async function enviar(b){
   const E = S.envio; if (!E) return;
   const to = (($("#shTo")||{}).value || "").trim(), msg = ($("#shMsg")||{}).value || "", wa = E.canal === "wa";
-  if (esCelular() && E.archivo && navigator.canShare && navigator.canShare({files:[E.archivo]})) {
+  if (E.archivo && navigator.canShare && navigator.canShare({files:[E.archivo]})) {
     try { await navigator.share({files:[E.archivo], text: msg, title: E.asunto}); cerrarEnvio(); }
     catch(e) { if (!(e && e.name === "AbortError")) toast("No se pudo abrir el menú para compartir"); }
     return;
   }
   if (wa && to && telWA(to).length < 10) { toast("Revisá el celular"); return; }
+  const lk = E.tipo === "op" ? linkOP(S.byId[E.id]) : "";
+  const texto = lk && !msg.includes(lk) ? msg + "\n\nOne pager: " + lk : msg;
   if (!wa && to && !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(to)) { toast("Revisá el mail"); return; }
   const url = wa
-    ? (esCelular() ? `https://wa.me/${telWA(to)}?text=${encodeURIComponent(msg)}` : `https://web.whatsapp.com/send?${to?"phone="+telWA(to)+"&":""}text=${encodeURIComponent(msg)}`)
-    : `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(E.asunto)}&body=${encodeURIComponent(msg)}`;
+    ? (esCelular() ? `https://wa.me/${telWA(to)}?text=${encodeURIComponent(texto)}` : `https://web.whatsapp.com/send?${to?"phone="+telWA(to)+"&":""}text=${encodeURIComponent(texto)}`)
+    : `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(E.asunto)}&body=${encodeURIComponent(texto)}`;
   if (wa) { if (!window.open(url, "_blank", "noopener")) abrirLink(url, true); } else abrirLink(url);
   if (E.archivo && S.dl) { try { await S.dl.save({filename: E.archivo.name, data: E.archivo}); } catch(_) {} }
   cerrarEnvio();
