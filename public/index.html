@@ -1383,8 +1383,8 @@ document.addEventListener("change", e => {
 document.addEventListener("keydown", e => { if (e.key==="Enter" && e.target.id==="comitente") consultar(); });
 
 /* ── Arranque ── */
-/* One pagers originales (config/onepagers: id -> ruta en public/onepagers) para fichas sin uno subido desde Gestión. */
-function conOnePager(p){ const r = S.onepagers && S.onepagers[p.id]; if (!p.onePager && r) p.onePager = {pdf:r, archivo:p.nombre+" - Neix.pdf", fecha:p.ultimaRevision||""}; return p; }
+/* One pagers originales (config/onepagers: id -> ruta, o {pdf, fecha}) para fichas sin uno subido desde Gestión. */
+function conOnePager(p){ const r = S.onepagers && S.onepagers[p.id]; if (!p.onePager && r) { const o = typeof r === "string" ? {pdf:r} : r; p.onePager = {pdf:o.pdf, archivo:p.nombre+" - Neix.pdf", fecha:o.fecha||p.ultimaRevision||""}; } return p; }
 function setProductos(list){ S.raw = list; list = list.map(p=>conOnePager(Object.assign({}, p))); S.productos = list.sort((a,b)=>a.nombre.localeCompare(b.nombre,"es")); S.byId = {}; list.forEach(p=>S.byId[p.id]=p); }
 /* ── Acceso de editores (Firebase: link al mail) ── */
 function vIngresar(){

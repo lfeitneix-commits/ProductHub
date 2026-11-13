@@ -1,27 +1,93 @@
 {
  "map": {
-  "acciones-argentinas": "onepagers/acciones-argentinas.pdf",
-  "avales-sgr": "onepagers/avales-sgr.pdf",
-  "bonos-cer-dl": "onepagers/bonos-cer-dl.pdf",
-  "bonos-soberanos": "onepagers/bonos-soberanos.pdf",
-  "cauciones": "onepagers/cauciones.pdf",
-  "cedears": "onepagers/cedears.pdf",
-  "cheques": "onepagers/cheques.pdf",
+  "acciones-argentinas": {
+   "pdf": "onepagers/acciones-argentinas.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "avales-sgr": {
+   "pdf": "onepagers/avales-sgr.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "bonos-cer-dl": {
+   "pdf": "onepagers/bonos-cer-dl.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "bonos-soberanos": {
+   "pdf": "onepagers/bonos-soberanos.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "cauciones": {
+   "pdf": "onepagers/cauciones.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "cedears": {
+   "pdf": "onepagers/cedears.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "cheques": {
+   "pdf": "onepagers/cheques.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
   "cuentas-offshore": "onepagers/cuentas-offshore.pdf",
   "estructuras-societarias": "onepagers/estructuras-societarias.pdf",
-  "facturas-fce": "onepagers/facturas-fce.pdf",
-  "fci": "onepagers/fci.pdf",
-  "fideicomisos": "onepagers/fideicomisos.pdf",
-  "futuros-dolar": "onepagers/futuros-dolar.pdf",
+  "facturas-fce": {
+   "pdf": "onepagers/facturas-fce.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "fci": {
+   "pdf": "onepagers/fci.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "fideicomisos": {
+   "pdf": "onepagers/fideicomisos.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "futuros-dolar": {
+   "pdf": "onepagers/futuros-dolar.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
   "inversiones-alternativas": "onepagers/inversiones-alternativas.pdf",
-  "licitaciones-primarias": "onepagers/licitaciones-primarias.pdf",
-  "notas-estructuradas": "onepagers/notas-estructuradas.pdf",
-  "obligaciones-negociables": "onepagers/obligaciones-negociables.pdf",
+  "licitaciones-primarias": {
+   "pdf": "onepagers/licitaciones-primarias.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "notas-estructuradas": {
+   "pdf": "onepagers/notas-estructuradas.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "obligaciones-negociables": {
+   "pdf": "onepagers/obligaciones-negociables.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
   "on-emision": "onepagers/on-emision.pdf",
-  "opciones": "onepagers/opciones.pdf",
-  "operaciones-bloque": "onepagers/operaciones-bloque.pdf",
+  "opciones": {
+   "pdf": "onepagers/opciones.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "operaciones-bloque": {
+   "pdf": "onepagers/operaciones-bloque.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
   "operatoria-internacional": "onepagers/operatoria-internacional.pdf",
-  "pagares": "onepagers/pagares.pdf",
-  "t-bills": "onepagers/t-bills.pdf"
+  "pagares": {
+   "pdf": "onepagers/pagares.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "t-bills": {
+   "pdf": "onepagers/t-bills.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "fal": {
+   "pdf": "onepagers/fal.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "fondo-dedicado": {
+   "pdf": "onepagers/fondo-dedicado.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "inversoras": {
+   "pdf": "onepagers/inversoras.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  }
  }
 }
