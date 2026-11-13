@@ -208,6 +208,13 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 /* Cliente */
 .cl-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
 .stack{display:grid;gap:12px}
+.ia-box{margin-bottom:18px;border-color:var(--line-2)}.ia-head{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.ia-res{font-size:15px;line-height:1.55;margin:12px 0 4px}.ia-h{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:18px 0 8px}
+.ia-diag{border-radius:8px;padding:9px 12px;font-size:13px;background:var(--surface-2);display:grid;gap:2px}.ia-diag b{font-size:13.5px}.ia-diag b span{font-size:11px;font-weight:600;margin-left:6px;opacity:.75}
+.ia-diag.ok{background:var(--ok-bg)}.ia-diag.warn{background:var(--warn-bg)}.ia-diag.opp{background:#E6EDF3}
+.ia-paso{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:start;border:1px solid var(--line);border-radius:10px;padding:10px 12px}.ia-paso .n{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12.5px;font-weight:600}.ia-paso a{text-decoration:none;color:inherit}
+.ia-list{list-style:none;padding-left:0;margin:0}.ia-list li{margin-bottom:6px;padding-left:14px;position:relative;list-style:none}.ia-list li::before{content:"";position:absolute;left:0;top:.6em;width:5px;height:5px;border-radius:50%;background:var(--ink-3)}
+.ia-load{display:flex;gap:6px;padding-top:4px}.ia-dot{width:8px;height:8px;border-radius:50%;background:var(--ink-3);animation:iad 1s infinite ease-in-out}.ia-dot:nth-child(2){animation-delay:.15s}.ia-dot:nth-child(3){animation-delay:.3s}@keyframes iad{0%,80%,100%{opacity:.25}40%{opacity:1}}
 .dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
 .busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
 @media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
@@ -465,6 +472,7 @@ td:first-child{color:var(--ink)}
 <nav class="tabbar" aria-label="Secciones"><a href="#soluciones" data-sec="soluciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Productos</a><a href="#cliente" data-sec="cliente"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></svg>Cliente</a><a href="#simuladores" data-sec="simuladores"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6zM9 7h6M9 12h6M9 16h3"/></svg>Simuladores</a><a href="#propuesta" data-sec="propuesta"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/></svg>Propuesta<span class="count pcount" hidden>0</span></a><a href="#presentaciones" data-sec="presentaciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM8 20h8M12 16v4"/></svg>Presentar</a><a href="#gestion" data-sec="gestion" data-admin hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M16 4v4M10 10v4"/></svg>Gestión</a></nav></div>
 <script src="js/firebase-config.js"></script>
 <script src="js/runtime.js"></script>
+<script src="js/ia-config.js"></script>
 <script>
 (function(){
 "use strict";
@@ -886,36 +894,95 @@ function buscaHTML(){
   const c = S.cliente, multi = (k, map) => `<div class="chips">${Object.entries(map).map(([v,t])=>`<button class="chip" data-act="cmulti" data-k="${k}" data-v="${v}" aria-pressed="${c[k].includes(v)}">${t}</button>`).join("")}</div>`;
   return `<div class="panel" style="margin-bottom:18px"><h3>Qué busca y situación actual</h3>
    <div class="busca"><div><h4>Qué busca</h4>${multi("objetivos", OBJ)}</div><div><h4>Situación actual</h4>${multi("eventos", EVT)}</div></div>
-   <button class="btn primary" data-act="iaCliente">${ico("_sol")}Analizalo con IA</button>
-   <p class="tiny muted" style="margin-top:8px">Abre Claude en otra pestaña con el perfil, la tenencia, lo que busca y su situación, para que proponga una estrategia con productos de Neix.</p></div>`;
+   <button class="btn primary" data-act="iaCliente" ${S.ia&&S.ia.estado==="cargando"?"disabled":""}>${ico("_sol")}${S.ia&&S.ia.estado==="listo"?"Volver a analizar":"Analizalo con IA"}</button>
+   <p class="tiny muted" style="margin-top:8px">Analiza el perfil, la tenencia, lo que busca y su situación, y propone una estrategia con productos de Neix.</p></div>${iaHTML()}`;
 }
-function promptCliente(){
-  const c = S.cliente, R = resultados(), tot = (c.tenencia||[]).reduce((a,h)=>a+h.usd,0);
-  const pat = (PATRI.find(([v])=>v===c.patrimonio)||[])[1];
-  const L = [
-    "Sos un asesor financiero de Neix (ALyC argentina). Analizá este cliente y proponé una estrategia concreta: qué productos de Neix ofrecerle, en qué orden y por qué, qué riesgos o puntos cuidar y qué preguntas hacerle en la próxima reunión. Respondé en español rioplatense, breve y accionable.",
-    "\nCLIENTE",
-    c.nombre ? "- Nombre: " + c.nombre : "",
-    c.tipo ? "- Tipo: " + (TIPO[c.tipo]||c.tipo) : "",
-    c.perfil ? "- Perfil de inversor (test, no modificable): " + (PERFIL[c.perfil]||c.perfil) : "",
-    c.horizonte ? "- Horizonte: " + (HORIZ[c.horizonte]||c.horizonte) : "",
-    pat && c.patrimonio ? "- Patrimonio o liquidez disponible: " + pat : "",
-    c.tenencia ? "\nTENENCIA (" + usd(tot) + ")\n" + c.tenencia.map(h=>"- " + h.activo + ": " + usd(h.usd) + " (" + Math.round(h.usd/tot*100) + "%)").join("\n") : "",
-    "\nQUÉ BUSCA\n" + (c.objetivos.length ? c.objetivos.map(k=>"- "+(OBJ[k]||k)).join("\n") : "- Sin marcar"),
-    "\nSITUACIÓN ACTUAL\n" + (c.eventos.length ? c.eventos.map(k=>"- "+(EVT[k]||k)).join("\n") : "- Sin marcar"),
-    R.rec.length ? "\nLO QUE EL HUB YA RECOMIENDA\n" + R.rec.map(r=>"- "+r.p.nombre).join("\n") : "",
-    R.tiene.length ? "\nPRODUCTOS QUE YA TIENE\n" + R.tiene.map(r=>"- "+r.p.nombre).join("\n") : "",
-    "\nPRODUCTOS DISPONIBLES EN NEIX\n" + S.productos.map(p=>"- " + p.nombre + " (" + p.categoria + ", riesgo " + (RISK_TXT[p.riesgoNivel]||"").toLowerCase() + ")").join("\n")
+/* ── Análisis con IA ──
+   Misma estructura de respuesta en los dos modos (ver api/analisis.js):
+   { resumen, diagnostico:[{titulo, detalle, nivel:"ok"|"alerta"|"oportunidad"}],
+     estrategia:[{producto_id, prioridad, por_que}], riesgos:[...], preguntas:[...] }
+   Modo en public/js/ia-config.js: "simulacion" (arma el análisis en el navegador) o "api" (POST /api/analisis con Claude). */
+const iaModo = () => (window.NEIX_IA && window.NEIX_IA.modo) || "simulacion";
+function datosIA(){
+  const c = S.cliente, R = resultados();
+  return {
+    cliente: {
+      nombre: c.nombre || "", tipo: TIPO[c.tipo] || "", perfil: PERFIL[c.perfil] || "", horizonte: HORIZ[c.horizonte] || "",
+      patrimonio: c.patrimonio ? ((PATRI.find(([v])=>v===c.patrimonio)||[])[1] || "") : "",
+      tenencia: (c.tenencia||[]).map(h=>({activo:h.activo, usd:h.usd})),
+      busca: c.objetivos.map(k=>OBJ[k]||k), situacion: c.eventos.map(k=>EVT[k]||k),
+      ya_tiene: R.tiene.map(r=>r.p.nombre)
+    },
+    recomendados_por_reglas: R.rec.map(r=>r.p.id),
+    catalogo: S.productos.map(p=>({id:p.id, nombre:p.nombre, categoria:p.categoria, riesgo:RISK_TXT[p.riesgoNivel]||"", para_que:p.cliente.titular, unidades:p.unidades}))
+  };
+}
+/* Simulación: arma un análisis plausible con reglas, para probar la pantalla sin la API. */
+function simularIA(){
+  const c = S.cliente, R = resultados(), ten = c.tenencia || [], tot = ten.reduce((a,h)=>a+h.usd,0);
+  const pct = n => tot ? Math.round(n/tot*100) : 0;
+  const enPesos = ten.filter(h=>["caucion","fci"].includes(h.tag)).reduce((a,h)=>a+h.usd,0);
+  const mayor = ten.slice().sort((a,b)=>b.usd-a.usd)[0];
+  const diag = [];
+  if (mayor && pct(mayor.usd) >= 40) diag.push({titulo:"Cartera concentrada", detalle:`${mayor.activo} explica el ${pct(mayor.usd)}% de la tenencia. Conviene repartir el riesgo entre más emisores o plazos.`, nivel:"alerta"});
+  else if (ten.length) diag.push({titulo:"Diversificación razonable", detalle:`Ningún activo supera el 40% de la cartera (el mayor es ${mayor.activo}, con ${pct(mayor.usd)}%).`, nivel:"ok"});
+  if (ten.length && pct(enPesos) >= 30) diag.push({titulo:"Mucha liquidez en pesos", detalle:`El ${pct(enPesos)}% está en caución o money market. Si no la necesita en el corto plazo, puede rendir más o cubrirse.`, nivel:"oportunidad"});
+  if (c.eventos.includes("excedente_liquidez")) diag.push({titulo:"Liquidez sin invertir", detalle:"Marcaste que tiene excedentes: es el momento de proponer dónde colocarlos según el plazo en que los necesite.", nivel:"oportunidad"});
+  if (c.perfil && PERFIL_MAX[c.perfil] <= 2 && ten.some(h=>["acciones","cedears"].includes(h.tag))) diag.push({titulo:"Renta variable con perfil conservador", detalle:"Tiene acciones o CEDEARs y su perfil es conservador. Revisá que el peso sea acotado y que lo tenga claro.", nivel:"alerta"});
+  if (!diag.length) diag.push({titulo:"Sin tenencia para analizar", detalle:"El análisis se basa en lo que busca y su situación. Leé la cuenta comitente para sumar el diagnóstico de cartera.", nivel:"ok"});
+  const elegidos = R.rec.concat(R.pos).slice(0, 4);
+  const estrategia = elegidos.map((r, i) => ({
+    producto_id: r.p.id, prioridad: i + 1,
+    por_que: `${r.p.cliente.titular}.${r.why.length ? " Responde a: " + r.why.slice(0,3).join(", ").toLowerCase() + "." : ""}${r.cond.length ? " Ojo: " + r.cond[0].toLowerCase() + "." : ""}`
+  }));
+  const riesgos = elegidos.slice(0, 3).map(r => r.p.cliente.aTener && r.p.cliente.aTener[0] ? `${r.p.nombre}: ${r.p.cliente.aTener[0]}` : "").filter(Boolean);
+  if (mayor && pct(mayor.usd) >= 40) riesgos.push(`Bajar la concentración en ${mayor.activo} de a poco, sin forzar ventas con pérdida.`);
+  const preguntas = [
+    "¿Qué parte de este dinero puede necesitar en los próximos 3 a 6 meses?",
+    c.objetivos.length ? `De lo que busca (${c.objetivos.map(k=>(OBJ[k]||k).toLowerCase()).join(", ")}), ¿qué es lo más urgente?` : "¿Qué espera lograr con esta inversión en el próximo año?",
+    "¿Tiene inversiones en otras entidades que debamos considerar?",
+    c.tipo === "pyme" || c.tipo === "grande" ? "¿Cómo viene el flujo de cobros y pagos de la empresa en los próximos meses?" : "¿Hay algún gasto o evento importante previsto (viaje, compra, herencia)?"
   ];
-  return L.filter(Boolean).join("\n");
+  const resumen = `${c.nombre || "El cliente"}${c.perfil ? ", perfil " + (PERFIL[c.perfil]||"").toLowerCase() : ""}${c.horizonte ? " y horizonte de " + (HORIZ[c.horizonte]||"").toLowerCase() : ""}${tot ? ", tiene " + usd(tot) + " en " + ten.length + " activos" : ""}. `
+    + (estrategia.length ? `Proponemos empezar por ${estrategia.slice(0,2).map(e=>S.byId[e.producto_id].nombre).join(" y ")}, que responden a lo que busca sin salirse de su perfil.` : "Marcá qué busca y su situación para sumar productos a la estrategia.");
+  return {resumen, diagnostico: diag, estrategia, riesgos, preguntas};
 }
-function iaCliente(){
+async function analizarIA(){
   const c = S.cliente;
   if (!c.tenencia && !c.objetivos.length && !c.eventos.length) { toast("Leé la cuenta o marcá qué busca y su situación"); return; }
-  const q = promptCliente();
-  if (navigator.clipboard) navigator.clipboard.writeText(q).catch(()=>{});
-  abrirLink("https://claude.ai/new?q=" + encodeURIComponent(q), true);
-  toast("Se abrió Claude con los datos del cliente (también quedaron copiados)");
+  S.ia = {estado:"cargando"}; render();
+  try {
+    let data;
+    if (iaModo() === "api") {
+      const r = await fetch("api/analisis", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(datosIA())});
+      const j = await r.json().catch(()=>({}));
+      if (!r.ok) throw new Error(j.error || ("HTTP " + r.status));
+      data = j;
+    } else {
+      await new Promise(ok => setTimeout(ok, 1400)); // simula la espera de la API
+      data = simularIA();
+    }
+    data.estrategia = (data.estrategia||[]).filter(e => S.byId[e.producto_id]).sort((a,b)=>a.prioridad-b.prioridad);
+    S.ia = {estado:"listo", data, modo: iaModo(), clave: claveIA()};
+  } catch(e) { console.error(e); S.ia = {estado:"error", msg: String(e && e.message || e)}; }
+  render();
+}
+const claveIA = () => JSON.stringify([S.cliente.comitente, S.cliente.objetivos, S.cliente.eventos]);
+function iaHTML(){
+  const ia = S.ia; if (!ia) return "";
+  if (ia.estado === "cargando") return `<div class="panel ia-box"><div class="ia-load"><span class="ia-dot"></span><span class="ia-dot"></span><span class="ia-dot"></span></div><p class="small muted" style="margin:8px 0 0">Analizando la cartera, lo que busca y su situación…</p></div>`;
+  if (ia.estado === "error") return `<div class="panel ia-box"><p class="small" style="color:var(--crit);margin:0">No pudimos hacer el análisis. Probá de nuevo en unos minutos.</p></div>`;
+  const d = ia.data, viejo = ia.clave !== claveIA();
+  const nivel = {ok:["ok","Bien"], alerta:["warn","Atención"], oportunidad:["opp","Oportunidad"]};
+  return `<div class="panel ia-box"><div class="ia-head"><h3 style="margin:0">Análisis con IA</h3>${ia.modo !== "api" ? `<span class="demo">Simulación</span>` : ""}</div>
+   ${viejo ? `<p class="tiny" style="color:var(--warn);margin:6px 0 0">Cambiaste los datos: volvé a analizar para actualizarlo.</p>` : ""}
+   <p class="ia-res">${esc(d.resumen)}</p>
+   <h4 class="ia-h">Diagnóstico de la cartera</h4><div class="stack" style="gap:8px">${(d.diagnostico||[]).map(x=>{ const [cls,txt] = nivel[x.nivel] || nivel.ok; return `<div class="ia-diag ${cls}"><b>${esc(x.titulo)} <span>${txt}</span></b>${esc(x.detalle)}</div>`; }).join("")}</div>
+   ${d.estrategia.length ? `<h4 class="ia-h">Estrategia sugerida</h4><div class="stack" style="gap:8px">${d.estrategia.map(e=>{ const p = S.byId[e.producto_id], inProp = S.prop.items.some(i=>i.id===p.id); return `<div class="ia-paso"><span class="n">${e.prioridad}</span><div style="min-width:0"><a href="#p-${p.id}"><b>${esc(p.nombre)}</b></a><p class="small muted" style="margin:2px 0 0">${esc(e.por_que)}</p></div><button class="btn ${inProp?"":"primary"}" data-act="toggleProp" data-id="${p.id}">${inProp?"Agregado":"Agregar"}</button></div>`; }).join("")}</div>
+   <button class="btn" data-act="iaTodo" style="margin-top:10px">${ico("_plus")}Sumar todos a la propuesta</button>` : ""}
+   ${(d.riesgos||[]).length ? `<h4 class="ia-h">Riesgos y puntos a cuidar</h4><ul class="clean small ia-list">${d.riesgos.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+   ${(d.preguntas||[]).length ? `<h4 class="ia-h">Preguntas para la próxima reunión</h4><ul class="clean small ia-list">${d.preguntas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+   <p class="tiny muted" style="margin-top:12px">Sugerencia para el asesor. Validá cada producto con el perfil y la normativa antes de ofrecerlo.</p></div>`;
 }
 async function consultar(){
   const c = S.cliente, n = ($("#comitente").value||"").trim(); c.comitente = n; c.apiErr = "";
@@ -1376,7 +1443,8 @@ document.addEventListener("click", e => {
   else if (a==="shClose" || (a==="shBg" && e.target===b)) cerrarEnvio();
   else if (a==="shSend" || a==="shShare") enviar(b);
   else if (a==="back") volver();
-  else if (a==="iaCliente") iaCliente();
+  else if (a==="iaCliente") analizarIA();
+  else if (a==="iaTodo" && S.ia && S.ia.data) { S.ia.data.estrategia.forEach(e=>{ if (!S.prop.items.some(i=>i.id===e.producto_id)) S.prop.items.push({id:e.producto_id, nota:e.por_que}); }); persist(); render(); toast("Sumados a la propuesta"); }
   else if (a==="validar") validar(id);
   else if (a==="notaMkt") notaMkt(id);
   else if (a==="save") save(id);
@@ -1386,7 +1454,7 @@ document.addEventListener("click", e => {
   else if (a==="logout") { e.preventDefault(); window.neixRuntime.logout(); }
   else if (a==="cset") { S.cliente[b.dataset.k] = S.cliente[b.dataset.k]===v ? "" : v; persist(); render(); }
   else if (a==="cmulti") { const arr = S.cliente[b.dataset.k], i = arr.indexOf(v); i>=0 ? arr.splice(i,1) : arr.push(v); persist(); render(); }
-  else if (a==="resetC") { S.cliente = blankCliente(); persist(); render(); }
+  else if (a==="resetC") { S.cliente = blankCliente(); S.ia = null; persist(); render(); }
   else if (a==="consultar") consultar();
   else if (a==="sim") { S.sim = v; render(); }
   else if (a==="pzSug") { PZ_SUG[+v][1].forEach(id=>{ if (S.byId[id] && !S.pz.items.includes(id)) S.pz.items.push(id); }); pzSave(); render(); }

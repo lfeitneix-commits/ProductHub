@@ -86,3 +86,17 @@ Se guardan como `[{"_a": [...]}]` y el runtime los reconstruye al leer. No edita
 ## Publicar en Vercel
 Importar el repo en Vercel sin framework ni build. Vercel sirve la carpeta `public/`.
 Después sumar el dominio en Firebase › Authentication › Authorized domains.
+
+## Análisis con IA (pantalla Cliente)
+"Analizalo con IA" muestra dentro del Hub un resumen, el diagnóstico de la cartera, una estrategia con productos de Neix
+(con botón para sumarlos a la propuesta), riesgos y preguntas para la reunión.
+
+- **Hoy (simulación):** `public/js/ia-config.js` tiene `modo: "simulacion"`. El análisis lo arma el navegador con reglas, sin IA real.
+- **Con la API de Anthropic:** la función `api/analisis.js` (Vercel) llama a Claude (`claude-opus-5-5`) y devuelve el análisis
+  con la misma estructura que la simulación. Para activarla:
+  1. Crear una clave en https://console.anthropic.com (Settings › API keys).
+  2. En Vercel: Settings › Environment Variables › `ANTHROPIC_API_KEY` = la clave. Nunca en el repo ni en el navegador.
+  3. Cambiar `public/js/ia-config.js` a `modo: "api"` y publicar.
+
+La función solo recibe los datos que se ven en la pantalla Cliente (perfil, tenencia, lo que busca y su situación) y el catálogo,
+y solo devuelve productos que existen en el catálogo.
