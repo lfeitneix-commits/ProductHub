@@ -1,6 +1,6 @@
 // Función de Vercel: POST /api/analisis
 // Recibe los datos del cliente que arma el Hub (datosIA en public/index.html) y devuelve el análisis
-// con la misma forma que la simulación: { resumen, metricas, asignacion, diagnostico, rotaciones, estrategia, objeciones, preguntas, proximo_paso }.
+// con la misma forma que la simulación: { resumen, metricas, asignacion, diagnostico, rotaciones, estrategia, proximo_paso }.
 //
 // Requiere la variable de entorno ANTHROPIC_API_KEY en Vercel (Settings › Environment Variables).
 // Para activarla en el Hub: public/js/ia-config.js -> modo: "api".
@@ -28,12 +28,12 @@ const SCHEMA = obj({
     prioridad: { type: "integer" }, por_que: str,
     argumento: { type: "string", description: "frase para decirle al cliente, en segunda persona" },
   }) },
-  objeciones: { type: "array", items: obj({ objecion: str, respuesta: str }) },
-  preguntas: { type: "array", items: str },
   proximo_paso: str,
 });
 
 const SYSTEM = `Sos un estratega senior de inversiones de Neix, una ALyC argentina, y preparás el análisis de un cliente para un asesor financiero con experiencia comercial. El asesor sabe vender: necesita un análisis técnico sólido y accionable, no generalidades.
+
+Los asesores tienen años de experiencia: no les expliques cómo vender ni les sugieras preguntas u objeciones; dales el análisis técnico.
 
 Te pasan la tenencia (con tipo y clase de activo), métricas ya calculadas, la cartera modelo que corresponde (por perfil o de tesorería si es empresa), lo que busca, su situación y el catálogo de productos de Neix con su pitch.
 
@@ -44,8 +44,6 @@ Entregá:
 - rotaciones (hasta 3): de un activo concreto de la tenencia a un producto del catálogo, con monto en USD redondeado a 5.000, el motivo técnico y el impacto en la cartera. Priorizá bajar concentración y acercarse a la cartera modelo sin cambiar el perfil. Si busca preservar dólares, no rotes dólares a pesos. Si es empresa, cuidá la liquidez operativa.
 - asignacion: por clase de activo, hoy, con las rotaciones aplicadas y el modelo.
 - estrategia (2 a 4 productos del catálogo, id exacto, ordenados): por qué para este cliente y un argumento de venta en segunda persona.
-- objeciones (2 a 3) probables de este cliente y cómo responderlas.
-- preguntas (3 a 4) para la reunión, que destraben la decisión.
 - proximo_paso: la acción concreta para esta semana.
 
 Español rioplatense, directo, con números. No inventes rendimientos ni precios que no estén en los datos. Es material interno para el asesor, no una recomendación al cliente.`;

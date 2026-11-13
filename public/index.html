@@ -946,7 +946,7 @@ function buscaHTML(){
      diagnostico:[{titulo, detalle, nivel:"ok"|"alerta"|"oportunidad"}],
      rotaciones:[{desde, hacia_producto_id, monto_usd, motivo, impacto}],
      estrategia:[{producto_id, prioridad, por_que, argumento}],
-     objeciones:[{objecion, respuesta}], preguntas:[...], proximo_paso }
+     proximo_paso }
    Modo en public/js/ia-config.js: "simulacion" (reglas en el navegador) o "api" (POST /api/analisis con Claude). */
 const iaModo = () => (window.NEIX_IA && window.NEIX_IA.modo) || "simulacion";
 /* Características de cada tipo de activo de la tenencia (para métricas y rotaciones). */
@@ -1078,16 +1078,6 @@ function simularIA(){
       por_que: ro ? `Destino de la rotación desde ${ro.desde} (${usd(ro.monto_usd)}). ${ro.impacto}` : `${p.cliente.titular}.${ev.why.length ? " Responde a " + ev.why.slice(0,2).join(" y ").toLowerCase() + "." : ""}`,
       argumento: p.interno.pitch || p.cliente.bajada || p.cliente.titular};
   });
-  /* Objeciones: las cargadas en las fichas, y las típicas de una rotación */
-  const objeciones = [];
-  estrategia.forEach(e => { const o = (S.byId[e.producto_id].interno.objeciones||[])[0]; if (o && objeciones.length < 3) objeciones.push({objecion:o[0], respuesta:o[1]}); });
-  if (rot.length && objeciones.length < 3) objeciones.push({objecion:"¿Por qué vender algo que me viene rindiendo bien?", respuesta:"No es vender por vender: es tomar parte de la ganancia y repartir el riesgo. Si ese activo sigue subiendo, seguís teniendo la mayor parte; si baja, no te arrastra toda la cartera."});
-  if (rot.some(r => r.hacia_producto_id === "t-bills" || r.hacia_producto_id === "fondos-offshore") && objeciones.length < 3) objeciones.push({objecion:"Los bonos argentinos rinden más que el Tesoro americano.", respuesta:"Rinden más porque tienen más riesgo. La idea es que una parte de tus dólares no dependa de Argentina: es el seguro de la cartera, no la apuesta."});
-  /* Preguntas: de las fichas y del caso */
-  const preguntas = [];
-  if (m && m.liquidez_inmediata_pct > 0) preguntas.push("De lo que tenés en pesos, ¿cuánto vas a necesitar en los próximos 3 meses?");
-  estrategia.forEach(e => { const q = (S.byId[e.producto_id].interno.preguntas||[])[0]; if (q && preguntas.length < 4 && !preguntas.includes(q)) preguntas.push(q); });
-  if (preguntas.length < 4) preguntas.push("¿Tenés inversiones en otras entidades que tengamos que mirar en conjunto?");
   /* Resumen y próximo paso */
   const totRot = rot.reduce((a,r)=>a+r.monto_usd,0);
   const resumen = m
@@ -1097,7 +1087,7 @@ function simularIA(){
   const proximo_paso = rot.length
     ? `Llamalo esta semana con la rotación 1 (${usd(rot[0].monto_usd)} de ${rot[0].desde} a ${S.byId[rot[0].hacia_producto_id].nombre}) como titular, y mandale la propuesta con ${estrategia.slice(0,2).map(e=>S.byId[e.producto_id].nombre).join(" y ")}.`
     : estrategia.length ? `Mandale la propuesta con ${estrategia.slice(0,2).map(e=>S.byId[e.producto_id].nombre).join(" y ")} y coordiná una llamada para definir montos.` : "Completá qué busca y su situación para armar la estrategia.";
-  return {resumen, metricas: m ? (({tot, ...x}) => x)(m) : null, asignacion, diagnostico: diag, rotaciones: rot, estrategia, objeciones, preguntas, proximo_paso};
+  return {resumen, metricas: m ? (({tot, ...x}) => x)(m) : null, asignacion, diagnostico: diag, rotaciones: rot, estrategia, proximo_paso};
 }
 async function analizarIA(){
   const c = S.cliente;
@@ -1164,9 +1154,7 @@ function iaHTML(){
    ${(d.asignacion||[]).length ? `<h4 class="ia-h">Asignación por clase de activo</h4><div class="tw"><table class="cmp ia-tab"><thead><tr><th>Clase</th><th class="r">Hoy</th><th class="r">Con las rotaciones</th><th class="r">Modelo</th></tr></thead><tbody>${d.asignacion.map(a=>`<tr><td>${esc(a.clase)}</td><td class="r">${a.actual_pct}%</td><td class="r"><b>${a.propuesto_pct}%</b></td><td class="r muted">${a.modelo_pct}%</td></tr>`).join("")}</tbody></table></div>` : ""}
    ${d.estrategia.length ? `<h4 class="ia-h">Productos a ofrecer</h4><div class="stack" style="gap:8px">${d.estrategia.map(e=>{ const p = S.byId[e.producto_id], inProp = S.prop.items.some(i=>i.id===p.id); return `<div class="ia-paso"><span class="n">${e.prioridad}</span><div style="min-width:0"><a href="#p-${p.id}"><b>${esc(p.nombre)}</b></a><p class="small muted" style="margin:2px 0 0">${esc(e.por_que)}</p>${e.argumento?`<p class="ia-pitch">“${esc(e.argumento)}”</p>`:""}</div><button class="btn ${inProp?"":"primary"}" data-act="toggleProp" data-id="${p.id}">${inProp?"Agregado":"Agregar"}</button></div>`; }).join("")}</div>
    <button class="btn" data-act="iaTodo" style="margin-top:10px">${ico("_plus")}Sumar todos a la propuesta</button>` : ""}
-   ${(d.objeciones||[]).length ? `<h4 class="ia-h">Si te dice…</h4><div class="stack" style="gap:6px">${d.objeciones.map(o=>`<details class="ia-obj"><summary>“${esc(o.objecion)}”</summary><p class="small" style="margin:6px 0 0">${esc(o.respuesta)}</p></details>`).join("")}</div>` : ""}
-   ${(d.preguntas||[]).length ? `<h4 class="ia-h">Preguntas para la reunión</h4><ul class="clean small ia-list">${d.preguntas.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-   ${m ? `<div class="ia-prop"><div><b>${S.prop.analisis ? "El análisis está en la propuesta" : "Sumá el análisis a la propuesta"}</b><span>Va la versión para el cliente: indicadores, diagnóstico, movimientos sugeridos y asignación. Lo interno (argumentos, objeciones, preguntas) no se incluye.</span></div>${S.prop.analisis ? `<span class="btn-row"><a class="btn" href="#propuesta">Ver propuesta</a><button class="btn ghost" data-act="iaPropQuitar">Quitar</button></span>` : `<button class="btn primary" data-act="iaProp">${ico("_prop")}Agregar a la propuesta</button>`}</div>` : ""}
+   ${m ? `<div class="ia-prop"><div><b>${S.prop.analisis ? "El análisis está en la propuesta" : "Sumá el análisis a la propuesta"}</b><span>Va la versión para el cliente: indicadores, diagnóstico, movimientos sugeridos y asignación. Lo interno (argumentos de venta y próximo paso) no se incluye.</span></div>${S.prop.analisis ? `<span class="btn-row"><a class="btn" href="#propuesta">Ver propuesta</a><button class="btn ghost" data-act="iaPropQuitar">Quitar</button></span>` : `<button class="btn primary" data-act="iaProp">${ico("_prop")}Agregar a la propuesta</button>`}</div>` : ""}
    ${d.proximo_paso ? `<div class="ia-next"><b>Próximo paso</b>${esc(d.proximo_paso)}</div>` : ""}
    <p class="tiny muted" style="margin-top:12px">Sugerencia para el asesor, sobre la cartera modelo de referencia. Validá montos, perfil y normativa antes de ofrecerlo.</p></div>`;
 }
