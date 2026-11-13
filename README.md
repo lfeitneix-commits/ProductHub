@@ -100,3 +100,26 @@ Después sumar el dominio en Firebase › Authentication › Authorized domains.
 
 La función solo recibe los datos que se ven en la pantalla Cliente (perfil, tenencia, lo que busca y su situación) y el catálogo,
 y solo devuelve productos que existen en el catálogo.
+
+## Ingreso con Microsoft (control de acceso)
+En Vercel, el Hub entero (páginas, fichas, PDF y /api) pide iniciar sesión con la cuenta de Microsoft de Neix.
+La primera vez el asesor toca su cuenta; después la sesión dura 90 días en ese navegador. "Salir" (al pie) cierra solo el Hub.
+En local (`npm run dev`) no hay ingreso.
+
+Piezas: `middleware.js` (controla cada pedido), `api/auth/login.js`, `api/auth/callback.js`, `api/auth/logout.js`, `api/me.js`, `lib/auth.js`.
+
+Configuración (una vez, con la dirección de Vercel ya publicada, por ejemplo `https://producthub-xxxx.vercel.app`):
+1. **entra.microsoft.com › App registrations › Hub de Productos Neix**
+   - **Authentication › Add a platform › Web** › Redirect URI: `https://producthub-xxxx.vercel.app/api/auth/callback` › Configure.
+   - **Certificates & secrets › Client secrets › New client secret** (24 meses) › copiar el **Value** (se ve una sola vez).
+2. **Vercel › Settings › Environment Variables** (Production):
+   - `AZURE_CLIENT_SECRET` = el Value del paso anterior.
+   - `SESSION_SECRET` = un texto largo al azar (40 caracteres o más). Si se cambia, todos vuelven a iniciar sesión.
+   - `EDITORES` = mails que ven Gestión, separados por coma (por ejemplo, Marketing y vos).
+   - `HABILITADOS` = (opcional) mails que pueden entrar. Vacío: cualquier cuenta @neix.com.ar.
+3. Volver a publicar (Deployments › Redeploy). Los cambios en las variables se aplican al publicar.
+
+Quién entra: solo cuentas del directorio de Neix (@neix.com.ar), y si `HABILITADOS` tiene mails, solo esos.
+Si alguien sale de `HABILITADOS`, pierde el acceso en la próxima publicación aunque tenga la sesión abierta;
+si Sistemas da de baja su cuenta de Microsoft, ya no puede volver a iniciar sesión.
+El secreto de Microsoft vence: anotá la fecha y renovalo antes (paso 1).

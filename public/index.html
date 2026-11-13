@@ -580,7 +580,8 @@ async function copy(text){ try { await navigator.clipboard.writeText(text); toas
 const risk = n => RISK_TXT[n] ? `<span class="risk ${n<=2?"r-lo":n===3?"r-mid":"r-hi"}" title="Riesgo ${esc(RISK_TXT[n].toLowerCase())}"><i aria-hidden="true"></i>Riesgo ${esc(RISK_TXT[n].toLowerCase())}</span>` : "";
 /* Gestión (one pagers y vigencia): abierta a todos hasta definir accesos (Marketing y responsables). Para cerrarla: false. */
 const GESTION_ABIERTA = true;
-const puedeGestionar = () => S.canEdit || GESTION_ABIERTA;
+// Con el ingreso de Microsoft activo (Vercel), Gestión es solo para los mails de EDITORES; en local queda abierta.
+const puedeGestionar = () => S.canEdit || (S.me ? !!S.me.editor : GESTION_ABIERTA);
 /* Color de cada área (tarjetas, fichas y filtros), de la paleta secundaria de Neix. */
 const UNI_COLOR = {"Banca Corporativa":"#003F61" /* Azul profundo */, "Banca Privada":"#004836" /* Verde inglés */, "Financial Advisors":"#9A8E7D" /* Arena */, "Mercado de Capitales":"#476785" /* Azul acero */};
 const units = p => p.unidades.map(u=>`<span class="utag" style="--u:${UNI_COLOR[u]||"#999"}" title="${esc(u)}">${UNI[u]||esc(u)}</span>`).join("");
@@ -686,6 +687,7 @@ function footer(r){
 }
 /* Acceso de editores: al pie de cada página (solo con Firebase). */
 function sesionLink(){
+  if (S.me) return `<p class="legal" style="margin-top:10px">Ingresaste como ${esc(S.me.nombre || S.me.email)}${S.me.editor ? " · editor" : ""} · <a href="/api/auth/logout" style="color:inherit">Salir</a></p>`;
   const ses = S.ses; if (!ses) return "";
   return `<p class="legal" style="margin-top:10px">${ses.editor ? `Editando como ${esc(ses.editor.email)} · <a href="#" data-act="logout" style="color:inherit">Salir</a>` : `<a href="#ingresar" style="color:inherit">Acceso editores</a>`}</p>`;
 }
@@ -1691,6 +1693,8 @@ function softRender(){ const a = document.activeElement; if (a && (a.tagName==="
 async function boot(){
   const st = document.createElement("style"); st.textContent = PP_CSS; document.head.appendChild(st);
   render(true);
+  // Quién está usando el Hub (ingreso con Microsoft en Vercel). En local no existe y se ignora.
+  fetch("api/me", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(me => { if (me && me.email) { S.me = me; render(); } }).catch(()=>{});
   const c = window.neixRuntime;
   if (!c || !c.use) { S.loading = false; S.dbMissing = true; render(); return; }
   c.use("downloads").then(d => { S.dl = d; });
