@@ -208,6 +208,9 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 /* Cliente */
 .cl-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
 .stack{display:grid;gap:12px}
+.dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
+.busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
+@media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
 .q{display:grid;gap:7px} .q h4{font-family:var(--f-body);font-size:12px;font-weight:600;color:var(--ink-2)}
 .hold-row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--line)}
 .res-sec{margin-bottom:20px}
@@ -863,7 +866,7 @@ function vCliente(){
     ${c.tenencia?`<div style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><b>${esc(c.nombre)}</b><span class="num small">${usd(tot)}</span></div><p class="tiny muted" style="margin:2px 0 6px">Tenencia valorizada al ${new Date().toLocaleDateString("es-AR")}</p>
      ${c.tenencia.map(h=>`<div class="hold-row"><span>${esc(h.activo)}</span><span class="num">${usd(h.usd)}</span></div>`).join("")}</div>`:""}</div>
    <div class="panel stack"><h3 style="margin:0">Perfil</h3>
-    <div class="q"><h4>Tipo de cliente</h4>${sel("tipo",TIPO)}</div><div class="q"><h4>Perfil de inversor</h4>${sel("perfil",PERFIL)}</div><div class="q"><h4>Horizonte</h4>${sel("horizonte",HORIZ)}</div>
+    <div class="q"><h4>Tipo de cliente</h4>${sel("tipo",TIPO)}</div><div class="q"><h4>Perfil de inversor</h4>${c.perfil ? `<div class="dato">${esc(PERFIL[c.perfil]||c.perfil)}</div><span class="tiny muted">Dato de la cuenta (test del inversor). No se modifica desde el Hub.</span>` : `<div class="dato vacio">Se completa al leer la cuenta comitente</div>`}</div><div class="q"><h4>Horizonte</h4>${sel("horizonte",HORIZ)}</div>
     <label class="f">Patrimonio o liquidez disponible<select class="input" id="patrimonio">${PATRI.map(([v,t])=>`<option value="${v}" ${c.patrimonio===v?"selected":""}>${t}</option>`).join("")}</select></label></div>
    <div class="panel"><h3>Qué busca</h3>${multi("objetivos",OBJ)}</div>
    <div class="panel"><h3>Situación actual</h3>${multi("eventos",EVT)}</div>
@@ -878,10 +881,46 @@ function resHTML(r, extra){
 function resultadosHTML(R){
   const sec = (t, n, body, d) => `<div class="res-sec"><h3>${t} <span class="muted small">${n}</span></h3>${d?`<p class="small muted">${d}</p>`:""}${body}</div>`;
   return (R.rec.length ? sec("Recomendados", R.rec.length, R.rec.map(r=>resHTML(r)).join(""), "Coinciden con lo que busca y con su perfil.") : sec("Recomendados", 0, `<div class="empty small">Sumá objetivos o situaciones para afinar la recomendación.</div>`))
-   + (R.cross.length ? sec("Para complementar lo que ya tiene", R.cross.length, R.cross.map(x=>resHTML(x.r, `<span class="tag">Complementa ${esc(x.from.join(", "))}</span>`)).join(""), "Cross selling a partir de su tenencia.") : "")
+   + buscaHTML()
    + (R.pos.length ? sec("También pueden aplicar", R.pos.length, R.pos.map(r=>resHTML(r)).join("")) : "")
    + (R.tiene.length ? sec("Ya los tiene", R.tiene.length, R.tiene.map(r=>`<div class="res"><span class="ic">${ico(r.p.categoria)}</span><div><h4><a href="#p-${r.p.id}">${esc(r.p.nombre)}</a></h4><div class="small muted">Detectado en su tenencia. Oportunidad de up selling: revisá montos y plazos.</div></div></div>`).join("")) : "")
    + (R.no.length ? `<details class="fold"><summary>No aplican (${R.no.length})</summary><div class="in">${R.no.map(r=>resHTML(r)).join("")}</div></details>` : "");
+}
+/* Qué busca y situación actual, con análisis en Claude (se abre con los datos del cliente cargados). */
+function buscaHTML(){
+  const c = S.cliente, chips = (arr, map) => arr.length ? `<div class="chips">${arr.map(k=>`<span class="tag">${esc(map[k]||k)}</span>`).join("")}</div>` : `<p class="small muted" style="margin:0">Sin marcar</p>`;
+  return `<div class="res-sec"><h3>Qué busca y situación actual</h3>
+   <div class="busca"><div><h4>Qué busca</h4>${chips(c.objetivos, OBJ)}</div><div><h4>Situación actual</h4>${chips(c.eventos, EVT)}</div></div>
+   <button class="btn primary" data-act="iaCliente">${ico("_sol")}Analizalo con IA</button>
+   <p class="tiny muted" style="margin-top:8px">Abre Claude en otra pestaña con el perfil, la tenencia, lo que busca y su situación, para que proponga una estrategia con productos de Neix.</p></div>`;
+}
+function promptCliente(){
+  const c = S.cliente, R = resultados(), tot = (c.tenencia||[]).reduce((a,h)=>a+h.usd,0);
+  const pat = (PATRI.find(([v])=>v===c.patrimonio)||[])[1];
+  const L = [
+    "Sos un asesor financiero de Neix (ALyC argentina). Analizá este cliente y proponé una estrategia concreta: qué productos de Neix ofrecerle, en qué orden y por qué, qué riesgos o puntos cuidar y qué preguntas hacerle en la próxima reunión. Respondé en español rioplatense, breve y accionable.",
+    "\nCLIENTE",
+    c.nombre ? "- Nombre: " + c.nombre : "",
+    c.tipo ? "- Tipo: " + (TIPO[c.tipo]||c.tipo) : "",
+    c.perfil ? "- Perfil de inversor (test, no modificable): " + (PERFIL[c.perfil]||c.perfil) : "",
+    c.horizonte ? "- Horizonte: " + (HORIZ[c.horizonte]||c.horizonte) : "",
+    pat && c.patrimonio ? "- Patrimonio o liquidez disponible: " + pat : "",
+    c.tenencia ? "\nTENENCIA (" + usd(tot) + ")\n" + c.tenencia.map(h=>"- " + h.activo + ": " + usd(h.usd) + " (" + Math.round(h.usd/tot*100) + "%)").join("\n") : "",
+    "\nQUÉ BUSCA\n" + (c.objetivos.length ? c.objetivos.map(k=>"- "+(OBJ[k]||k)).join("\n") : "- Sin marcar"),
+    "\nSITUACIÓN ACTUAL\n" + (c.eventos.length ? c.eventos.map(k=>"- "+(EVT[k]||k)).join("\n") : "- Sin marcar"),
+    R.rec.length ? "\nLO QUE EL HUB YA RECOMIENDA\n" + R.rec.map(r=>"- "+r.p.nombre).join("\n") : "",
+    R.tiene.length ? "\nPRODUCTOS QUE YA TIENE\n" + R.tiene.map(r=>"- "+r.p.nombre).join("\n") : "",
+    "\nPRODUCTOS DISPONIBLES EN NEIX\n" + S.productos.map(p=>"- " + p.nombre + " (" + p.categoria + ", riesgo " + (RISK_TXT[p.riesgoNivel]||"").toLowerCase() + ")").join("\n")
+  ];
+  return L.filter(Boolean).join("\n");
+}
+function iaCliente(){
+  const c = S.cliente;
+  if (!c.tenencia && !c.objetivos.length && !c.eventos.length) { toast("Leé la cuenta o marcá qué busca y su situación"); return; }
+  const q = promptCliente();
+  if (navigator.clipboard) navigator.clipboard.writeText(q).catch(()=>{});
+  abrirLink("https://claude.ai/new?q=" + encodeURIComponent(q), true);
+  toast("Se abrió Claude con los datos del cliente (también quedaron copiados)");
 }
 async function consultar(){
   const c = S.cliente, n = ($("#comitente").value||"").trim(); c.comitente = n; c.apiErr = "";
@@ -1342,6 +1381,7 @@ document.addEventListener("click", e => {
   else if (a==="shClose" || (a==="shBg" && e.target===b)) cerrarEnvio();
   else if (a==="shSend" || a==="shShare") enviar(b);
   else if (a==="back") volver();
+  else if (a==="iaCliente") iaCliente();
   else if (a==="validar") validar(id);
   else if (a==="notaMkt") notaMkt(id);
   else if (a==="save") save(id);
