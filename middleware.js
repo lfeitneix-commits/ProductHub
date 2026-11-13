@@ -1,5 +1,5 @@
 // Controla cada pedido al Hub (páginas, fichas, PDF y /api) en Vercel.
-// Sin sesión válida: las páginas van al inicio de sesión con Microsoft y los datos responden 401.
+// Sin sesión válida: las páginas van a la pantalla de entrada (api/auth/ingresar) y los datos responden 401.
 // /api/auth/* queda afuera para poder iniciar y cerrar sesión.
 // En local (npm run dev) no corre: el Hub queda abierto para probar.
 import { next } from "@vercel/functions";
@@ -16,7 +16,7 @@ export default async function middleware(request) {
   const pideHTML = (request.headers.get("accept") || "").includes("text/html");
   if (request.method === "GET" && pideHTML) {
     const destino = url.pathname + url.search;
-    return Response.redirect(new URL("/api/auth/login?next=" + encodeURIComponent(destino), url), 302);
+    return Response.redirect(new URL("/api/auth/ingresar?next=" + encodeURIComponent(destino), url), 302);
   }
   return new Response(JSON.stringify({ error: "Iniciá sesión con tu cuenta de Neix" }), { status: 401, headers: { "content-type": "application/json" } });
 }
