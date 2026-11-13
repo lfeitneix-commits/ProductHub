@@ -1308,7 +1308,7 @@ function cpdDoc(v){
    <p class="opx-baj">${bajada}</p></div>
   <div class="opx-body">
    <div class="opx-facts"><div><b>Monto del cheque</b><span>${ars2(r.C3)}</span></div><div><b>Vencimiento</b><span>${fdate(v.fVto)}</span></div><div><b>Plazo</b><span>${fmt(r.C9)} días</span></div><div class="hl"><b>Diferencia en TNA</b><span>${pct(r.D25,2)}</span></div></div>
-   <p class="opx-txt">Descontar este cheque en Neix tiene una diferencia ${r.D25 >= 0 ? "a favor" : "en contra"} en TNA de <strong>${pct(Math.abs(r.D25),2)}</strong> con respecto al circuito bancario. A continuación, dejamos el detalle de la diferencia de conceptos:</p>
+   <p class="opx-txt">Descontar este cheque en Neix tiene ${r.D25 >= 0 ? "un beneficio" : "una diferencia en contra"} del <strong>${pct(Math.abs(r.D25),2)} TNA</strong> con respecto al circuito bancario. A continuación, dejamos el detalle de la diferencia:</p>
    <div class="opx-box"><table><thead><tr><th>Concepto</th><th class="r">Neix</th><th class="r">Banco</th></tr></thead><tbody>
     ${fila("Tasa de descuento", pct(r.C7), pct(r.D7))}${fila("Intereses", r.C8, r.D8)}
     ${fila("IVA sobre intereses", r.C11, r.D11)}${fila("IVA RIN", r.C12, r.D12)}${fila("I.I.B.B.", r.C13, r.D13)}${fila("Impuesto a los créditos", r.C14, r.D14)}
