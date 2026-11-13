@@ -234,6 +234,11 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 .op-pop{background:var(--surface);border-radius:12px;width:min(960px,100%);height:min(92vh,1100px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
 .op-pop-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line)}.op-pop-h b{font-size:14px;font-weight:500}
 .op-pop iframe{flex:1;border:0;width:100%;background:#525659}
+.drop{display:flex;align-items:center;gap:14px;border:1.5px dashed var(--line-2);border-radius:12px;padding:14px 16px;cursor:pointer;background:var(--surface);transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--ink-3);background:var(--surface-2)}.drop.ok{border-style:solid;border-color:#2E9E5B;background:#F1F8F3}
+.drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}.drop .op-ic{opacity:.85}.drop.ok .op-ic{opacity:1}
+.drop-t{flex:1;min-width:0}.drop-t b{display:block;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.drop-t small{display:block;font-size:12px;color:var(--ink-3)}
+.drop-b{pointer-events:none;flex:none}
 .dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
 .busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
 @media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
@@ -828,7 +833,7 @@ function vEditar(id){
   <form id="editForm" class="stack" onsubmit="return false"><div class="panel"><h3>One pager oficial</h3>${p.onePager
      ? `<div class="op-file"><button type="button" class="op-file-n" data-act="opVer" data-id="${id}"><span class="op-ic">PDF</span><span><b>${esc(p.onePager.archivo||"One pager.pdf")}</b><small>Cargado el ${fdate(p.onePager.fecha)} · tocá para verlo</small></span></button>
         <span class="btn-row"><button type="button" class="btn" data-act="opVer" data-id="${id}">Ver</button>${S.assets?`<button type="button" class="btn ghost" data-act="opQuitar" data-id="${id}">Eliminar</button>`:""}</span></div>`
-     : (S.assets ? `<p class="small muted" style="margin-bottom:10px">Todavía no tiene el PDF oficial.</p><div class="upl"><label class="f" for="up_pdf">PDF del one pager<input class="input" id="up_pdf" type="file" accept="application/pdf"></label><button class="btn" type="button" data-act="upOP" data-id="${id}">Subir one pager</button></div>` : `<p class="small muted">Todavía no tiene el PDF oficial.</p>`)}</div>${EDIT_FIELDS.map(([g,fs])=>`<div class="panel"><h3>${g}</h3><div class="stack">${fs.map(([k,l,t])=>{
+     : (S.assets ? `<p class="small muted" style="margin-bottom:10px">Todavía no tiene el PDF oficial.</p><div class="upl" style="border:0;padding:0"><label class="drop" for="up_pdf" id="dropPdf"><input id="up_pdf" type="file" accept="application/pdf"><span class="op-ic">PDF</span><span class="drop-t"><b id="dropNom">Elegí el PDF del one pager</b><small id="dropSub">o arrastralo acá</small></span><span class="btn drop-b">Buscar archivo</span></label><button class="btn primary" type="button" data-act="upOP" data-id="${id}" id="upBtn" disabled>Subir one pager</button></div>` : `<p class="small muted">Todavía no tiene el PDF oficial.</p>`)}</div>${EDIT_FIELDS.map(([g,fs])=>`<div class="panel"><h3>${g}</h3><div class="stack">${fs.map(([k,l,t])=>{
     const v = getP(p,k); let val = v;
     if (t==="list") val = (v||[]).join("\n"); if (t==="pairs") val = (v||[]).map(x=>x.join(" | ")).join("\n");
     const fid = "ed_"+k.replace(/\./g,"_");
@@ -1878,8 +1883,20 @@ document.addEventListener("input", e => {
     persist(); refreshPreview(); }
   else if (t.dataset.pi) { S.prop.items[+t.dataset.pi].nota = t.value; persist(); refreshPreview(); }
 });
+/* Selector de PDF de Gestión: muestra el archivo elegido y acepta arrastrar y soltar. */
+function pdfElegido(f){
+  const ok = f && (f.type === "application/pdf" || /\.pdf$/i.test(f.name)), d = $("#dropPdf"), n = $("#dropNom"), sb = $("#dropSub"), b = $("#upBtn");
+  if (!d) return;
+  if (f && !ok) { toast("Tiene que ser un PDF"); return; }
+  d.classList.toggle("ok", !!ok); if (n) n.textContent = ok ? f.name : "Elegí el PDF del one pager";
+  if (sb) sb.textContent = ok ? `${fmt(f.size/1024/1024, 1)} MB · tocá para cambiarlo` : "o arrastralo acá"; if (b) b.disabled = !ok;
+}
+["dragenter","dragover"].forEach(ev => document.addEventListener(ev, e => { const d = e.target.closest && e.target.closest("#dropPdf"); if (d) { e.preventDefault(); d.classList.add("over"); } }));
+["dragleave","drop"].forEach(ev => document.addEventListener(ev, e => { const d = e.target.closest && e.target.closest("#dropPdf"); if (!d) return; e.preventDefault(); d.classList.remove("over");
+  if (ev === "drop" && e.dataTransfer.files[0]) { const i = $("#up_pdf"); try { i.files = e.dataTransfer.files; } catch(_) {} pdfElegido(e.dataTransfer.files[0]); } }));
 document.addEventListener("change", e => {
   const t = e.target;
+  if (t.id === "up_pdf") { pdfElegido(t.files[0]); return; }
   if (t.id==="fEstado") { S.fEstado = t.value; render(); }
   else if (t.dataset.pzp) { const i = S.pz.items.indexOf(t.dataset.pzp); if (t.checked && i<0) S.pz.items.push(t.dataset.pzp); if (!t.checked && i>=0) S.pz.items.splice(i,1); pzSave(); render(); }
   else if (t.id==="pz_inst") { S.pz.inst = t.checked; pzSave(); refreshDeck(); }
