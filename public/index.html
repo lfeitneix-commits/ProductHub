@@ -1216,7 +1216,7 @@ function abrirEnvio(canal, tipo, id){
     : `Hola${nombre?" "+nombre:""}, te comparto la propuesta que armamos a partir de lo que conversamos. Cualquier duda, me escribís.${firma}`;
   const asunto = tipo === "op" ? `${p.nombre} · Neix` : `Propuesta Neix${P.cliente?" para "+P.cliente:""}`;
   const E = S.envio = {canal, tipo, id, asunto, archivo: null};
-  const listo = (txt) => { if (S.envio !== E) return; const n = $("#shAtt"); if (n) n.textContent = txt; ["#shSend","#shShare"].forEach(q => { const bt = $(q); if (bt) bt.disabled = false; }); };
+  const listo = (txt) => { if (S.envio !== E) return; const n = $("#shAtt"); if (n) n.textContent = txt; ["#shSend","#shShare","#shEml"].forEach(q => { const bt = $(q); if (bt) bt.disabled = false; }); };
   (tipo === "op" ? archivoOP(p) : propPDFBlob().then(b => new File([b], propNombre(), {type:"application/pdf"})))
     .then(f => { E.archivo = f; listo("PDF listo: " + f.name); })
     .catch(() => listo("No pudimos preparar el archivo. Se envía solo el mensaje."));
@@ -1226,10 +1226,29 @@ function abrirEnvio(canal, tipo, id){
     ${`<label class="f" for="shTo">${wa?"Celular":"Para"}<input class="input" id="shTo" type="${wa?"tel":"email"}" placeholder="${wa?"+54 9 11 …":"nombre@empresa.com"}" autocomplete="off"></label>`}
     <label class="f" for="shMsg">Mensaje<textarea class="input" id="shMsg">${esc(msg)}</textarea></label>
     <div class="att" id="shAtt">Preparando el archivo…</div>
-    <p class="tiny muted" style="margin:0"><b>Enviar</b>: abre ${wa?"WhatsApp":"tu mail"} con ${wa?"el número":"la dirección"} y el mensaje${tipo==="op"&&p&&p.onePager?", con el link al PDF":""}. El PDF también se descarga, por si querés arrastrarlo.${cel?` <b>Compartir con PDF</b>: abre el menú para compartir con el PDF adjunto; ahí elegís el contacto. El mensaje queda copiado: si no aparece, pegalo con Ctrl+V.`:""}</p>
-    <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button>${cel?`<button class="btn" id="shShare" data-act="shShare" disabled>${ico("_dl")}Compartir con PDF</button>`:""}<button class="btn primary" id="shSend" data-act="shSend" disabled>${wa?ico("_wa"):ico("_mail")}Enviar</button></div></div>`;
+    <p class="tiny muted" style="margin:0">${wa?"":`<b>Outlook con PDF</b>: descarga un borrador; al abrirlo, Outlook lo muestra con destinatario, asunto, mensaje y el PDF adjunto, listo para enviar. `}<b>Enviar</b>: abre ${wa?"WhatsApp":"tu mail"} con ${wa?"el número":"la dirección"} y el mensaje${tipo==="op"&&p&&p.onePager?", con el link al PDF":""}. El PDF también se descarga, por si querés arrastrarlo.${cel?` <b>Compartir con PDF</b>: abre el menú para compartir con el PDF adjunto; ahí elegís el contacto. El mensaje queda copiado: si no aparece, pegalo con Ctrl+V.`:""}</p>
+    <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button>${!wa?`<button class="btn" id="shEml" data-act="shEml" disabled>${ico("_mail")}Outlook con PDF</button>`:""}${cel?`<button class="btn" id="shShare" data-act="shShare" disabled>${ico("_dl")}Compartir con PDF</button>`:""}<button class="btn primary" id="shSend" data-act="shSend" disabled>${wa?ico("_wa"):ico("_mail")}Enviar</button></div></div>`;
   document.body.appendChild(div);
   const f = $("#shTo") || $("#shMsg"); if (f) f.focus();
+}
+/* Borrador de Outlook (.eml): destinatario, asunto, mensaje y PDF adjunto en un solo archivo. X-Unsent hace que Outlook lo abra para enviar. */
+async function borradorOutlook(){
+  const E = S.envio; if (!E || !E.archivo) return;
+  const to = (($("#shTo")||{}).value || "").trim(), msg = ($("#shMsg")||{}).value || "";
+  if (to && !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(to)) { toast("Revisá el mail"); return; }
+  const b64 = (u8) => { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s).replace(/.{76}/g, "$&\r\n"); };
+  const utf8 = (t) => new TextEncoder().encode(t), hdr = (t) => "=?UTF-8?B?" + btoa(String.fromCharCode(...utf8(t))) + "?=";
+  const bnd = "neix-" + Date.now().toString(36), pdf = new Uint8Array(await E.archivo.arrayBuffer());
+  const eml = [
+    "X-Unsent: 1", to ? "To: " + to : "To: ", "Subject: " + hdr(E.asunto), "MIME-Version: 1.0",
+    `Content-Type: multipart/mixed; boundary="${bnd}"`, "", `--${bnd}`,
+    "Content-Type: text/plain; charset=UTF-8", "Content-Transfer-Encoding: base64", "", b64(utf8(msg)), "", `--${bnd}`,
+    `Content-Type: application/pdf; name="${hdr(E.archivo.name)}"`, "Content-Transfer-Encoding: base64",
+    `Content-Disposition: attachment; filename="${hdr(E.archivo.name)}"`, "", b64(pdf), "", `--${bnd}--`, ""
+  ].join("\r\n");
+  const nombre = E.archivo.name.replace(/\.pdf$/i, "") + " (borrador).eml";
+  try { await S.dl.save({filename: nombre, data: new Blob([eml], {type:"message/rfc822"})}); cerrarEnvio(); toast("Abrí el borrador descargado: Outlook lo muestra listo para enviar"); }
+  catch(e) { toast("No pudimos armar el borrador"); }
 }
 function cerrarEnvio(){ const m = $("#shm"); if (m) m.remove(); S.envio = null; }
 function telWA(t){ let d = String(t||"").replace(/\D/g, ""); if (!d) return ""; if (d.startsWith("0")) d = d.slice(1); if (d.length === 10) d = "549" + d; else if (d.length === 11 && d.startsWith("9")) d = "54" + d; return d; }
@@ -1341,6 +1360,7 @@ document.addEventListener("click", e => {
   else if (a==="share") abrirEnvio(v, b.dataset.k, id);
   else if (a==="shClose" || (a==="shBg" && e.target===b)) cerrarEnvio();
   else if (a==="shSend" || a==="shShare") enviar(b);
+  else if (a==="shEml") borradorOutlook();
   else if (a==="back") volver();
   else if (a==="validar") validar(id);
   else if (a==="notaMkt") notaMkt(id);
