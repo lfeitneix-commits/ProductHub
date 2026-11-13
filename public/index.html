@@ -97,7 +97,11 @@ label.f .hint{font-size:11.5px;color:var(--ink-3);font-weight:400}
 .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
 .pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.crit{background:var(--crit-bg);color:var(--crit)}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none} .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.crit{background:var(--crit)}
-.risk{display:inline-flex;gap:3px;align-items:center} .risk i{width:6px;height:6px;border-radius:50%;background:var(--line-2)} .risk i.on{background:var(--ink-2)}
+.risk{display:inline-flex;gap:6px;align-items:center;font-size:11.5px;color:var(--ink-2);white-space:nowrap} .risk i{width:9px;height:9px;border-radius:50%;flex:none} .risk.r-lo i{background:#2E9E5B} .risk.r-mid i{background:#E3B02B} .risk.r-hi i{background:#D2453B}
+.utag::before,.uchip::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px;background:var(--u,#999)}
+.shm{position:fixed;inset:0;background:rgba(20,19,18,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:60}
+.shm .box{background:var(--surface);color:var(--ink);border-radius:14px;padding:22px;width:min(480px,100%);display:grid;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.shm h3{margin:0;font-size:19px}.shm textarea{min-height:110px}.shm .att{font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border-radius:8px;padding:8px 10px}
 .utag{font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--surface-2);color:var(--ink-2)}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;min-width:0}
 .panel>h3,.ph{font-size:16px;margin-bottom:10px}
@@ -483,7 +487,7 @@ const P_ = {
   _dl:"M12 4v11M7 10l5 5 5-5M5 20h14",
   _wa:"M4 20l1.3-4A8 8 0 1 1 8 19z",
   _calc:"M6 3h12v18H6zM9 7h6M9 12h6M9 16h3",
-  _plus:"M12 5v14M5 12h14", _check:"M5 12l5 5 9-10"
+  _plus:"M12 5v14M5 12h14", _mail:"M3 6h18v12H3zM3 7l9 6 9-6", _check:"M5 12l5 5 9-10"
 };
 const ico = (k, cls) => `<svg class="ico ${cls||""}" viewBox="0 0 24 24" aria-hidden="true"><path d="${P_[k]||P_._sol}"/></svg>`;
 
@@ -526,7 +530,7 @@ const S = {
   db: null, uid: null, canEdit: false, dl: null, assets: null, user: null, notas: [], names: {},
   loading: true, slow: false, dbMissing: false,
   view: "interno", persona: "Persona humana",
-  q: "", fUnidad: "", fCat: "", fEstado: "", fNeed: "",
+  q: "", fUnidad: "", fCat: "", fEstado: "", fNeeds: [],
   cliente: blankCliente(),
   prop: {cliente:"", asesor:"", mail:"", tel:"", mensaje:"", items:[]},
   sim: "caucion",
@@ -551,8 +555,14 @@ const daysTo = iso => iso ? Math.round((new Date(iso+"T12:00:00") - new Date(tod
 const fdate = iso => { if (!iso) return "Sin fecha"; const [y,m,d] = iso.split("-"); return `${d}/${m}/${y}`; };
 function toast(msg){ const t = document.createElement("div"); t.className = "toast"; t.setAttribute("role","status"); t.textContent = msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 2600); }
 async function copy(text){ try { await navigator.clipboard.writeText(text); toast("Copiado al portapapeles"); } catch(e) { const ta = document.createElement("textarea"); ta.value = text; ta.className = "input"; ta.style.cssText = "position:fixed;inset:20% 10% auto;height:40%;z-index:50"; document.body.appendChild(ta); ta.select(); toast("Seleccioná y copiá el texto"); ta.addEventListener("blur", ()=>ta.remove()); } }
-const risk = n => `<span class="risk" title="Riesgo ${esc(RISK_TXT[n]||"")}" aria-label="Riesgo ${esc(RISK_TXT[n]||"")}">${[1,2,3,4,5].map(i=>`<i class="${i<=n?"on":""}"></i>`).join("")}</span>`;
-const units = p => p.unidades.map(u=>`<span class="utag" title="${esc(u)}">${UNI[u]||esc(u)}</span>`).join("");
+/* Riesgo: verde (muy bajo y bajo), amarillo (medio), rojo (medio alto y alto). */
+const risk = n => RISK_TXT[n] ? `<span class="risk ${n<=2?"r-lo":n===3?"r-mid":"r-hi"}" title="Riesgo ${esc(RISK_TXT[n].toLowerCase())}"><i aria-hidden="true"></i>Riesgo ${esc(RISK_TXT[n].toLowerCase())}</span>` : "";
+/* Gestión (one pagers y vigencia): abierta a todos hasta definir accesos (Marketing y responsables). Para cerrarla: false. */
+const GESTION_ABIERTA = true;
+const puedeGestionar = () => S.canEdit || GESTION_ABIERTA;
+/* Color de cada área (tarjetas, fichas y filtros). */
+const UNI_COLOR = {"Banca Corporativa":"#2F6FD0", "Banca Privada":"#B08A4F", "Financial Advisors":"#7A55B8", "Mercado de Capitales":"#2C8C8C"};
+const units = p => p.unidades.map(u=>`<span class="utag" style="--u:${UNI_COLOR[u]||"#999"}" title="${esc(u)}">${UNI[u]||esc(u)}</span>`).join("");
 
 const blobUrl = id => /^(https?:|blob:|\/|onepagers\/)/.test(String(id)) ? id : "/_blob/" + id;
 async function dlPdf(id){
@@ -612,7 +622,7 @@ function render(anim){
   const r = route(), app = $("#app");
   const sec = r.startsWith("p-") || r.startsWith("editar-") ? "soluciones" : r;
   document.querySelectorAll("[data-sec]").forEach(a => a.setAttribute("aria-current", a.dataset.sec === sec ? "page" : "false"));
-  document.querySelectorAll("[data-admin]").forEach(a => a.hidden = !S.canEdit);
+  document.querySelectorAll("[data-admin]").forEach(a => a.hidden = !puedeGestionar());
   document.querySelectorAll(".pcount").forEach(c => { c.textContent = S.prop.items.length; c.hidden = !S.prop.items.length; });
   let html;
   if (r === "ingresar") html = vIngresar();
@@ -626,7 +636,7 @@ function render(anim){
   else if (r === "simuladores") html = vSimuladores();
   else if (r === "propuesta") html = vPropuesta();
   else if (r === "presentaciones") html = vPresentaciones();
-  else if (r === "gestion") html = S.canEdit ? vGestion() : stateMsg("Gestión es para el equipo de Marketing", "Si necesitás cambiar una ficha, dejá una nota al validarla.");
+  else if (r === "gestion") html = puedeGestionar() ? vGestion() : stateMsg("Gestión es para el equipo de Marketing", "Si necesitás cambiar una ficha, dejá una nota al validarla.");
   else html = vSoluciones();
   app.innerHTML = `<div class="${anim?"view":""}">${html}</div>`;
   footer(r);
@@ -651,14 +661,16 @@ function sesionLink(){
 function stateMsg(t, d){ return `<div class="page-head"><div><div class="eyebrow">Hub de Productos</div><h1>${esc(t)}</h1><p>${esc(d)}</p></div></div>`; }
 
 /* ── Productos ── */
+const sinAcento = t => String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const needsDe = p => NEEDS.filter(n=>p.match.objetivos.some(o=>n.objs.includes(o)));
 function filtrar(){
-  const q = S.q.trim().toLowerCase(), need = NEEDS.find(n=>n.k===S.fNeed);
+  const q = sinAcento(S.q.trim()), needs = NEEDS.filter(n=>S.fNeeds.includes(n.k));
   return S.productos.filter(p => {
     if (S.fUnidad && !p.unidades.includes(S.fUnidad)) return false;
     if (S.fCat && p.categoria !== S.fCat) return false;
     if (S.fEstado && estadoDe(p).k !== S.fEstado) return false;
-    if (need && !p.match.objetivos.some(o=>need.objs.includes(o))) return false;
-    if (q) { const hay = (p.nombre+" "+p.cliente.titular+" "+p.categoria+" "+p.interno.perfiles.join(" ")+" "+p.unidades.join(" ")+" "+ventajas(p).map(v=>v.join(" ")).join(" ")).toLowerCase(); if (!hay.includes(q)) return false; }
+    if (needs.length && !needs.some(n=>p.match.objetivos.some(o=>n.objs.includes(o)))) return false;
+    if (q) { const hay = sinAcento(p.nombre+" "+p.cliente.titular+" "+p.categoria+" "+p.interno.perfiles.join(" ")+" "+p.unidades.join(" ")+" "+ventajas(p).map(v=>v.join(" ")).join(" ")+" "+needsDe(p).map(n=>n.label).join(" ")+" "+p.match.objetivos.map(o=>OBJ[o]||"").join(" ")); if (!q.split(/\s+/).every(w=>hay.includes(w))) return false; }
     return true;
   });
 }
@@ -666,16 +678,17 @@ function vSoluciones(){
   const list = filtrar();
   const cats = CAT_ORDER.filter(c=>S.productos.some(p=>p.categoria===c)).concat([...new Set(S.productos.map(p=>p.categoria))].filter(c=>!CAT_ORDER.includes(c)));
   const groups = {}; list.forEach(p => (groups[p.categoria] = groups[p.categoria] || []).push(p));
-  const any = S.q || S.fUnidad || S.fCat || S.fEstado || S.fNeed;
+  const any = S.q || S.fUnidad || S.fCat || S.fEstado || S.fNeeds.length;
   const nCount = n => S.productos.filter(p=>p.match.objetivos.some(o=>n.objs.includes(o))).length;
   return `
   <div class="page-head"><div><div class="eyebrow">Hub de Productos</div><h1>Productos Neix</h1>
    <p class="muted">${S.productos.length} productos de Banca Corporativa, Banca Privada, FAs y la Mesa, con la versión para el cliente, el playbook interno y cómo se opera.</p></div>
    <a class="btn primary" href="#cliente">${ico("_cli")}Buscar para un cliente</a></div>
   <div class="search">${ico("_search")}<input class="input" id="q" type="search" placeholder="Buscá por producto, necesidad o tipo de cliente" value="${esc(S.q)}" aria-label="Buscar productos" autocomplete="off"></div>
-  <div class="needs" role="group" aria-label="Qué necesita tu cliente">${NEEDS.map(n=>`<button class="need" data-act="fNeed" data-v="${n.k}" aria-pressed="${S.fNeed===n.k}"><span class="ic">${ico(n.icon)}</span><b>${n.label}</b><span class="n">${nCount(n)} productos</span></button>`).join("")}</div>
+  <p class="tiny muted" style="margin:14px 0 -4px">Podés elegir más de un objetivo.</p>
+  <div class="needs" role="group" aria-label="Qué necesita tu cliente">${NEEDS.map(n=>`<button class="need" data-act="fNeed" data-v="${n.k}" aria-pressed="${S.fNeeds.includes(n.k)}"><span class="ic">${ico(n.icon)}</span><b>${n.label}</b><span class="n">${nCount(n)} productos</span></button>`).join("")}</div>
   <div class="filters">
-   <div class="frow"><span class="lbl">Unidad</span><div class="chips scroll">${[["","Todas"]].concat(Object.keys(UNI).map(u=>[u, u==="Mercado de Capitales"?"Mesa · Mercado de Capitales":u])).map(([u,t])=>`<button class="chip" data-act="fUnidad" data-v="${esc(u)}" aria-pressed="${S.fUnidad===u}">${esc(t)}</button>`).join("")}</div></div>
+   <div class="frow"><span class="lbl">Unidad</span><div class="chips scroll">${[["","Todas"]].concat(Object.keys(UNI).map(u=>[u, u==="Mercado de Capitales"?"Mesa · Mercado de Capitales":u])).map(([u,t])=>`<button class="chip${u?" uchip":""}" style="--u:${UNI_COLOR[u]||"#999"}" data-act="fUnidad" data-v="${esc(u)}" aria-pressed="${S.fUnidad===u}">${esc(t)}</button>`).join("")}</div></div>
    <div class="rescount"><span>${list.length} ${list.length===1?"resultado":"resultados"}</span><span class="btn-row">
 
     ${any?`<button class="btn ghost" data-act="clearF">Limpiar</button>`:""}</span></div>
@@ -684,7 +697,7 @@ function vSoluciones(){
 }
 function card(p){
   const e = estadoDe(p);
-  return `<a class="card" href="#p-${p.id}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="units">${units(p)}</span><span class="dot ${e.cls}" title="${e.txt}" aria-label="${e.txt}"></span></div>
+  return `<a class="card" href="#p-${p.id}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="units">${units(p)}</span></div>
   <h3>${esc(p.nombre)}</h3><p class="tit">${esc(p.cliente.titular)}</p>
   <div class="foot"><span class="btn-row" style="gap:6px">${p.onePager?`<span class="optag">One pager</span>`:""}<span class="tiny muted">${p.simulador?"Con simulador":""}</span></span>${risk(p.riesgoNivel)}</div></a>`;
 }
@@ -699,14 +712,14 @@ function vProducto(id){
    <div style="min-width:0"><div class="units" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px">${units(p)}</div><p class="lead">${esc(p.cliente.titular)}<span>${esc(p.cliente.bajada)}</span></p>
    <div class="btn-row"><button class="btn" data-act="toggleProp" data-id="${p.id}">${ico(inProp?"_check":"_plus")}${inProp?"En la propuesta":"Agregar a propuesta"}</button></div></div></div>
   <div class="p-bar"><div class="seg" role="tablist">${tabs.map(([k,t])=>`<button role="tab" data-act="view" data-v="${k}" aria-pressed="${S.view===k}">${t}</button>`).join("")}</div>
-   <div class="btn-row">${p.onePager?`<button class="btn" data-act="dlPdf" data-id="${p.id}">${ico("_dl")}One pager PDF</button>`:`<button class="btn" data-act="dlOnePager" data-id="${p.id}">${ico("_dl")}One pager</button>`}<button class="btn" data-act="copyWA" data-id="${p.id}">${ico("_wa")}WhatsApp</button>${p.simulador?`<a class="btn" href="#simuladores" data-act="openSim" data-v="${p.simulador}">${ico("_calc")}Simular</a>`:""}</div></div>
+   <div class="btn-row">${p.onePager?`<button class="btn" data-act="dlPdf" data-id="${p.id}">${ico("_dl")}One pager PDF</button>`:`<button class="btn" data-act="dlOnePager" data-id="${p.id}">${ico("_dl")}One pager</button>`}<button class="btn" data-act="share" data-v="wa" data-k="op" data-id="${p.id}">${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="op" data-id="${p.id}">${ico("_mail")}Mail</button>${p.simulador?`<a class="btn" href="#simuladores" data-act="openSim" data-v="${p.simulador}">${ico("_calc")}Simular</a>`:""}</div></div>
   ${S.view==="cliente" ? `<div class="p-grid full"><div style="min-width:0">${clienteView(p)}</div></div>` : `<div class="p-grid"><div style="min-width:0">${S.view==="interno"?playbook(p):operativa(p)}</div>${aside(p,e)}</div>`}`;
 }
 function aside(p, e){
   return `<aside class="aside"><div class="panel"><h3 class="ph">¿Algo para corregir o sumar?</h3><p class="small muted" style="margin-bottom:12px">Dejá una nota sobre esta ficha.</p>
    <div style="display:grid;gap:8px"><textarea class="input" id="mkNota" placeholder="Ej.: cambió el mínimo, falta un dato, un cliente preguntó por…" aria-label="Nota sobre esta ficha"></textarea>
    <button class="btn" data-act="notaMkt" data-id="${p.id}">Enviar</button>
-   ${S.canEdit?`<a class="btn ghost" href="#editar-${p.id}">Editar contenido</a>`:""}</div></div>
+   ${puedeGestionar()?`<a class="btn ghost" href="#editar-${p.id}">Editar contenido</a>`:""}</div></div>
    ${S.canEdit && p.observaciones.length?`<details class="warnbox"><summary>${p.observaciones.length} pendientes del relevamiento</summary><ul class="clean small">${p.observaciones.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></details>`:""}</aside>`;
 }
 function facts(f){ return `<dl class="facts">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Monto",f.minimo],["Liquidez",f.liquidez],["Dónde opera",f.mercado]].map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`; }
@@ -763,7 +776,7 @@ const getP = (o, path) => path.split(".").reduce((a,k)=>a==null?a:a[k], o);
 function setP(o, path, v){ const ks = path.split("."); let a = o; ks.slice(0,-1).forEach(k=>{ a[k] = a[k] || {}; a = a[k]; }); a[ks[ks.length-1]] = v; }
 function vEditar(id){
   const p = S.byId[id]; if (!p) return stateMsg("No encontramos esa ficha", "");
-  if (!S.canEdit) return stateMsg("Solo Marketing edita las fichas", "Si ves algo para corregir, dejá una nota al validar la ficha.");
+  if (!puedeGestionar()) return stateMsg("Solo Marketing edita las fichas", "Si ves algo para corregir, dejá una nota al validar la ficha.");
   return `<div class="crumb"><a href="#gestion">Gestión</a><span>/</span><a href="#p-${id}">${esc(p.nombre)}</a></div><div class="page-head"><div><div class="eyebrow">Editar ficha</div><h1>${esc(p.nombre)}</h1></div>
   <div class="btn-row"><a class="btn" href="#p-${id}">Cancelar</a><button class="btn primary" data-act="save" data-id="${id}">Guardar cambios</button></div></div>
   <form id="editForm" class="stack" onsubmit="return false"><div class="panel"><h3>One pager oficial</h3>${p.onePager?`<p class="small" style="margin-bottom:10px">Cargado el ${fdate(p.onePager.fecha)}: ${esc(p.onePager.archivo||"PDF")}. Subí uno nuevo para reemplazarlo.</p>`:`<p class="small muted" style="margin-bottom:10px">Todavía no tiene el PDF oficial.</p>`}
@@ -797,15 +810,20 @@ async function upOP(id){
     await S.db.doc("productos/"+id).update({onePager: op}); toast("One pager cargado"); go("p-"+id);
   } catch(e) { toast("No se pudo subir. Revisá el archivo y probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Subir one pager"; } }
 }
+/* Las notas de las fichas llegan por mail a estas casillas, desde el mail de quien las escribe. */
+const NOTAS_PARA = ["lfeit@neix.com.ar", "info@neix.com.ar"];
+function abrirLink(href, nueva){ const l = document.createElement("a"); l.href = href; if (nueva) { l.target = "_blank"; l.rel = "noopener"; } document.body.appendChild(l); l.click(); l.remove(); }
 async function notaMkt(id){
   const el = $("#mkNota"), t = (el && el.value || "").trim(), p = S.byId[id];
   if (!t) { toast("Escribí la nota antes de enviarla"); return; }
-  if (!S.db) { toast("No pudimos conectar con la base. Probá de nuevo."); return; }
+  const ficha = location.origin + location.pathname + "#p-" + id;
+  abrirLink(`mailto:${NOTAS_PARA.join(",")}?subject=${encodeURIComponent("Hub de Productos · Nota sobre " + (p ? p.nombre : id))}&body=${encodeURIComponent(t + "\n\nFicha: " + ficha)}`);
+  if (!S.db) { if (el) el.value = ""; return; }
   const b = document.querySelector('[data-act="notaMkt"]'); if (b) { b.disabled = true; b.textContent = "Enviando"; }
   try { const nid = Date.now().toString(36) + Math.random().toString(36).slice(2,7);
     await S.db.doc("notas/"+nid).set({producto:id, productoNombre:p?p.nombre:id, texto:t.slice(0,2000), fecha:new Date().toISOString(), autor:S.uid||"", enviada:false});
-    el.value = ""; toast("Nota enviada"); }
-  catch(e) { toast("No pudimos guardar la nota. Probá de nuevo."); }
+    el.value = ""; toast("Se abrió tu mail con la nota. Revisala y tocá enviar."); }
+  catch(e) { if (el) el.value = ""; toast("Se abrió tu mail con la nota. Revisala y tocá enviar."); }
   if (b) { b.disabled = false; b.textContent = "Enviar"; }
 }
 async function validar(id){
@@ -989,7 +1007,7 @@ function vPropuesta(){
   P.items.forEach(it => { const p = S.byId[it.id]; if (!p) return; p.interno.relacionados.forEach(r => { if (!P.items.some(i=>i.id===r) && S.byId[r]) (sug[r] = sug[r] || []).push(p.nombre); }); });
   return `<div class="page-head"><div><div class="eyebrow">Propuesta</div><h1>Armá la propuesta</h1>
   <p class="muted">Sumá productos, contá por qué tienen sentido para este cliente y exportala lista para enviar.</p></div>
-  <div class="btn-row"><button class="btn" data-act="copyPropWA" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar propuesta</button></div></div>
+  <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
   <div class="pr-grid"><div class="stack">
    <div class="panel stack"><h3 style="margin:0">Para quién</h3>
     <label class="f" for="pr_cliente">Cliente<input class="input" id="pr_cliente" data-pf="cliente" value="${esc(P.cliente)}" placeholder="Nombre o razón social"></label>
@@ -1120,6 +1138,94 @@ function refreshDeck(){
 }
 function scaleDeck(){ document.querySelectorAll(".slide-wrap").forEach(w => { const s = w.clientWidth/1280; const el = w.firstElementChild; if (el) el.style.transform = `scale(${s})`; }); }
 window.addEventListener("resize", scaleDeck);
+/* ── PDF de la propuesta (A4, cortes entre secciones) ── */
+async function propPDFBlob(){
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+  try { await document.fonts.ready; } catch(_) {}
+  const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0;width:820px;background:#fff"; host.innerHTML = propDoc(); document.body.appendChild(host);
+  try {
+    const root = host.firstElementChild, SC = 2, top0 = root.getBoundingClientRect().top;
+    const cortes = [...root.querySelectorAll(".pp-sec,.pp-item,.pp-body")].map(el => Math.round((el.getBoundingClientRect().top - top0) * SC)).sort((a,b)=>a-b);
+    const cv = await window.html2canvas(root, {scale:SC, backgroundColor:"#ffffff", useCORS:true, logging:false});
+    const pdf = new window.jspdf.jsPDF({unit:"pt", format:"a4"}), W = 595.28, H = 841.89, k = cv.width / W, alto = Math.floor(H * k);
+    for (let y = 0, i = 0; y < cv.height - 2; i++) {
+      let fin = Math.min(y + alto, cv.height);
+      if (fin < cv.height) { const c = cortes.filter(x => x > y + alto * .35 && x <= fin).pop(); if (c) fin = c; }
+      const pg = document.createElement("canvas"); pg.width = cv.width; pg.height = fin - y;
+      const g = pg.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, pg.width, pg.height); g.drawImage(cv, 0, y, cv.width, pg.height, 0, 0, cv.width, pg.height);
+      if (i) pdf.addPage(); pdf.addImage(pg.toDataURL("image/jpeg", .92), "JPEG", 0, 0, W, pg.height / k);
+      y = fin;
+    }
+    return pdf.output("blob");
+  } finally { host.remove(); }
+}
+const propNombre = () => `Propuesta Neix${S.prop.cliente?" - "+S.prop.cliente:""}.pdf`;
+async function dlPropPDF(b){
+  if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
+  const txt = b.innerHTML; b.disabled = true; b.textContent = "Armando PDF";
+  try { await S.dl.save({filename: propNombre(), data: await propPDFBlob()}); toast("PDF listo"); }
+  catch(e) { toast("No pudimos armar el PDF. Probá de nuevo."); }
+  b.disabled = false; b.innerHTML = txt;
+}
+
+/* ── Enviar por mail o WhatsApp con el archivo ──
+   Celular: se abre el menú de compartir del teléfono con el PDF ya adjunto.
+   Compu: se descarga el PDF y se abre el mail o WhatsApp Web con el destinatario y el mensaje
+   (el navegador no permite adjuntar archivos a un mail o a WhatsApp por su cuenta). */
+const esCelular = () => matchMedia("(pointer:coarse)").matches && matchMedia("(max-width:900px)").matches;
+async function archivoOP(p){
+  if (p.onePager) {
+    const r = await fetch(blobUrl(p.onePager.pdf), {cache:"no-store"}); if (!r.ok) throw new Error("pdf");
+    return new File([await r.blob()], p.onePager.archivo || (p.nombre+" - Neix.pdf"), {type:"application/pdf"});
+  }
+  return new File([onePagerDoc(p)], `${p.nombre} - Neix.html`, {type:"text/html"});
+}
+function abrirEnvio(canal, tipo, id){
+  const p = tipo === "op" ? S.byId[id] : null; if (tipo === "op" && !p) return;
+  const P = S.prop, nombre = P.cliente ? P.cliente.split(" ")[0] : "";
+  const firma = tipo === "prop" && P.asesor ? `\n\n${P.asesor}` : "";
+  const msg = tipo === "op"
+    ? `Hola, te comparto el one pager de ${p.nombre}: ${p.cliente.titular.charAt(0).toLowerCase()+p.cliente.titular.slice(1)}. Si te interesa, lo vemos con tus números.`
+    : `Hola${nombre?" "+nombre:""}, te comparto la propuesta que armamos a partir de lo que conversamos. Cualquier duda, me escribís.${firma}`;
+  const asunto = tipo === "op" ? `${p.nombre} · Neix` : `Propuesta Neix${P.cliente?" para "+P.cliente:""}`;
+  const E = S.envio = {canal, tipo, id, asunto, archivo: null};
+  const listo = (txt) => { if (S.envio !== E) return; const n = $("#shAtt"); if (n) n.textContent = txt; const bt = $("#shSend"); if (bt) bt.disabled = false; };
+  (tipo === "op" ? archivoOP(p) : propPDFBlob().then(b => new File([b], propNombre(), {type:"application/pdf"})))
+    .then(f => { E.archivo = f; listo("Adjunto: " + f.name); })
+    .catch(() => listo("No pudimos preparar el archivo. Se envía solo el mensaje."));
+  const cel = esCelular(), wa = canal === "wa";
+  const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
+  div.innerHTML = `<div class="box" role="dialog" aria-modal="true" aria-labelledby="shT"><h3 id="shT">${wa?"Enviar por WhatsApp":"Enviar por mail"}</h3>
+    ${cel ? "" : `<label class="f" for="shTo">${wa?"Celular":"Para"}<input class="input" id="shTo" type="${wa?"tel":"email"}" placeholder="${wa?"+54 9 11 …":"nombre@empresa.com"}" autocomplete="off"></label>`}
+    <label class="f" for="shMsg">Mensaje<textarea class="input" id="shMsg">${esc(msg)}</textarea></label>
+    <div class="att" id="shAtt">Preparando el archivo…</div>
+    <p class="tiny muted" style="margin:0">${cel ? `Se abre el menú para compartir del celular con el archivo adjunto: elegí ${wa?"WhatsApp":"tu app de mail"} y el contacto.` : `Se descarga el archivo y se abre ${wa?"WhatsApp Web":"tu mail"} con el mensaje. Arrastrá el archivo descargado para adjuntarlo.`}</p>
+    <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button><button class="btn primary" id="shSend" data-act="shSend" disabled>${wa?ico("_wa"):ico("_mail")}Enviar</button></div></div>`;
+  document.body.appendChild(div);
+  const f = $("#shTo") || $("#shMsg"); if (f) f.focus();
+}
+function cerrarEnvio(){ const m = $("#shm"); if (m) m.remove(); S.envio = null; }
+function telWA(t){ let d = String(t||"").replace(/\D/g, ""); if (!d) return ""; if (d.startsWith("0")) d = d.slice(1); if (d.length === 10) d = "549" + d; else if (d.length === 11 && d.startsWith("9")) d = "54" + d; return d; }
+async function enviar(b){
+  const E = S.envio; if (!E) return;
+  const to = (($("#shTo")||{}).value || "").trim(), msg = ($("#shMsg")||{}).value || "", wa = E.canal === "wa";
+  if (esCelular() && E.archivo && navigator.canShare && navigator.canShare({files:[E.archivo]})) {
+    try { await navigator.share({files:[E.archivo], text: msg, title: E.asunto}); cerrarEnvio(); }
+    catch(e) { if (!(e && e.name === "AbortError")) toast("No se pudo abrir el menú para compartir"); }
+    return;
+  }
+  if (wa && to && telWA(to).length < 10) { toast("Revisá el celular"); return; }
+  if (!wa && to && !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(to)) { toast("Revisá el mail"); return; }
+  const url = wa
+    ? (esCelular() ? `https://wa.me/${telWA(to)}?text=${encodeURIComponent(msg)}` : `https://web.whatsapp.com/send?${to?"phone="+telWA(to)+"&":""}text=${encodeURIComponent(msg)}`)
+    : `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(E.asunto)}&body=${encodeURIComponent(msg)}`;
+  if (wa) { if (!window.open(url, "_blank", "noopener")) abrirLink(url, true); } else abrirLink(url);
+  if (E.archivo && S.dl) { try { await S.dl.save({filename: E.archivo.name, data: E.archivo}); } catch(_) {} }
+  cerrarEnvio();
+  toast(E.archivo ? "Se descargó el archivo: arrastralo al mensaje para adjuntarlo" : "Se abrió el mensaje");
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape" && S.envio) cerrarEnvio(); });
 function loadScript(src){ return new Promise((ok,ko)=>{ if (document.querySelector(`script[src="${src}"]`)) return ok(); const t = document.createElement("script"); t.src = src; t.onload = ok; t.onerror = ko; document.head.appendChild(t); }); }
 async function pzPDF(){
   if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
@@ -1188,9 +1294,9 @@ document.addEventListener("click", e => {
   const b = e.target.closest("[data-act]"); if (!b) return;
   const a = b.dataset.act, v = b.dataset.v, id = b.dataset.id;
   if (a==="fUnidad"||a==="fCat") { S[a] = S[a]===v && v ? "" : v; render(); }
-  else if (a==="fNeed") { S.fNeed = S.fNeed===v ? "" : v; render(); }
-  else if (a==="goCat") { S.fCat = v; S.fNeed = ""; S.q = ""; }
-  else if (a==="clearF") { S.q=""; S.fUnidad=""; S.fCat=""; S.fEstado=""; S.fNeed=""; render(); }
+  else if (a==="fNeed") { const i = S.fNeeds.indexOf(v); i>=0 ? S.fNeeds.splice(i,1) : S.fNeeds.push(v); render(); }
+  else if (a==="goCat") { S.fCat = v; S.fNeeds = []; S.q = ""; }
+  else if (a==="clearF") { S.q=""; S.fUnidad=""; S.fCat=""; S.fEstado=""; S.fNeeds=[]; render(); }
   else if (a==="view") { S.view = v; render(); }
   else if (a==="persona") { S.persona = v; persist(); render(); }
   else if (a==="toggleProp") { const i = S.prop.items.findIndex(x=>x.id===id); if (i>=0) S.prop.items.splice(i,1); else { S.prop.items.push({id, nota:""}); toast("Sumada a la propuesta"); } persist(); render(); }
@@ -1201,7 +1307,10 @@ document.addEventListener("click", e => {
   else if (a==="upOP") upOP(id);
   else if (a==="dlOnePager") { const p = S.byId[id]; download(`${p.nombre} - Neix.html`, onePagerDoc(p)); }
   else if (a==="copyPropWA") copy(waProp());
-  else if (a==="dlProp") download(`Propuesta Neix${S.prop.cliente?" - "+S.prop.cliente:""}.html`, EXPORT_HEAD("Propuesta Neix") + propDoc() + "</body></html>");
+  else if (a==="dlProp") dlPropPDF(b);
+  else if (a==="share") abrirEnvio(v, b.dataset.k, id);
+  else if (a==="shClose" || (a==="shBg" && e.target===b)) cerrarEnvio();
+  else if (a==="shSend") enviar(b);
   else if (a==="validar") validar(id);
   else if (a==="notaMkt") notaMkt(id);
   else if (a==="save") save(id);
@@ -1295,7 +1404,7 @@ async function boot(){
   const db = await c.use("db");
   if (!db) { S.loading = false; S.dbMissing = true; render(); return; }
   S.db = db;
-  if (S.canEdit) watchNotas();
+  if (puedeGestionar()) watchNotas();
   const timer = setTimeout(()=>{ S.slow = true; render(); }, 10000);
   // Si Firebase no deja leer (reglas sin publicar o base vacía), se muestran las fichas de public/data en solo lectura.
   let respaldo = false;
