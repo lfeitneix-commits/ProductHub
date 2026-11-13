@@ -623,6 +623,7 @@ function route(){ const h = (location.hash || "").slice(1); return (!h || h === 
 function go(h){ if (location.hash.slice(1) === h) render(); else location.hash = h; }
 let rutaActual = null;
 window.addEventListener("hashchange", () => {
+  if (S.envio || $("#shm")) cerrarEnvio();
   if (rutaActual !== null) scrollPos[rutaActual] = window.scrollY;
   const r = route(), y = volviendo ? (scrollPos[r] || 0) : 0;
   prevRoute = volviendo ? null : rutaActual; volviendo = false; rutaActual = r;
