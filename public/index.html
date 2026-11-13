@@ -222,6 +222,8 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .ia-paso{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:start;border:1px solid var(--line);border-radius:10px;padding:10px 12px}.ia-paso .n{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12.5px;font-weight:600}.ia-paso a{text-decoration:none;color:inherit}
 .ia-list{list-style:none;padding-left:0;margin:0}.ia-list li{margin-bottom:6px;padding-left:14px;position:relative;list-style:none}.ia-list li::before{content:"";position:absolute;left:0;top:.6em;width:5px;height:5px;border-radius:50%;background:var(--ink-3)}
 .ia-load{display:flex;gap:6px;padding-top:4px}.ia-dot{width:8px;height:8px;border-radius:50%;background:var(--ink-3);animation:iad 1s infinite ease-in-out}.ia-dot:nth-child(2){animation-delay:.15s}.ia-dot:nth-child(3){animation-delay:.3s}@keyframes iad{0%,80%,100%{opacity:.25}40%{opacity:1}}
+table.cpd{width:100%;border-collapse:collapse;font-size:13px}table.cpd th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:10px 14px;border-bottom:1px solid var(--line-2)}
+table.cpd td{padding:7px 14px;border-bottom:1px solid var(--line)}table.cpd .r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}table.cpd tr.b td{font-weight:600}table.cpd tr.sec td{background:var(--surface-2);font-size:11.5px;font-weight:600;color:var(--ink-2);padding:6px 14px}table.cpd td.neg{color:var(--crit)}
 .dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
 .busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
 @media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
@@ -558,7 +560,8 @@ const S = {
   simv: {
     caucion:{modo:"colocar", monto:50000000, tna:32, dias:7, arancel:0.5, garantia:100000000, aforo:85},
     descuento:{vn:20000000, dias:90, tna:38, comision:0.6, aval:false, sgr:4},
-    fal:{emp:120, sal:1800000, tipo:"pyme", fondo:"I", aj:25, rot:8, ant:5, meses:36}
+    fal:{emp:120, sal:1800000, tipo:"pyme", fondo:"I", aj:25, rot:8, ant:5, meses:36},
+    cpd:{precio:80000000, tasaNeix:28, tasaBanco:28, diasNeix:30, diasBanco:30, comNeg:3, comMer:0.0315, cliente:"", asesor:""}
   }
 };
 const LS = "neix-hub-v2";
@@ -1150,7 +1153,7 @@ async function consultar(){
 
 /* ── Simuladores ── */
 function vSimuladores(){
-  const tabs = [["caucion","Caución"],["descuento","Descuento de documentos"],["fal","FAL"]];
+  const tabs = [["caucion","Caución"],["descuento","Descuento de documentos"],["cpd","Cheques: Neix vs. banco"],["fal","FAL"]];
   return `<div class="page-head"><div><div class="eyebrow">Simuladores</div><h1>Números para la conversación</h1>
   <p class="muted">Cálculos rápidos para mostrarle al cliente qué significa el producto en su caso. Las tasas son de ejemplo: confirmalas con la Mesa antes de compartir.</p></div></div>
   <div class="seg" style="margin-bottom:16px">${tabs.map(([k,t])=>`<button data-act="sim" data-v="${k}" aria-pressed="${S.sim===k}">${t}</button>`).join("")}</div>
@@ -1159,6 +1162,7 @@ function vSimuladores(){
 const numF = (id, l, v, hint, step) => `<label class="f" for="s_${id}">${l}<input class="input num" id="s_${id}" data-s="${id}" type="number" inputmode="decimal" step="${step||"any"}" value="${v}">${hint?`<span class="hint">${hint}</span>`:""}</label>`;
 function simForm(){
   const v = S.simv[S.sim];
+  if (S.sim === "cpd") return cpdForm(v);
   if (S.sim === "caucion") return `<div class="seg">${[["colocar","Colocar fondos"],["tomar","Tomar fondos"]].map(([k,t])=>`<button data-act="simset" data-k="modo" data-v="${k}" aria-pressed="${v.modo===k}">${t}</button>`).join("")}</div>
    ${v.modo==="colocar" ? numF("monto","Monto a colocar ($)",v.monto) : numF("garantia","Cartera en garantía ($)",v.garantia) + `<label class="f" for="s_aforo">Aforo del título<select class="input" id="s_aforo" data-s="aforo">${[[85,"AL30 · 85%"],[80,"Acciones Galicia · 80%"],[93,"T-Bills · 93%"],[70,"Otro · 70%"]].map(([a,t])=>`<option value="${a}" ${Number(v.aforo)===a?"selected":""}>${t}</option>`).join("")}</select><span class="hint">Aforos de ejemplo. Los fija el mercado.</span></label>`}
    ${numF("tna","TNA (%)",v.tna,"Valor de ejemplo")}${numF("dias","Plazo (días)",v.dias,"De 1 a 30 días",1)}${numF("arancel","Aranceles y derechos (% anual)",v.arancel,"Valor de ejemplo")}`;
@@ -1189,12 +1193,148 @@ function calcSim(){
     const pv = vn/(1+tna*d/365), com = vn*(+v.comision/100), sgr = v.aval ? vn*(+v.sgr/100)*d/365 : 0, neto = pv - com - sgr, costo = vn - neto, cft = (vn/neto - 1)*365/d;
     out.innerHTML = `<div class="out">${stat("Recibís hoy", ars(neto), true, "en 24 hs")}${stat("Costo total", ars(costo), false, fmt(costo/vn*100,2)+"% del nominal")}${stat("Costo financiero total", fmt(cft*100,1)+"% TNA")}</div>
     <div class="panel small"><b>Cómo leerlo.</b> Por un documento de ${ars(vn)} que vence en ${d} días recibís ${ars(neto)} hoy. ${v.aval?"Cargá la tasa avalada que te pase la Mesa y compará contra la sin aval.":"Si la empresa califica en una SGR, con aval la tasa suele bajar: activá la opción para comparar."}</div>`;
+  } else if (S.sim === "cpd") {
+    out.innerHTML = cpdOut(v);
   } else {
     const r = falCalc(v);
     out.innerHTML = `<div class="out">${stat("Saldo a "+v.meses+" meses", ars(r.saldoFin), true)}${stat("Aporte mensual hoy", ars(r.aporte0), false, "se compensa con contribuciones")}${stat("Cubre un año de indemnizaciones", r.be?("Mes "+r.be):"Fuera del horizonte", false, "estimadas en "+ars(r.indFin)+" por año")}</div>
     <div class="chart">${falChart(r)}</div>
     <p class="tiny muted" style="margin-top:8px">Simulación ilustrativa en pesos nominales. Rendimiento esperado bruto, antes de honorarios (gerente 0,80% y depositaria 0,10% + IVA), no garantizado. Indemnización estimada como un salario por año de antigüedad. Validar contra la calculadora de neix.com.ar/fal.</p>`;
   }
+}
+/* ── Cheques: Neix vs. banco ──
+   Copia literal de "CPD con fórmulas.xlsx" (Hoja1). Cada línea indica la celda del Excel.
+   Entradas: C3 precio del cheque, C7/D7 tasa de descuento, C9/D9 plazo, G17 comisión de negociación (TNA), G19 comisión de mercado (% cheque). */
+function cpdCalc(v){
+  const C3 = +v.precio, C7 = +v.tasaNeix/100, D7 = +v.tasaBanco/100, G17 = +v.comNeg/100, G19 = +v.comMer/100;
+  const C9 = +v.diasNeix, D9 = +v.diasBanco;                 // VALUE(SUBSTITUTE(C9," días",""))
+  const C8 = -C3*C7*C9/365;                                  // =-$C$3*C7*VALUE(SUBSTITUTE(C9," días",""))/365
+  const D8 = -C3*D7*D9/365;                                  // =-$C$3*D7*VALUE(SUBSTITUTE(D9," días",""))/365
+  const C11 = 0, C12 = 0, C13 = 0, C14 = 0, C15 = 0, C16 = 0; // Neix: sin IVA, IVA RIN, IIBB, imp. crédito, sellos ni comisión bancaria
+  const D11 = D8*0.21;                                       // =D8*21%      IVA sobre intereses
+  const D12 = D8*0.015;                                      // =D8*1.5%     IVA RIN
+  const D13 = D8*0.0175;                                     // =D8*1.75%    I.I.B.B.
+  const D14 = -(C3+D8+D11)*0.006;                            // =-($C$3+D8+D11)*0.6%   Imp. crédito
+  const D15 = 0, D16 = 0;                                    // Imp. de sellos, comisión bancaria
+  const C17 = -C3*G17*C9/365, D17 = 0;                       // =-$C$3*$G$17*VALUE(SUBSTITUTE(C9," días",""))/365
+  const C18 = C17*0.21, D18 = 0;                             // =C17*21%     IVA (comisión)
+  const C19 = -C3*G19, D19 = 0;                              // =-$C$3*$G$19  Comisión de mercado
+  const C20 = C19*0.21, D20 = 0;                             // =C19*21%     IVA (derecho de mercado)
+  const C21 = C17+C18+C19+C20+C8;                            // =SUM(C17:C20,C8)
+  const D21 = D8+D11+D12+D13+D14;                            // =SUM(D8,D11:D14)
+  const C6 = C3+C21, D6 = C3+D21;                            // =C3+C21 / =C3+D21  Neto acreditado
+  const D23 = D21-C21;                                       // =SUM(D21-C21)  Diferencia $
+  const D24 = (C6-D6)/C3;                                    // =(C6-D6)/$C$3  Diferencia directa
+  const D25 = D24*365/C9;                                    // =D24*365/VALUE(SUBSTITUTE(C9," días",""))  Diferencia en TNA
+  return {C3, C6, D6, C7, D7, C8, D8, C9, D9, C11, C12, C13, C14, C15, C16, D11, D12, D13, D14, D15, D16,
+          C17, D17, C18, D18, C19, D19, C20, D20, C21, D21, D23, D24, D25, G17, G19};
+}
+const ars2 = n => (n < -0.004 ? "-" : "") + "$ " + fmt(Math.abs(n), 2);           // formato del Excel: "$ #,##0.00", negativos con signo
+const pct = (n, d=0) => fmt(n*100, d) + "%";
+const neg = n => n < -0.004 ? "neg" : "";
+function cpdForm(v){
+  return `<p class="small muted">Comparativo del descuento de un cheque de pago diferido en el mercado con Neix contra un banco. Fórmulas de la planilla "CPD con fórmulas".</p>
+   <label class="f" for="s_cliente">Cliente (para el one pager)<input class="input" id="s_cliente" data-s="cliente" value="${esc(v.cliente||"")}" placeholder="Razón social"></label>
+   <label class="f" for="s_asesor">Asesor<input class="input" id="s_asesor" data-s="asesor" value="${esc(v.asesor||"")}" placeholder="Tu nombre" list="asesoresList" autocomplete="off"></label>${asesoresList()}
+   ${numF("precio","Precio del cheque ($)",v.precio)}
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${numF("tasaNeix","Tasa Neix (TNA %)",v.tasaNeix)}${numF("tasaBanco","Tasa banco (TNA %)",v.tasaBanco)}</div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${numF("diasNeix","Plazo Neix (días)",v.diasNeix,"",1)}${numF("diasBanco","Plazo banco (días)",v.diasBanco,"",1)}</div>
+   <details class="fold"><summary>Parámetros editables</summary><div class="in stack">${numF("comNeg","Comisión de negociación (TNA %)",v.comNeg)}${numF("comMer","Comisión de mercado (% del cheque)",v.comMer)}</div></details>`;
+}
+function cpdOut(v){
+  const r = cpdCalc(v), favor = -r.D23;
+  const row = (l, c, d, cls) => `<tr class="${cls||""}"><td>${l}</td><td class="r ${typeof c==="number"?neg(c):""}">${typeof c==="number"?ars2(c):c}</td><td class="r ${typeof d==="number"?neg(d):""}">${typeof d==="number"?ars2(d):d}</td></tr>`;
+  return `<div class="out">${stat("Neto acreditado con Neix", ars2(r.C6), true)}${stat("Neto acreditado en el banco", ars2(r.D6))}${stat(favor >= 0 ? "A favor de Neix" : "A favor del banco", ars2(Math.abs(favor)), false, "Directa " + pct(r.D24,2) + " · En TNA " + pct(r.D25,2))}</div>
+   <div class="panel" style="padding:0;overflow:hidden"><div class="tw"><table class="cpd"><thead><tr><th>Detalle de la operación</th><th class="r">Neix</th><th class="r">Banco</th></tr></thead><tbody>
+    ${row("Neto acreditado", r.C6, r.D6, "b")}${row("Tasa de descuento", pct(r.C7), pct(r.D7))}${row("Intereses", r.C8, r.D8)}${row("Plazo", fmt(r.C9) + " días", fmt(r.D9) + " días")}
+    <tr class="sec"><td colspan="3">Costos e impuestos</td></tr>
+    ${row("IVA sobre intereses", r.C11, r.D11)}${row("IVA RIN", r.C12, r.D12)}${row("I.I.B.B.", r.C13, r.D13)}${row("Imp. crédito", r.C14, r.D14)}${row("Imp. de sellos", r.C15, r.D15)}${row("Comisión bancaria", r.C16, r.D16)}
+    ${row("Comisión de negociación (TNA " + pct(r.G17,2) + ")", r.C17, r.D17)}${row("IVA (comisión)", r.C18, r.D18)}${row("Comisión de mercado de descuento de cheques", r.C19, r.D19)}${row("IVA (derecho de mercado)", r.C20, r.D20)}
+    ${row("Total", r.C21, r.D21, "b")}
+    <tr class="sec"><td colspan="3"></td></tr>
+    <tr class="b"><td>Diferencia $</td><td></td><td class="r ${neg(r.D23)}">${ars2(r.D23)}</td></tr>
+    <tr><td>Diferencia directa</td><td></td><td class="r">${pct(r.D24,2)}</td></tr>
+    <tr><td>Diferencia en TNA</td><td></td><td class="r">${pct(r.D25,2)}</td></tr>
+   </tbody></table></div></div>
+   <div class="btn-row" style="margin-top:14px"><button class="btn primary" data-act="cpdPDF">${ico("_dl")}One pager PDF</button><button class="btn" data-act="cpdVer">Ver one pager</button></div>
+   <p class="tiny muted" style="margin-top:8px">Simulación con tasas de referencia: confirmalas con la Mesa antes de compartir.</p>`;
+}
+
+/* ── One pager del comparativo (mismo formato que las fichas nuevas) ── */
+function cpdDoc(v){
+  const r = cpdCalc(v), favor = -r.D23, a = findAsesor(v.asesor);
+  const fecha = new Date().toLocaleDateString("es-AR", {day:"numeric", month:"long", year:"numeric"});
+  const tasa = r.C7 === r.D7 ? pct(r.C7) + " TNA" : `${pct(r.C7)} Neix · ${pct(r.D7)} banco`;
+  const plazo = r.C9 === r.D9 ? fmt(r.C9) + " días" : `${fmt(r.C9)} / ${fmt(r.D9)} días`;
+  const fila = (l, c, d, cls) => `<tr class="${cls||""}"><td>${l}</td><td class="r">${typeof c==="number"?ars2(c):c}</td><td class="r">${typeof d==="number"?ars2(d):d}</td></tr>`;
+  const contacto = a ? `${esc(a.nombre)}` : "Banca Corporativa";
+  const datos = a ? `${esc(a.tel)} · ${esc(a.mail)}` : "(011) 4859-1552 · bancacorporativa@neix.com.ar";
+  return `<div class="opx">
+  <div class="opx-hero"><div class="opx-top"><img src="${LOGO_LIGHT}" alt="NEIX"><span>Banca Corporativa</span><span>Simulación</span></div>
+   <span class="opx-pill"><i></i>Descuento de cheques</span>
+   <h1>Neix vs. banco: cuánto acreditás por tu cheque</h1>
+   <p>${v.cliente ? "Simulación para " + esc(v.cliente) + " · " : ""}${fecha}. Comparamos el neto que recibís descontando un cheque de pago diferido en el mercado con Neix y en un banco.</p></div>
+  <div class="opx-body">
+   <div class="opx-facts"><div><b>Valor del cheque</b><span>${ars2(r.C3)}</span></div><div><b>Plazo</b><span>${plazo}</span></div><div><b>Tasa de descuento</b><span>${tasa}</span></div><div class="hl"><b>${favor >= 0 ? "A favor de Neix" : "A favor del banco"}</b><span>${ars2(Math.abs(favor))}</span></div></div>
+   <div class="opx-sec"><h2>Resultado</h2><div>
+    <div class="opx-res"><div><b>Neto acreditado con Neix</b><span class="v">${ars2(r.C6)}</span></div><div><b>Neto acreditado en el banco</b><span class="v">${ars2(r.D6)}</span></div></div>
+    <p class="opx-dif">Diferencia directa <strong>${pct(r.D24,2)}</strong> del valor del cheque · Diferencia en TNA <strong>${pct(r.D25,2)}</strong></p></div></div>
+   <div class="opx-box"><h2>Detalle de la operación</h2><table><thead><tr><th></th><th class="r">Neix</th><th class="r">Banco</th></tr></thead><tbody>
+    ${fila("Tasa de descuento", pct(r.C7), pct(r.D7))}${fila("Intereses", r.C8, r.D8)}
+    ${fila("IVA sobre intereses", r.C11, r.D11)}${fila("IVA RIN", r.C12, r.D12)}${fila("I.I.B.B.", r.C13, r.D13)}${fila("Impuesto a los créditos", r.C14, r.D14)}
+    ${fila("Comisión de negociación", r.C17, r.D17)}${fila("IVA (comisión)", r.C18, r.D18)}${fila("Derecho de mercado", r.C19, r.D19)}${fila("IVA (derecho de mercado)", r.C20, r.D20)}
+    ${fila("Total costos", r.C21, r.D21, "t")}${fila("Neto acreditado", r.C6, r.D6, "t")}</tbody></table></div>
+   <div class="opx-sec"><h2>Por qué la diferencia</h2><div class="opx-two"><div><b>En Neix</b>Descontás el cheque en el mercado de capitales: pagás la comisión de negociación y el derecho de mercado, con su IVA.</div><div><b>En el banco</b>Sobre los intereses se suman IVA (21%), IVA RIN (1,5%), Ingresos Brutos (1,75%) y el impuesto a los créditos (0,6%).</div></div></div>
+   <div class="opx-sec opx-why"><h2>Por qué Neix</h2><div class="opx-four"><div>Asesoramiento personalizado con especialistas.</div><div>Liquidez en 24 horas, con o sin aval de SGR.</div><div>Top 5 en ByMA y top 10 en A3.</div><div>Seguridad operativa y altos estándares normativos.</div></div></div>
+  </div>
+  <div class="opx-foot"><div><b>Contacto · ${contacto}</b><span>${datos}</span><span>Don Francisco 3345, piso 5, San Fernando · www.neix.com.ar</span></div>
+   <p>Simulación ilustrativa con tasas de referencia; las condiciones finales se confirman al operar. ${esc(LEYENDA)}</p></div></div>`;
+}
+const OPX_CSS = `.opx{width:794px;height:1123px;display:flex;flex-direction:column;background:#fff;color:#2A2927;font-family:Inter,Arial,sans-serif;overflow:hidden}
+.opx-hero{background:radial-gradient(75% 95% at 50% 125%,rgba(196,178,148,.6),transparent 62%) #262523;color:#F3F0EB;padding:24px 48px 24px}
+.opx-top{display:flex;align-items:center;gap:22px;font-size:11px;color:#E8E3DB;margin-bottom:28px}.opx-top img{height:15px;margin-right:auto}
+.opx-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border-radius:999px;padding:5px 11px;font-size:10.5px;margin-bottom:16px}.opx-pill i{width:6px;height:6px;border-radius:50%;background:#CFC6B8}
+.opx h1,.opx h2{font-family:"Playfair Display",Georgia,serif;font-weight:400;margin:0}
+.opx-hero h1{font-size:36px;line-height:1.1;max-width:22ch;margin-bottom:12px}.opx-hero p{font-size:12px;line-height:1.55;color:#D9D3CA;max-width:64ch;margin:0}
+.opx-body{padding:18px 48px 14px;display:grid;gap:13px}
+.opx-facts{display:grid;grid-template-columns:repeat(4,1fr)}.opx-facts div{padding:0 14px;border-left:1px solid #E7E3DD}.opx-facts div:first-child{padding-left:0;border-left:0}
+.opx-facts b{display:block;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:#8C7F6B;font-weight:600;margin-bottom:6px}.opx-facts span{font-family:"Playfair Display",Georgia,serif;font-size:19px;line-height:1.2}.opx-facts .hl span{color:#004836}
+.opx-sec{display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:start}.opx-sec h2{font-size:22px;line-height:1.15}
+.opx-res{display:grid;grid-template-columns:1fr 1fr;gap:14px}.opx-res div{border-top:1px solid #2A2927;padding-top:8px}.opx-res b{display:block;font-size:10.5px;color:#6B655D;font-weight:500}.opx-res .v{font-family:"Playfair Display",Georgia,serif;font-size:23px}
+.opx-res div:first-child .v{color:#004836}.opx-dif{font-size:11.5px;color:#6B655D;margin:6px 0 0}.opx-dif strong{color:#2A2927}
+.opx-box{background:#F4F2EF;border-radius:12px;padding:14px 20px}.opx-box h2{font-size:19px;margin-bottom:6px}
+.opx table{width:100%;border-collapse:collapse;font-size:10.5px}.opx th{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:#8C7F6B;font-weight:600;text-align:left;padding:4px 0;border-bottom:1px solid #2A2927}
+.opx td{padding:3.6px 0;border-bottom:1px solid #E2DDD5}.opx .r{text-align:right;width:130px}.opx tr.t td{font-weight:600;border-bottom:0;padding-top:7px}
+.opx-two{display:grid;grid-template-columns:1fr 1fr;gap:18px;font-size:11px;line-height:1.5}.opx-two div{border-top:1px solid #E2DDD5;padding-top:8px}.opx-two b{display:block;font-size:11.5px;margin-bottom:2px}
+.opx-four{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;font-size:10.5px;line-height:1.45;color:#3D3D3D}.opx-four div{border-top:1px solid #C9C2B7;padding-top:8px}
+.opx-why{grid-template-columns:200px 1fr}
+.opx-foot{margin-top:auto;background:radial-gradient(60% 140% at 85% 120%,rgba(196,178,148,.35),transparent 60%) #262523;color:#E8E3DB;padding:18px 48px 20px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:end}
+.opx-foot b{display:block;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:#CFC6B8;margin-bottom:8px}.opx-foot span{display:block;font-size:10.5px;line-height:1.6}.opx-foot p{font-size:7.5px;line-height:1.5;color:#A9A196;margin:0}`;
+async function cpdFuentes(){
+  if (!document.getElementById("opxFont")) { const l = document.createElement("link"); l.id = "opxFont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap"; document.head.appendChild(l); }
+  if (!document.getElementById("opxCss")) { const st = document.createElement("style"); st.id = "opxCss"; st.textContent = OPX_CSS; document.head.appendChild(st); }
+  try { await Promise.all([document.fonts.load('400 40px "Playfair Display"'), document.fonts.load('400 12px Inter'), document.fonts.load('600 12px Inter')]); await document.fonts.ready; } catch(_) {}
+}
+async function cpdPDF(b){
+  if (!S.dl) return;
+  const txt = b.innerHTML; b.disabled = true; b.textContent = "Armando PDF";
+  try {
+    await cpdFuentes();
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0"; host.innerHTML = cpdDoc(S.simv.cpd); document.body.appendChild(host);
+    const cv = await window.html2canvas(host.firstElementChild, {scale:2, backgroundColor:"#ffffff", useCORS:true, logging:false}); host.remove();
+    const pdf = new window.jspdf.jsPDF({unit:"pt", format:"a4"}); pdf.addImage(cv.toDataURL("image/jpeg", .93), "JPEG", 0, 0, 595.28, 841.89);
+    const v = S.simv.cpd;
+    await S.dl.save({filename: `Descuento de cheques Neix vs banco${v.cliente ? " - " + v.cliente : ""}.pdf`, data: pdf.output("blob")}); toast("PDF listo");
+  } catch(e) { console.error(e); toast("No pudimos armar el PDF. Probá de nuevo."); }
+  b.disabled = false; b.innerHTML = txt;
+}
+async function cpdVer(){
+  await cpdFuentes();
+  const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
+  div.innerHTML = `<div style="max-height:92vh;overflow:auto;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.35)"><div style="transform-origin:top left;width:794px">${cpdDoc(S.simv.cpd)}</div></div>`;
+  document.body.appendChild(div); S.envio = {ver:true};
 }
 function falCalc(v){
   const tasa = v.tipo==="pyme" ? .025 : .01, tna = v.fondo==="I" ? .23 : .28, gm = Math.pow(1+(+v.aj)/100, 1/12);
@@ -1605,6 +1745,8 @@ document.addEventListener("click", e => {
   else if (a==="shClose" || (a==="shBg" && e.target===b)) cerrarEnvio();
   else if (a==="shSend" || a==="shShare") enviar(b);
   else if (a==="back") volver();
+  else if (a==="cpdPDF") cpdPDF(b);
+  else if (a==="cpdVer") cpdVer();
   else if (a==="iaCliente") analizarIA();
   else if (a==="iaProp") { analisisAPropuesta(); }
   else if (a==="iaPropQuitar") { delete S.prop.analisis; persist(); render(); toast("Análisis quitado de la propuesta"); }
