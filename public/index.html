@@ -312,6 +312,8 @@ main{max-width:1180px;padding-block:0 0}
 
 .p-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px 56px;align-items:end}
 .p-hero h1{font-size:clamp(34px,4.2vw,52px);line-height:1.02;margin:18px 0 0}
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--line-2);color:var(--ink-2);border-radius:999px;padding:5px 12px 5px 9px;font:inherit;font-size:12.5px;cursor:pointer;margin-bottom:14px} .back:hover{color:var(--ink);border-color:var(--ink-3)} .back svg{width:15px;height:15px}
+.p-hero .back{border-color:rgba(255,255,255,.22);color:var(--dark-2)} .p-hero .back:hover{color:var(--dark-ink);border-color:rgba(255,255,255,.5)}
 .p-hero .crumb{margin:0 0 22px;color:var(--dark-2)} .p-hero .crumb a{color:var(--dark-2)} .p-hero .crumb a:hover{color:var(--dark-ink)}
 .p-hero .units .utag{background:rgba(255,255,255,.08);color:var(--dark-2)}
 .p-hero .lead{font-size:16px;line-height:1.55;color:var(--dark-ink);font-weight:500;max-width:46ch}
@@ -614,9 +616,18 @@ function resultados(){
 }
 
 /* ── Router ── */
+/* Volver: página anterior del Hub, o Productos si se entró directo a la ficha. La lista recuerda dónde estabas. */
+const scrollPos = {}; let prevRoute = null, volviendo = false;
+function volver(){ if (prevRoute !== null) { volviendo = true; history.back(); } else go("soluciones"); }
 function route(){ const h = (location.hash || "").slice(1); return (!h || h === "catalogo") ? "soluciones" : h; }
 function go(h){ if (location.hash.slice(1) === h) render(); else location.hash = h; }
-window.addEventListener("hashchange", () => { render(true); window.scrollTo(0,0); });
+let rutaActual = null;
+window.addEventListener("hashchange", () => {
+  if (rutaActual !== null) scrollPos[rutaActual] = window.scrollY;
+  const r = route(), y = volviendo ? (scrollPos[r] || 0) : 0;
+  prevRoute = volviendo ? null : rutaActual; volviendo = false; rutaActual = r;
+  render(true); window.scrollTo(0, y);
+});
 
 /* ── Render ── */
 function render(anim){
@@ -708,7 +719,7 @@ function vProducto(id){
   const p = S.byId[id]; if (!p) return stateMsg("No encontramos esa ficha", "Volvé a Productos.");
   const e = estadoDe(p), inProp = S.prop.items.some(i=>i.id===id);
   const tabs = [["interno","Para el asesor"],["cliente","Para el cliente"],["opera","Cómo se opera"]];
-  return `<div class="p-hero"><div style="min-width:0"><div class="crumb"><a href="#soluciones">Productos</a><span>/</span><a href="#soluciones" data-act="goCat" data-v="${esc(p.categoria)}">${esc(p.categoria)}</a></div>
+  return `<div class="p-hero"><div style="min-width:0"><button class="back" data-act="back" aria-label="Volver"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Volver</button><div class="crumb"><a href="#soluciones">Productos</a><span>/</span><a href="#soluciones" data-act="goCat" data-v="${esc(p.categoria)}">${esc(p.categoria)}</a></div>
    <span class="kicker">${esc(p.categoria)}</span><h1>${esc(p.nombre)}</h1></div>
    <div style="min-width:0"><div class="units" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px">${units(p)}</div><p class="lead">${esc(p.cliente.titular)}<span>${esc(p.cliente.bajada)}</span></p>
    <div class="btn-row"><button class="btn" data-act="toggleProp" data-id="${p.id}">${ico(inProp?"_check":"_plus")}${inProp?"En la propuesta":"Agregar a propuesta"}</button></div></div></div>
@@ -1328,6 +1339,7 @@ document.addEventListener("click", e => {
   else if (a==="share") abrirEnvio(v, b.dataset.k, id);
   else if (a==="shClose" || (a==="shBg" && e.target===b)) cerrarEnvio();
   else if (a==="shSend" || a==="shShare") enviar(b);
+  else if (a==="back") volver();
   else if (a==="validar") validar(id);
   else if (a==="notaMkt") notaMkt(id);
   else if (a==="save") save(id);
@@ -1443,6 +1455,7 @@ async function boot(){
   };
   leer(db);
 }
+rutaActual = route();
 boot();
 })();
 </script>
