@@ -86,3 +86,20 @@ Se guardan como `[{"_a": [...]}]` y el runtime los reconstruye al leer. No edita
 ## Publicar en Vercel
 Importar el repo en Vercel sin framework ni build. Vercel sirve la carpeta `public/`.
 Después sumar el dominio en Firebase › Authentication › Authorized domains.
+
+## Outlook de Neix (mail con PDF adjunto)
+Con la conexión a Microsoft 365, "Enviar por mail" crea un borrador en el Outlook del asesor con el mensaje arriba,
+su firma (armada con `public/data/config/asesores.json`) y el PDF adjunto. El asesor lo abre, elige el destinatario y lo envía.
+Sin la conexión, Enviar usa el menú de compartir del sistema.
+
+Lo configura Sistemas una sola vez, en https://entra.microsoft.com:
+1. **Identidad › Aplicaciones › Registros de aplicaciones › Nuevo registro**.
+   Nombre: `Hub de Productos Neix`. Tipos de cuenta: **solo cuentas de este directorio organizativo**.
+2. **URI de redirección**: plataforma **Aplicación de página única (SPA)**, con la dirección donde está publicado el Hub
+   (por ejemplo `https://hub-neix.vercel.app/`) y `http://localhost:5173/` para pruebas. La barra final importa.
+3. **Permisos de API › Agregar un permiso › Microsoft Graph › Permisos delegados**: `User.Read` y `Mail.ReadWrite`.
+   Tocar **Conceder consentimiento de administrador para Neix**, así los asesores no ven pedidos de permiso.
+4. No hace falta crear un secreto ni un certificado.
+5. Copiar el **Id. de aplicación (cliente)** y el **Id. de directorio (inquilino)** en `public/js/m365-config.js`.
+
+El Hub solo usa el buzón de quien inició sesión y solo crea borradores; no lee ni envía mails por su cuenta.
