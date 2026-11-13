@@ -37,7 +37,7 @@
     "queEs": "El BPOB7 es una serie del Bono para la Reconstrucción de una Argentina Libre (BOPREAL), emitido por el BCRA. Su particularidad es que se puede usar para pagar impuestos nacionales, obligaciones aduaneras y sus intereses y multas, computado a su valor técnico.",
     "titular": "Pagá impuestos con un bono que rinde mientras esperás"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 2 · BOPREAL para pago de impuestos (Mesa)",
   "impuestos": [
     "tp_usd"
@@ -100,10 +100,10 @@
   ],
   "riesgoNivel": 2,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

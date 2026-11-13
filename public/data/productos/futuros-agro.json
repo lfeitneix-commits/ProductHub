@@ -38,7 +38,7 @@
     "queEs": "Un futuro es un contrato para comprar o vender un producto a un precio fijado hoy, con entrega en una fecha futura. Si sos productor, te permite asegurar el precio de tu soja, maíz o trigo antes de cosecharlos. Los contratos se liquidan a través de una cámara compensadora, que garantiza su cumplimiento.",
     "titular": "Asegurá hoy el precio de tu próxima cosecha"
   },
-  "estado": "a_validar",
+  "estado": "validado",
   "fuente": "One pager 1 · Futuros Agro (Mesa)",
   "impuestos": [
     "opc_fut"
@@ -110,10 +110,10 @@
   ],
   "riesgoNivel": 3,
   "simulador": null,
-  "ultimaRevision": "2026-11-06",
+  "ultimaRevision": "2026-11-13",
   "unidades": [
     "Banca Corporativa"
   ],
-  "validador": "",
-  "vence": "2027-02-06"
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-11"
 }

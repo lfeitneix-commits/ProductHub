@@ -28,8 +28,14 @@
    "pdf": "onepagers/cheques.pdf?v=20261113",
    "fecha": "2026-11-13"
   },
-  "cuentas-offshore": "onepagers/cuentas-offshore.pdf",
-  "estructuras-societarias": "onepagers/estructuras-societarias.pdf",
+  "cuentas-offshore": {
+   "pdf": "onepagers/cuentas-offshore.pdf?v=20261113c",
+   "fecha": "2026-11-13"
+  },
+  "estructuras-societarias": {
+   "pdf": "onepagers/estructuras-societarias.pdf?v=20261113c",
+   "fecha": "2026-11-13"
+  },
   "facturas-fce": {
    "pdf": "onepagers/facturas-fce.pdf?v=20261113",
    "fecha": "2026-11-13"
@@ -94,6 +100,14 @@
   },
   "research": {
    "pdf": "onepagers/research.pdf?v=20261113",
+   "fecha": "2026-11-13"
+  },
+  "bopreal-impuestos": {
+   "pdf": "onepagers/bopreal-impuestos.pdf?v=20261113c",
+   "fecha": "2026-11-13"
+  },
+  "futuros-agro": {
+   "pdf": "onepagers/futuros-agro.pdf?v=20261113c",
    "fecha": "2026-11-13"
   }
  }
