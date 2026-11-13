@@ -1210,7 +1210,7 @@ async function archivoOP(p){
 function abrirEnvio(canal, tipo, id){
   const p = tipo === "op" ? S.byId[id] : null; if (tipo === "op" && !p) return;
   const P = S.prop, nombre = P.cliente ? P.cliente.split(" ")[0] : "";
-  const firma = tipo === "prop" && P.asesor ? `\n\n${P.asesor}` : "";
+  const firma = tipo === "prop" && P.asesor && canal === "wa" ? `\n\n${P.asesor}` : ""; // en el mail la firma la pone Outlook
   const msg = tipo === "op"
     ? `Hola, te comparto el one pager de ${p.nombre}: ${p.cliente.titular.charAt(0).toLowerCase()+p.cliente.titular.slice(1)}. Si te interesa, lo vemos con tus números.`
     : `Hola${nombre?" "+nombre:""}, te comparto la propuesta que armamos a partir de lo que conversamos. Cualquier duda, me escribís.${firma}`;
