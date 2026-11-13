@@ -59,7 +59,10 @@
    "pdf": "onepagers/obligaciones-negociables.pdf?v=20261113",
    "fecha": "2026-11-13"
   },
-  "on-emision": "onepagers/on-emision.pdf",
+  "on-emision": {
+   "pdf": "onepagers/on-emision.pdf?v=20261113b",
+   "fecha": "2026-11-13"
+  },
   "opciones": {
    "pdf": "onepagers/opciones.pdf?v=20261113",
    "fecha": "2026-11-13"
