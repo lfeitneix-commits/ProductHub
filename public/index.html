@@ -226,6 +226,7 @@ table.cpd{width:100%;border-collapse:collapse;font-size:13px}table.cpd th{text-a
 table.cpd td{padding:7px 14px;border-bottom:1px solid var(--line)}table.cpd .r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}table.cpd tr.b td{font-weight:600}table.cpd tr.sec td{background:var(--surface-2);font-size:11.5px;font-weight:600;color:var(--ink-2);padding:6px 14px}table.cpd td.neg{color:var(--crit)}
 /* Campos numéricos: sin flechas para subir o bajar de a uno; se escribe el monto. */
 input[type=number]{-moz-appearance:textfield;appearance:textfield}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 .dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
 .busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
 @media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
@@ -687,7 +688,7 @@ function footer(r){
   const corp = p && p.unidades.includes("Banca Corporativa") && !p.unidades.includes("Banca Privada");
   const mail = p ? (corp ? "bancacorporativa@neix.com.ar" : "bancaprivada@neix.com.ar") : "bancaprivada@neix.com.ar · bancacorporativa@neix.com.ar";
   f.innerHTML = `<div class="in"><div class="top"><div><h2>Hablemos.</h2><img src="${LOGO_LIGHT}" alt="NEIX"></div>
-   <dl><div><dt>Teléfono</dt><dd>(011) 4859-1552</dd></div><div><dt>Email</dt><dd>${esc(mail)}</dd></div><div><dt>Oficinas</dt><dd>Don Francisco 3345, piso 5, San Fernando</dd></div><div><dt>Web</dt><dd>www.neix.com.ar</dd></div></dl></div>
+   <dl><div><dt>Teléfono</dt><dd>(011) 4859-1552</dd></div><div><dt>Email</dt><dd>${esc(mail)}</dd></div><div><dt>Oficinas</dt><dd>Don Francisco 3345, piso 5, San Fernando</dd></div><div><dt>Web</dt><dd><a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></dd></div></dl></div>
    <p class="legal">${esc(LEYENDA)}</p>${sesionLink()}</div>`;
 }
 /* Acceso de editores: al pie de cada página (solo con Firebase). */
@@ -1211,7 +1212,7 @@ function calcSim(){
     const r = falCalc(v);
     out.innerHTML = `<div class="out">${stat("Saldo a "+v.meses+" meses", ars(r.saldoFin), true)}${stat("Aporte mensual hoy", ars(r.aporte0), false, "se compensa con contribuciones")}${stat("Cubre un año de indemnizaciones", r.be?("Mes "+r.be):"Fuera del horizonte", false, "estimadas en "+ars(r.indFin)+" por año")}</div>
     <div class="chart">${falChart(r)}</div>
-    <p class="tiny muted" style="margin-top:8px">Simulación ilustrativa en pesos nominales. Rendimiento esperado bruto, antes de honorarios (gerente 0,80% y depositaria 0,10% + IVA), no garantizado. Indemnización estimada como un salario por año de antigüedad. Validar contra la calculadora de neix.com.ar/fal.</p>`;
+    <p class="tiny muted" style="margin-top:8px">Simulación ilustrativa en pesos nominales. Rendimiento esperado bruto, antes de honorarios (gerente 0,80% y depositaria 0,10% + IVA), no garantizado. Indemnización estimada como un salario por año de antigüedad. Validar contra la calculadora de <a href="https://www.neix.com.ar/fal" target="_blank" rel="noopener">neix.com.ar/fal</a>.</p>`;
   }
 }
 /* ── Cheques: Neix vs. banco ──
@@ -1299,7 +1300,7 @@ function cpdDoc(v){
    <div class="opx-sec"><h2>Por qué la diferencia</h2><div class="opx-two"><div><b>En Neix</b>Descontás el cheque en el mercado de capitales: pagás la comisión de negociación y el derecho de mercado, con su IVA.</div><div><b>En el banco</b>Sobre los intereses se suman IVA (21%), IVA RIN (1,5%), Ingresos Brutos (1,75%) y el impuesto a los créditos (0,6%).</div></div></div>
    <div class="opx-sec opx-why"><h2>Por qué Neix</h2><div class="opx-four"><div>Asesoramiento personalizado con especialistas.</div><div>Liquidez en 24 horas, con o sin aval de SGR.</div><div>Top 5 en ByMA y top 10 en A3.</div><div>Seguridad operativa y altos estándares normativos.</div></div></div>
   </div>
-  <div class="opx-foot"><div><b>${a ? "Asesor" : "Contacto"} · ${contacto}</b><span>${datos}</span><span>Don Francisco 3345, piso 5, San Fernando · www.neix.com.ar</span></div>
+  <div class="opx-foot"><div><b>${a ? "Asesor" : "Contacto"} · ${contacto}</b><span>${datos}</span><span>Don Francisco 3345, piso 5, San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></span></div>
    <p>Simulación ilustrativa con tasas de referencia; las condiciones finales se confirman al operar. ${esc(LEYENDA)}</p></div></div>`;
 }
 const OPX_CSS = `.opx{width:794px;height:1123px;display:flex;flex-direction:column;background:#fff;color:#2A2927;font-family:Inter,Arial,sans-serif;overflow:hidden}
@@ -1335,8 +1336,10 @@ async function cpdPDF(b){
     await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
     await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
     const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0"; host.innerHTML = cpdDoc(S.simv.cpd); document.body.appendChild(host);
+    const links = linksDe(host.firstElementChild);
     const cv = await window.html2canvas(host.firstElementChild, {scale:2, backgroundColor:"#ffffff", useCORS:true, logging:false}); host.remove();
     const pdf = new window.jspdf.jsPDF({unit:"pt", format:"a4"}); pdf.addImage(cv.toDataURL("image/jpeg", .93), "JPEG", 0, 0, 595.28, 841.89);
+    const k = 595.28 / 794; links.forEach(l => pdf.link(l.x*k, l.y*k, l.w*k, l.h*k, {url: l.url}));
     const v = S.simv.cpd;
     await S.dl.save({filename: `Descuento de cheques Neix vs banco${v.cliente ? " - " + v.cliente : ""}.pdf`, data: pdf.output("blob")}); toast("PDF listo");
   } catch(e) { console.error(e); toast("No pudimos armar el PDF. Probá de nuevo."); }
@@ -1468,7 +1471,7 @@ function propDoc(){
     <div class="pp-facts"><span><b>Moneda</b> ${esc(p.cliente.ficha.moneda)}</span><span><b>Plazo</b> ${esc(p.cliente.ficha.plazo)}</span><span><b>Monto</b> ${esc(p.cliente.ficha.minimo)}</span><span><b>Liquidez</b> ${esc(p.cliente.ficha.liquidez)}</span></div>
     <p class="pp-note">${esc(p.cliente.aTener.join(" "))}</p></div></div>`).join("")}
    <div class="pp-sec"><div class="ey">Próximos pasos</div><div class="pp-steps"><div><b>Lo revisamos juntos</b>Repasamos cada idea con tus números y resolvemos tus dudas.</div><div><b>Definimos el plan</b>Montos, plazos y el orden de implementación.</div><div><b>Lo implementamos</b>Nos ocupamos de la operatoria y te acompañamos en el seguimiento.</div></div>
-    <div class="pp-contact"><div><div class="ey">Tu asesor en Neix</div><div style="font-family:Inter,Arial,sans-serif;font-weight:300;font-size:18px;margin-top:2px">${esc(P.asesor||"Tu asesor")}</div></div><div style="font-size:13px">${esc([P.mail, P.tel].filter(Boolean).join(" · ") || P.contacto || "(011) 4859-1552 · www.neix.com.ar")}</div></div>
+    <div class="pp-contact"><div><div class="ey">Tu asesor en Neix</div><div style="font-family:Inter,Arial,sans-serif;font-weight:300;font-size:18px;margin-top:2px">${esc(P.asesor||"Tu asesor")}</div></div><div style="font-size:13px">${esc([P.mail, P.tel].filter(Boolean).join(" · ") || P.contacto || "(011) 4859-1552")} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div>
     <p class="pp-legal">${esc(LEYENDA)}</p></div>
   </div></div>`;
 }
@@ -1553,7 +1556,7 @@ function deckSlides(){
      <div class="ben">${c.beneficios.slice(0,3).map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div></div>${slideFoot("")}</div>`); });
   const mail = P.area ? AREAS[P.area] : "info@neix.com.ar";
   out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><div class="pad" style="justify-content:flex-end"><h2 style="font-size:92px">Hablemos.</h2>
-   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:44px;font-size:19px">${P.asesor?`<div><div class="ey">Tu asesor</div><div style="margin-top:8px">${[P.asesor, P.mail, P.tel].filter(Boolean).map(esc).join("<br>")}</div></div>`:""}<div><div class="ey">Contacto</div><div style="margin-top:8px">(011) 4859-1552<br>${esc(mail)}</div></div><div><div class="ey">Oficinas</div><div style="margin-top:8px">Don Francisco 3345, piso 5<br>San Fernando · www.neix.com.ar</div></div></div>
+   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:44px;font-size:19px">${P.asesor?`<div><div class="ey">Tu asesor</div><div style="margin-top:8px">${[P.asesor, P.mail, P.tel].filter(Boolean).map(esc).join("<br>")}</div></div>`:""}<div><div class="ey">Contacto</div><div style="margin-top:8px">(011) 4859-1552<br>${esc(mail)}</div></div><div><div class="ey">Oficinas</div><div style="margin-top:8px">Don Francisco 3345, piso 5<br>San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div></div>
    <p style="font-size:12px;color:#A9A196;margin-top:40px">${esc(LEYENDA)}</p></div></div>`);
   return out;
 }
@@ -1567,6 +1570,8 @@ function refreshDeck(){
 function scaleDeck(){ document.querySelectorAll(".slide-wrap").forEach(w => { const s = w.clientWidth/1280; const el = w.firstElementChild; if (el) el.style.transform = `scale(${s})`; }); }
 window.addEventListener("resize", scaleDeck);
 /* ── PDF de la propuesta (A4, cortes entre secciones) ── */
+/* Posición de los links de un bloque, para que sigan clickeables en el PDF. */
+function linksDe(root){ const b = root.getBoundingClientRect(); return [...root.querySelectorAll("a[href^='http']")].map(a => { const r = a.getBoundingClientRect(); return {x:r.left-b.left, y:r.top-b.top, w:r.width, h:r.height, url:a.href}; }); }
 async function propPDFBlob(){ return docPDFBlob(propDoc()); }
 /* One pager sin PDF oficial: se arma en PDF con el mismo formato que la descarga. */
 function onePagerPDFBlob(p){ const head = EXPORT_HEAD(p.nombre+" · Neix"); return docPDFBlob(onePagerDoc(p).slice(head.length).replace("</body></html>","")); }
@@ -1578,6 +1583,7 @@ async function docPDFBlob(html){
   try {
     const root = host.firstElementChild, SC = 2, top0 = root.getBoundingClientRect().top;
     const cortes = [...root.querySelectorAll(".pp-sec,.pp-item,.pp-body,.pp-h4,.pp-kpis,.pp-diag > div,.pp-tab tbody tr")].map(el => Math.round((el.getBoundingClientRect().top - top0) * SC)).sort((a,b)=>a-b);
+    const links = linksDe(root);
     const cv = await window.html2canvas(root, {scale:SC, backgroundColor:"#ffffff", useCORS:true, logging:false});
     const pdf = new window.jspdf.jsPDF({unit:"pt", format:"a4"}), W = 595.28, H = 841.89, k = cv.width / W, alto = Math.floor(H * k);
     for (let y = 0, i = 0; y < cv.height - 2; i++) {
@@ -1586,6 +1592,7 @@ async function docPDFBlob(html){
       const pg = document.createElement("canvas"); pg.width = cv.width; pg.height = fin - y;
       const g = pg.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, pg.width, pg.height); g.drawImage(cv, 0, y, cv.width, pg.height, 0, 0, cv.width, pg.height);
       if (i) pdf.addPage(); pdf.addImage(pg.toDataURL("image/jpeg", .92), "JPEG", 0, 0, W, pg.height / k);
+      links.forEach(l => { const ly = l.y * SC; if (ly >= y && ly < fin) pdf.link(l.x*SC/k, (ly - y)/k, l.w*SC/k, l.h*SC/k, {url: l.url}); });
       y = fin;
     }
     return pdf.output("blob");
@@ -1692,7 +1699,7 @@ async function pzPDF(){
     const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0;width:1280px"; document.body.appendChild(host);
     const pdf = new window.jspdf.jsPDF({orientation:"landscape", unit:"px", format:[1280,720], hotfixes:["px_scaling"]});
     const sl = deckSlides();
-    for (let i=0;i<sl.length;i++){ host.innerHTML = sl[i]; const cv = await window.html2canvas(host.firstElementChild, {scale:1.5, backgroundColor:null, useCORS:true, logging:false}); if (i) pdf.addPage([1280,720],"landscape"); pdf.addImage(cv.toDataURL("image/jpeg",.92),"JPEG",0,0,1280,720); }
+    for (let i=0;i<sl.length;i++){ host.innerHTML = sl[i]; const links = linksDe(host.firstElementChild); const cv = await window.html2canvas(host.firstElementChild, {scale:1.5, backgroundColor:null, useCORS:true, logging:false}); if (i) pdf.addPage([1280,720],"landscape"); pdf.addImage(cv.toDataURL("image/jpeg",.92),"JPEG",0,0,1280,720); links.forEach(l => pdf.link(l.x, l.y, l.w, l.h, {url: l.url})); }
     host.remove();
     const name = `Presentación Neix${S.pz.cliente?" - "+S.pz.cliente:""}.pdf`;
     await S.dl.save({filename:name, data: pdf.output("blob")}); toast("PDF listo");
@@ -1720,7 +1727,7 @@ function onePagerDoc(p){
   <div class="pp-sec" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px"><div><div class="ey">Para quién es</div><p style="margin-top:8px">${esc(c.paraQuien)}</p></div>
    <div><div class="ey">Cómo funciona</div><ol style="margin:8px 0 0;padding-left:18px">${c.comoFunciona.map(s=>`<li style="margin-bottom:4px">${esc(s)}</li>`).join("")}</ol></div></div>
   ${tax}<div class="pp-sec"><div class="ey">Lo que tenés que saber</div><ul style="margin:8px 0 0;padding-left:18px">${c.aTener.map(a=>`<li style="margin-bottom:4px">${esc(a)}</li>`).join("")}</ul>
-   <div class="pp-contact"><div><div class="ey">En Neix</div><p style="margin-top:4px;max-width:52ch">${esc(c.enNeix)}</p></div><div style="font-size:13px">${p.unidades[0]} · ${contacto}<br>(011) 4859-1552 · www.neix.com.ar</div></div>
+   <div class="pp-contact"><div><div class="ey">En Neix</div><p style="margin-top:4px;max-width:52ch">${esc(c.enNeix)}</p></div><div style="font-size:13px">${p.unidades[0]} · ${contacto}<br>(011) 4859-1552 · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div>
    <p class="pp-legal">${esc(LEYENDA)}</p></div></div></div></body></html>`;
 }
 async function download(filename, html){
