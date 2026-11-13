@@ -227,6 +227,13 @@ table.cpd td{padding:7px 14px;border-bottom:1px solid var(--line)}table.cpd .r{t
 /* Campos numéricos: sin flechas para subir o bajar de a uno; se escribe el monto. */
 input[type=number]{-moz-appearance:textfield;appearance:textfield}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
+.op-file{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.op-file-n{display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left;min-width:0}.op-file-n:hover b{text-decoration:underline}
+.op-file-n b{display:block;font-size:14px;font-weight:500}.op-file-n small{display:block;font-size:12px;color:var(--ink-3)}
+.op-ic{width:38px;height:46px;border-radius:6px;background:#A8243A;color:#fff;font-size:10.5px;font-weight:700;display:grid;place-items:center;flex:none}
+.op-pop{background:var(--surface);border-radius:12px;width:min(960px,100%);height:min(92vh,1100px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.op-pop-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line)}.op-pop-h b{font-size:14px;font-weight:500}
+.op-pop iframe{flex:1;border:0;width:100%;background:#525659}
 .dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
 .busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
 @media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
@@ -658,7 +665,7 @@ window.addEventListener("hashchange", () => {
 /* ── Render ── */
 function render(anim){
   const r = route(), app = $("#app");
-  const sec = r.startsWith("p-") || r.startsWith("editar-") ? "soluciones" : r;
+  const sec = r.startsWith("p-") ? "soluciones" : r.startsWith("editar-") ? "gestion" : r;
   document.querySelectorAll("[data-sec]").forEach(a => a.setAttribute("aria-current", a.dataset.sec === sec ? "page" : "false"));
   document.querySelectorAll("[data-admin]").forEach(a => a.hidden = !puedeGestionar());
   document.querySelectorAll(".pcount").forEach(c => { c.textContent = S.prop.items.length; c.hidden = !S.prop.items.length; });
@@ -818,8 +825,10 @@ function vEditar(id){
   if (!puedeGestionar()) return stateMsg("Solo Marketing edita las fichas", "Si ves algo para corregir, dejá una nota al validar la ficha.");
   return `<div class="crumb"><a href="#gestion">Gestión</a><span>/</span><span>${esc(p.nombre)}</span></div><div class="page-head"><div><div class="eyebrow">Editar ficha</div><h1>${esc(p.nombre)}</h1></div>
   <div class="btn-row"><a class="btn" href="#gestion">Volver a Gestión</a><button class="btn primary" data-act="save" data-id="${id}">Guardar cambios</button></div></div>
-  <form id="editForm" class="stack" onsubmit="return false"><div class="panel"><h3>One pager oficial</h3>${p.onePager?`<p class="small" style="margin-bottom:10px">Cargado el ${fdate(p.onePager.fecha)}: ${esc(p.onePager.archivo||"PDF")}. Subí uno nuevo para reemplazarlo.</p>`:`<p class="small muted" style="margin-bottom:10px">Todavía no tiene el PDF oficial.</p>`}
-   ${S.assets?`<div class="upl"><label class="f" for="up_pdf">PDF del one pager<input class="input" id="up_pdf" type="file" accept="application/pdf"></label><label class="f" for="up_img">Imagen de vista previa (opcional)<input class="input" id="up_img" type="file" accept="image/jpeg,image/png,image/webp"><span class="hint">Una captura del one pager completo. Se muestra en la pestaña Para el cliente.</span></label><button class="btn" type="button" data-act="upOP" data-id="${id}">Subir one pager</button></div>`:`<p class="tiny muted">Solo los editores del Hub pueden subir archivos.</p>`}</div>${EDIT_FIELDS.map(([g,fs])=>`<div class="panel"><h3>${g}</h3><div class="stack">${fs.map(([k,l,t])=>{
+  <form id="editForm" class="stack" onsubmit="return false"><div class="panel"><h3>One pager oficial</h3>${p.onePager
+     ? `<div class="op-file"><button type="button" class="op-file-n" data-act="opVer" data-id="${id}"><span class="op-ic">PDF</span><span><b>${esc(p.onePager.archivo||"One pager.pdf")}</b><small>Cargado el ${fdate(p.onePager.fecha)} · tocá para verlo</small></span></button>
+        <span class="btn-row"><button type="button" class="btn" data-act="opVer" data-id="${id}">Ver</button>${S.assets?`<button type="button" class="btn ghost" data-act="opQuitar" data-id="${id}">Eliminar</button>`:""}</span></div>`
+     : (S.assets ? `<p class="small muted" style="margin-bottom:10px">Todavía no tiene el PDF oficial.</p><div class="upl"><label class="f" for="up_pdf">PDF del one pager<input class="input" id="up_pdf" type="file" accept="application/pdf"></label><button class="btn" type="button" data-act="upOP" data-id="${id}">Subir one pager</button></div>` : `<p class="small muted">Todavía no tiene el PDF oficial.</p>`)}</div>${EDIT_FIELDS.map(([g,fs])=>`<div class="panel"><h3>${g}</h3><div class="stack">${fs.map(([k,l,t])=>{
     const v = getP(p,k); let val = v;
     if (t==="list") val = (v||[]).join("\n"); if (t==="pairs") val = (v||[]).map(x=>x.join(" | ")).join("\n");
     const fid = "ed_"+k.replace(/\./g,"_");
@@ -838,15 +847,29 @@ async function save(id){
   try { await S.db.doc("productos/"+id).set(p); toast("Ficha guardada"); go("gestion"); }
   catch(e) { toast(e && e.code === "permission_denied" ? "No tenés permiso para editar fichas" : "No se pudo guardar. Probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Guardar cambios"; } }
 }
+/* Ver el one pager en una ventana emergente, y eliminarlo para subir otro. */
+function opVer(id){
+  const p = S.byId[id]; if (!p || !p.onePager) return;
+  const url = blobUrl(p.onePager.pdf);
+  const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
+  div.innerHTML = `<div class="op-pop" role="dialog" aria-modal="true" aria-label="${esc(p.onePager.archivo||"One pager")}"><div class="op-pop-h"><b>${esc(p.onePager.archivo||"One pager")}</b><span class="btn-row"><a class="btn" href="${esc(url)}" download="${esc(p.onePager.archivo||"one-pager.pdf")}">${ico("_dl")}Descargar</a><button class="btn ghost" data-act="shClose">Cerrar</button></span></div><iframe src="${esc(url)}#view=FitH" title="One pager"></iframe></div>`;
+  document.body.appendChild(div); S.envio = {ver:true};
+}
+async function opQuitar(id){
+  const p = S.byId[id]; if (!p || !p.onePager || !S.db) return;
+  if (!confirm(`¿Eliminar el one pager de ${p.nombre}? Después podés subir otro.`)) return;
+  try { await S.db.doc("productos/"+id).update({onePager: null, onePagerQuitado: true}); toast("One pager eliminado. Ya podés subir otro."); render(); }
+  catch(e) { toast("No se pudo eliminar. Probá de nuevo."); }
+}
 async function upOP(id){
-  const pdf = ($("#up_pdf")||{}).files?.[0], img = ($("#up_img")||{}).files?.[0];
+  const pdf = ($("#up_pdf")||{}).files?.[0];
   if (!pdf) { toast("Elegí el PDF del one pager"); return; }
   if (!S.assets || !S.db) { toast("No tenés permiso para subir archivos"); return; }
   const b = document.querySelector('[data-act="upOP"]'); if (b) { b.disabled = true; b.textContent = "Subiendo"; }
   try {
-    const a = await S.assets.upload(pdf), i = img ? await S.assets.upload(img) : null, p = S.byId[id];
-    const op = {pdf:a.id, archivo: p.nombre+" - Neix.pdf", fecha: todayISO()}; if (i) op.img = i.id; else if (p.onePager && p.onePager.img) op.img = p.onePager.img;
-    await S.db.doc("productos/"+id).update({onePager: op}); toast("One pager cargado"); go("editar-"+id);
+    const a = await S.assets.upload(pdf), p = S.byId[id];
+    const op = {pdf:a.id, archivo: p.nombre+" - Neix.pdf", fecha: todayISO()};
+    await S.db.doc("productos/"+id).update({onePager: op, onePagerQuitado: false}); toast("One pager cargado"); go("editar-"+id);
   } catch(e) { toast("No se pudo subir. Revisá el archivo y probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Subir one pager"; } }
 }
 /* Las notas de las fichas se publican en el canal de Teams de Marketing (api/nota.js), con el nombre de quien las escribe. */
@@ -1812,6 +1835,8 @@ document.addEventListener("click", e => {
   else if (a==="shClose" || (a==="shBg" && e.target===b)) cerrarEnvio();
   else if (a==="shSend" || a==="shShare") enviar(b);
   else if (a==="back") volver();
+  else if (a==="opVer") opVer(id);
+  else if (a==="opQuitar") opQuitar(id);
   else if (a==="cpdPDF") cpdPDF(b);
   else if (a==="cpdVer") cpdVer();
   else if (a==="iaCliente") analizarIA();
@@ -1866,7 +1891,7 @@ document.addEventListener("keydown", e => { if (e.key==="Enter" && e.target.id==
 
 /* ── Arranque ── */
 /* One pagers originales (config/onepagers: id -> ruta, o {pdf, fecha}) para fichas sin uno subido desde Gestión. */
-function conOnePager(p){ const r = S.onepagers && S.onepagers[p.id]; if (!p.onePager && r) { const o = typeof r === "string" ? {pdf:r} : r; p.onePager = {pdf:o.pdf, archivo:p.nombre+" - Neix.pdf", fecha:o.fecha||p.ultimaRevision||""}; } return p; }
+function conOnePager(p){ const r = S.onepagers && S.onepagers[p.id]; if (!p.onePager && r && !p.onePagerQuitado) { const o = typeof r === "string" ? {pdf:r} : r; p.onePager = {pdf:o.pdf, archivo:p.nombre+" - Neix.pdf", fecha:o.fecha||p.ultimaRevision||""}; } return p; }
 function setProductos(list){ S.raw = list; list = list.map(p=>conOnePager(Object.assign({}, p))); S.productos = list.sort((a,b)=>a.nombre.localeCompare(b.nombre,"es")); S.byId = {}; list.forEach(p=>S.byId[p.id]=p); }
 /* ── Acceso de editores (Firebase: link al mail) ── */
 function vIngresar(){
