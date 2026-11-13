@@ -462,8 +462,6 @@ td:first-child{color:var(--ink)}
 <nav class="tabbar" aria-label="Secciones"><a href="#soluciones" data-sec="soluciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>Productos</a><a href="#cliente" data-sec="cliente"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></svg>Cliente</a><a href="#simuladores" data-sec="simuladores"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6zM9 7h6M9 12h6M9 16h3"/></svg>Simuladores</a><a href="#propuesta" data-sec="propuesta"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/></svg>Propuesta<span class="count pcount" hidden>0</span></a><a href="#presentaciones" data-sec="presentaciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM8 20h8M12 16v4"/></svg>Presentar</a><a href="#gestion" data-sec="gestion" data-admin hidden><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M16 4v4M10 10v4"/></svg>Gestión</a></nav></div>
 <script src="js/firebase-config.js"></script>
 <script src="js/runtime.js"></script>
-<script src="js/m365-config.js"></script>
-<script src="js/m365.js"></script>
 <script>
 (function(){
 "use strict";
@@ -625,7 +623,6 @@ function route(){ const h = (location.hash || "").slice(1); return (!h || h === 
 function go(h){ if (location.hash.slice(1) === h) render(); else location.hash = h; }
 let rutaActual = null;
 window.addEventListener("hashchange", () => {
-  if (S.envio || $("#shm")) cerrarEnvio();
   if (rutaActual !== null) scrollPos[rutaActual] = window.scrollY;
   const r = route(), y = volviendo ? (scrollPos[r] || 0) : 0;
   prevRoute = volviendo ? null : rutaActual; volviendo = false; rutaActual = r;
@@ -1228,39 +1225,16 @@ function abrirEnvio(canal, tipo, id){
   div.innerHTML = `<div class="box" role="dialog" aria-modal="true" aria-labelledby="shT"><h3 id="shT">${wa?"Enviar por WhatsApp":"Enviar por mail"}</h3>
     <label class="f" for="shMsg">Mensaje<textarea class="input" id="shMsg">${esc(msg)}</textarea></label>
     <div class="att" id="shAtt">Preparando el archivo…</div>
-    <p class="tiny muted" style="margin:0">${!wa && conOutlook() ? `Al tocar Enviar se crea un borrador en tu Outlook con este mensaje arriba, tu firma y el PDF adjunto. Lo abrís, elegís el destinatario y lo mandás. La primera vez te pide entrar con tu cuenta de Neix.` : cel ? `Al tocar Enviar se abre el menú para compartir con el PDF adjunto: elegí ${wa?"WhatsApp":"Outlook"} y el contacto. El mensaje queda copiado; si no aparece, pegalo con Ctrl+V.` : `Este navegador no permite adjuntar archivos: se abre ${wa?"WhatsApp":"tu mail"} con el mensaje${tipo==="op"&&p&&p.onePager?" y el link al PDF":""}, y el PDF se descarga para arrastrarlo. Para adjuntarlo directo, usá Chrome o Edge.`}</p>
+    <p class="tiny muted" style="margin:0">${cel ? `Al tocar Enviar se abre el menú para compartir con el PDF adjunto: elegí ${wa?"WhatsApp":"Outlook"} y el contacto. El mensaje queda copiado; si no aparece, pegalo con Ctrl+V.` : `Este navegador no permite adjuntar archivos: se abre ${wa?"WhatsApp":"tu mail"} con el mensaje${tipo==="op"&&p&&p.onePager?" y el link al PDF":""}, y el PDF se descarga para arrastrarlo. Para adjuntarlo directo, usá Chrome o Edge.`}</p>
     <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button><button class="btn primary" id="shSend" data-act="shSend" disabled>${wa?ico("_wa"):ico("_mail")}Enviar</button></div></div>`;
   document.body.appendChild(div);
   const f = $("#shSend"); if (f) f.focus();
 }
 function cerrarEnvio(){ const m = $("#shm"); if (m) m.remove(); S.envio = null; }
 function telWA(t){ let d = String(t||"").replace(/\D/g, ""); if (!d) return ""; if (d.startsWith("0")) d = d.slice(1); if (d.length === 10) d = "549" + d; else if (d.length === 11 && d.startsWith("9")) d = "54" + d; return d; }
-/* ── Mail con Outlook de Neix (Microsoft 365): borrador con mensaje, firma y PDF ── */
-const conOutlook = () => !!(window.neixM365 && window.neixM365.configurado);
-function firmaHTML(mail){
-  const a = (S.asesores||[]).find(x => x.mail === String(mail||"").toLowerCase());
-  const nombre = a ? a.nombre : "", linea2 = a && a.area ? a.area + " · Neix" : "Neix";
-  const contacto = [a && a.tel, mail].filter(Boolean).map(esc).join(" · ");
-  return `<div style="margin-top:22px;font-family:Arial,sans-serif;font-size:12.5px;color:#3D3D3D;line-height:1.5">${nombre?`<b style="font-size:13.5px">${esc(nombre)}</b><br>`:""}${esc(linea2)}<br>${contacto}<br><a href="https://www.neix.com.ar" style="color:#476785">www.neix.com.ar</a></div>`;
-}
-async function borradorOutlook(b, msg){
-  const E = S.envio; b.disabled = true; b.textContent = "Creando borrador…";
-  try {
-    const cuerpo = (cuenta) => `<div style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.5">${esc(msg).replace(/\n/g,"<br>")}</div>` + firmaHTML(cuenta);
-    const cuenta = window.neixM365.cuenta();
-    const r = await window.neixM365.crearBorrador({asunto: E.asunto, html: cuerpo(cuenta), archivo: E.archivo, cuerpo});
-    const box = $("#shm .box");
-    if (box) box.innerHTML = `<h3>Borrador listo en tu Outlook</h3><p class="small">Tiene el mensaje, tu firma y el PDF adjunto. Abrilo, poné el destinatario y envialo. También lo encontrás en la carpeta Borradores.</p>
-      <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cerrar</button><a class="btn primary" href="${esc(r.webLink||"https://outlook.office.com/mail/drafts")}" target="_blank" rel="noopener" data-act="shClose">${ico("_mail")}Abrir en Outlook</a></div>`;
-  } catch(e) {
-    console.error(e); b.disabled = false; b.innerHTML = ico("_mail") + "Enviar";
-    toast(e && e.errorCode === "user_cancelled" ? "Cancelaste el inicio de sesión" : e && e.code === "graph_403" ? "Tu cuenta no tiene permiso para crear borradores. Avisale a Sistemas." : "No pudimos crear el borrador en Outlook. Probá de nuevo.");
-  }
-}
 async function enviar(b){
   const E = S.envio; if (!E) return;
   const to = (($("#shTo")||{}).value || "").trim(), msg = ($("#shMsg")||{}).value || "", wa = E.canal === "wa";
-  if (!wa && conOutlook()) return borradorOutlook(b, msg);
   if (E.archivo && navigator.canShare && navigator.canShare({files:[E.archivo]})) {
     /* WhatsApp y Outlook suelen ignorar el texto cuando hay un archivo: el mensaje queda copiado para pegarlo. */
     const copiado = navigator.clipboard ? navigator.clipboard.writeText(msg).then(()=>true, ()=>false) : Promise.resolve(false);
