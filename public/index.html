@@ -1332,7 +1332,7 @@ function cpdDoc(v){
    <div class="opx-why"><h2>Por qué Neix</h2><div class="opx-four"><div>Asesoramiento personalizado con especialistas.</div><div>Soluciones integradas en tipo de cambio y commodities.</div><div>Top 5 en ByMA y top 10 en A3.</div><div>Seguridad operativa y altos estándares normativos.</div></div></div>
   </div>
   <div class="opx-foot">
-   <div class="opx-foot-top"><div>${hayAsesor ? `<b>Asesor · ${esc(v.asesor)}</b><span>${[v.tel, v.mail].filter(Boolean).map(esc).join(" · ")}</span>` : `<b>Contacto · Banca Corporativa</b><span>(011) 4859-1552 · bancacorporativa@neix.com.ar</span>`}<span>Don Francisco 3345, piso 5, San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></span></div>
+   <div class="opx-foot-top"><div>${hayAsesor ? `<b>Asesor · ${esc(v.asesor)}</b><span>${[v.tel ? telLink(v.tel) : "", v.mail ? mailLink(v.mail) : ""].filter(Boolean).join(" · ")}</span>` : `<b>Contacto · Banca Corporativa</b><span>(011) 4859-1552 · bancacorporativa@neix.com.ar</span>`}<span>Don Francisco 3345, piso 5, San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></span></div>
     <em>Neix. Inteligencia Financiera.</em></div>
    <p>${esc(LEGAL_CPD(fLarga(v.fNeg)))}</p></div></div>`;
 }
@@ -1523,7 +1523,7 @@ function propDoc(){
     <div class="pp-facts"><span><b>Moneda</b> ${esc(p.cliente.ficha.moneda)}</span><span><b>Plazo</b> ${esc(p.cliente.ficha.plazo)}</span><span><b>Monto</b> ${esc(p.cliente.ficha.minimo)}</span><span><b>Liquidez</b> ${esc(p.cliente.ficha.liquidez)}</span></div>
     <p class="pp-note">${esc(p.cliente.aTener.join(" "))}</p></div></div>`).join("")}
    <div class="pp-sec"><div class="ey">Próximos pasos</div><div class="pp-steps"><div><b>Lo revisamos juntos</b>Repasamos cada idea con tus números y resolvemos tus dudas.</div><div><b>Definimos el plan</b>Montos, plazos y el orden de implementación.</div><div><b>Lo implementamos</b>Nos ocupamos de la operatoria y te acompañamos en el seguimiento.</div></div>
-    <div class="pp-contact"><div><div class="ey">Tu asesor en Neix</div><div style="font-family:Inter,Arial,sans-serif;font-weight:300;font-size:18px;margin-top:2px">${esc(P.asesor||"Tu asesor")}</div></div><div style="font-size:13px">${esc([P.mail, P.tel].filter(Boolean).join(" · ") || P.contacto || "(011) 4859-1552")} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div>
+    <div class="pp-contact"><div><div class="ey">Tu asesor en Neix</div><div style="font-family:Inter,Arial,sans-serif;font-weight:300;font-size:18px;margin-top:2px">${esc(P.asesor||"Tu asesor")}</div></div><div style="font-size:13px">${[P.mail ? mailLink(P.mail) : "", P.tel ? telLink(P.tel) : ""].filter(Boolean).join(" · ") || esc(P.contacto || "(011) 4859-1552")} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div>
     <p class="pp-legal">${esc(LEYENDA)}</p></div>
   </div></div>`;
 }
@@ -1608,7 +1608,7 @@ function deckSlides(){
      <div class="ben">${c.beneficios.slice(0,3).map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div></div>${slideFoot("")}</div>`); });
   const mail = P.area ? AREAS[P.area] : "info@neix.com.ar";
   out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><div class="pad" style="justify-content:flex-end"><h2 style="font-size:92px">Hablemos.</h2>
-   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:44px;font-size:19px">${P.asesor?`<div><div class="ey">Tu asesor</div><div style="margin-top:8px">${[P.asesor, P.mail, P.tel].filter(Boolean).map(esc).join("<br>")}</div></div>`:""}<div><div class="ey">Contacto</div><div style="margin-top:8px">(011) 4859-1552<br>${esc(mail)}</div></div><div><div class="ey">Oficinas</div><div style="margin-top:8px">Don Francisco 3345, piso 5<br>San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div></div>
+   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:44px;font-size:19px">${P.asesor?`<div><div class="ey">Tu asesor</div><div style="margin-top:8px">${[P.asesor ? esc(P.asesor) : "", P.mail ? mailLink(P.mail) : "", P.tel ? telLink(P.tel) : ""].filter(Boolean).join("<br>")}</div></div>`:""}<div><div class="ey">Contacto</div><div style="margin-top:8px">(011) 4859-1552<br>${esc(mail)}</div></div><div><div class="ey">Oficinas</div><div style="margin-top:8px">Don Francisco 3345, piso 5<br>San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div></div>
    <p style="font-size:12px;color:#A9A196;margin-top:40px">${esc(LEYENDA)}</p></div></div>`);
   return out;
 }
@@ -1623,7 +1623,10 @@ function scaleDeck(){ document.querySelectorAll(".slide-wrap").forEach(w => { co
 window.addEventListener("resize", scaleDeck);
 /* ── PDF de la propuesta (A4, cortes entre secciones) ── */
 /* Posición de los links de un bloque, para que sigan clickeables en el PDF. */
-function linksDe(root){ const b = root.getBoundingClientRect(); return [...root.querySelectorAll("a[href^='http']")].map(a => { const r = a.getBoundingClientRect(); return {x:r.left-b.left, y:r.top-b.top, w:r.width, h:r.height, url:a.href}; }); }
+/* Celular y mail del asesor como links en los documentos: el celular abre WhatsApp y el mail, un correo nuevo. */
+const telLink = t => { const n = telWA(t); return n ? `<a class="web" href="https://wa.me/${n}" target="_blank" rel="noopener">${esc(t)}</a>` : esc(t); };
+const mailLink = m => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(m||"").trim()) ? `<a class="web" href="mailto:${esc(String(m).trim())}">${esc(m)}</a>` : esc(m);
+function linksDe(root){ const b = root.getBoundingClientRect(); return [...root.querySelectorAll("a[href^='http'],a[href^='mailto:']")].map(a => { const r = a.getBoundingClientRect(); return {x:r.left-b.left, y:r.top-b.top, w:r.width, h:r.height, url:a.href}; }); }
 async function propPDFBlob(){ return docPDFBlob(propDoc()); }
 /* One pager sin PDF oficial: se arma en PDF con el mismo formato que la descarga. */
 function onePagerPDFBlob(p){ const head = EXPORT_HEAD(p.nombre+" · Neix"); return docPDFBlob(onePagerDoc(p).slice(head.length).replace("</body></html>","")); }
