@@ -573,7 +573,7 @@ const S = {
   productos: [], byId: {}, vals: {}, imp: null,
   db: null, uid: null, canEdit: false, dl: null, assets: null, user: null, notas: [], names: {},
   loading: true, slow: false, dbMissing: false,
-  view: "interno", persona: "Persona física",
+  view: "cliente", persona: "Persona física",
   q: "", fUnidad: "", fCat: "", fEstado: "", fNeeds: [],
   cliente: blankCliente(),
   prop: {cliente:"", asesor:"", mail:"", tel:"", mensaje:"", items:[]},
@@ -760,7 +760,7 @@ function card(p){
 function vProducto(id){
   const p = S.byId[id]; if (!p) return stateMsg("No encontramos esa ficha", "Volvé a Productos.");
   const e = estadoDe(p), inProp = S.prop.items.some(i=>i.id===id);
-  const tabs = [["interno","Para el asesor"],["cliente","Para el cliente"],["opera","Cómo se opera"]];
+  const tabs = [["cliente","Para el cliente"],["interno","Para el asesor"],["opera","Cómo se opera"]];
   return `<div class="p-hero"><div style="min-width:0"><button class="back" data-act="back" aria-label="Volver"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Volver</button><div class="crumb"><a href="#soluciones">Productos</a><span>/</span><a href="#soluciones" data-act="goCat" data-v="${esc(p.categoria)}">${esc(p.categoria)}</a></div>
    <span class="kicker">${esc(p.categoria)}</span><h1>${esc(p.nombre)}</h1></div>
    <div style="min-width:0"><div class="units" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px">${units(p)}</div><p class="lead">${esc(p.cliente.titular)}<span>${esc(p.cliente.bajada)}</span></p>
