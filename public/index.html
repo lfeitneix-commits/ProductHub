@@ -2302,7 +2302,7 @@ async function boot(){
   // Quién está usando el Hub (ingreso con Microsoft en Vercel). En local no existe y se ignora.
   if (window.neixBase) window.neixBase().then(b => { S.base = b; if (route() === "gestion") softRender(); });
   if (window.neixCambios) window.neixCambios().then(c => { S.cambios = (c || []).concat(S.cambios.filter(x => !(c || []).some(y => y.fecha === x.fecha && y.id === x.id))).sort((a,b) => String(b.fecha).localeCompare(String(a.fecha))); if (route() === "gestion") softRender(); });
-  fetch("api/me", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(me => { if (me && me.email) { S.me = me; render(); } }).catch(()=>{});
+  fetch("api/datos?me=1", {cache:"no-store", credentials:"same-origin"}).then(r => r.ok ? r.json() : null).then(me => { if (me && me.email) { S.me = me; render(); } }).catch(()=>{});
   setTimeout(usoEnviar, 4000);
   const c = window.neixRuntime;
   if (!c || !c.use) { S.loading = false; S.dbMissing = true; render(); return; }

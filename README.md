@@ -106,7 +106,7 @@ En Vercel, el Hub entero (páginas, fichas, PDF y /api) pide iniciar sesión con
 La primera vez el asesor toca su cuenta; después la sesión dura 90 días en ese navegador. "Salir" (al pie) cierra solo el Hub.
 En local (`npm run dev`) no hay ingreso.
 
-Piezas: `middleware.js` (controla cada pedido), `api/auth/login.js`, `api/auth/callback.js`, `api/auth/logout.js`, `api/me.js`, `lib/auth.js`.
+Piezas: `middleware.js` (controla cada pedido), `api/auth/login.js`, `api/auth/callback.js`, `api/auth/logout.js`, `api/datos.js?me=1` (quién entró), `lib/auth.js`.
 
 Configuración (una vez, con la dirección de Vercel ya publicada, por ejemplo `https://producthub-xxxx.vercel.app`):
 1. **entra.microsoft.com › App registrations › Hub de Productos Neix**
@@ -162,4 +162,5 @@ fichas vencidas o fichas que vencen en los próximos 7 días, publica un resumen
 Si no hay nada para informar, no manda nada. Usa `TEAMS_WEBHOOK_URL`.
 Opcional: `CRON_SECRET` en Vercel (un texto largo al azar) para que solo Vercel Cron pueda llamarla.
 
-Ojo: el plan Hobby de Vercel permite hasta 12 funciones en `api/`. Hoy hay 12; para sumar otra, hay que unirla con una existente.
+Ojo: el plan Hobby de Vercel permite hasta 12 funciones y el middleware cuenta como una. Hoy hay 11 en `api/` más el middleware (12).
+Para sumar otra (por ejemplo, la tenencia de NEIX Connect), unir antes las de `api/auth/` en una sola.

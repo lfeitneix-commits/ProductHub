@@ -3,8 +3,9 @@
 //   POST  { col: "productos" | "validaciones", id, data }  guarda un documento (solo EDITORES).
 //   POST  { accion: "resolverNota", id, resuelta }  marca una nota como resuelta o la reabre (solo EDITORES).
 //   POST  { accion: "uso", eventos: { "<producto>": { v, o, e, p } } }  suma el uso del Hub que juntó el navegador (cualquier asesor).
+//   GET   ?me=1  quién está usando el Hub: { email, nombre, editor }.
 //   GET   ?uso=1  totales de uso por mes (solo EDITORES), para "Uso del Hub" en Gestión.
-//   (El uso va en esta función porque el plan Hobby de Vercel permite hasta 12 funciones.)
+//   (Van en esta función porque el plan Hobby de Vercel permite hasta 12 funciones, y el middleware cuenta como una.)
 // Lo que no está guardado acá sale de los archivos del repo (public/data). Almacenamiento: lib/datos.js.
 import { hayBase, hayArchivos, leerTodo, guardarDoc, colValida, quien, idValido, CONFIG_EDITABLE, resolverNota, leerUso, sumarUso } from "../lib/datos.js";
 
@@ -12,6 +13,7 @@ export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   const u = await quien(req);
   if (!u) return res.status(401).json({ error: "Iniciá sesión con tu cuenta de Neix" });
+  if (req.method === "GET" && req.query && req.query.me) return res.status(200).json(u); // quién está usando el Hub (antes api/me)
   if (!hayBase()) return res.status(200).json({ base: false });
   try {
     if (req.method === "GET" && req.query && req.query.uso) {
