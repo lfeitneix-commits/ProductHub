@@ -1653,17 +1653,18 @@ function vPresentaciones(){
 }
 /* Presentación con el diseño de los one pagers (banda gris con halo arena, títulos en Playfair)
    y la estructura de las presentaciones comerciales: portada, contenido, Neix, propuesta por producto y cierre. */
-function haloSlide(){
-  if (S._haloSl) return S._haloSl;
-  const w = 640, ht = 360, c = document.createElement("canvas"); c.width = w; c.height = ht;
+/* Mismo halo que la banda de los one pagers (luz arena gaussiana pegada al borde inferior), con la altura medida sobre el ancho. */
+function haloSlide(W = 1280, H = 720){
+  const key = W + "x" + H; S._haloSl = S._haloSl || {}; if (S._haloSl[key]) return S._haloSl[key];
+  const w = Math.round(W / 2), ht = Math.round(H / 2), c = document.createElement("canvas"); c.width = w; c.height = ht;
   const g = c.getContext("2d"), img = g.createImageData(w, ht), d = img.data;
-  const cx = 0.5 * w, cy = ht + 0.042 * w, rx = 0.5 * w, ry = 0.128 * w * 1.6, A = [143.6, 129.0, 108.1];
+  const cx = 0.5 * w, cy = ht + 0.042 * w, rx = 0.5 * w, ry = 0.128 * w, A = [143.6, 129.0, 108.1];
   for (let y = 0; y < ht; y++) for (let x = 0; x < w; x++) {
     const k = Math.exp(-(((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2)), o = (y * w + x) * 4;
     d[o] = 35 + A[0] * k; d[o+1] = 35 + A[1] * k; d[o+2] = 35 + A[2] * k; d[o+3] = 255;
   }
   g.putImageData(img, 0, 0);
-  return (S._haloSl = c.toDataURL("image/png"));
+  return (S._haloSl[key] = c.toDataURL("image/png"));
 }
 /* Título en dos líneas, la segunda en itálica: "Soluciones de inversión / *y financiamiento*". */
 function tituloPF(t){
@@ -1705,7 +1706,7 @@ function deckSlides(){
       <p>NEIX nace en 2008 como Sociedad de Bolsa y opera como Agente de Liquidación y Compensación bajo regulación de la Comisión Nacional de Valores de la Argentina.</p>
       <p>Acompañamos a empresas, individuos y familias, clientes institucionales y Financial Advisors con asesoramiento y ejecución en el mercado financiero local e internacional.</p>
       <p>Desde 2018 sostenemos una posición de liderazgo en el ranking ByMA, con presencia en ByMA, MAV y A3.</p></div>
-      <div class="rgt" ${halo}><img src="${LOGO_LIGHT}" alt="NEIX"><div class="pf" style="font-size:40px;line-height:1.12">Inteligencia<br><em>Financiera</em></div></div></div>${foot.replace('class="ft"','class="ft" style="right:550px"')}</div>`);
+      <div class="rgt" style="background-image:url(${haloSlide(470,720)})"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="pf" style="font-size:40px;line-height:1.12">Inteligencia<br><em>Financiera</em></div></div></div>${foot.replace('class="ft"','class="ft" style="right:550px"')}</div>`);
     out.push(lt(`<div class="pad"><h2 class="pf ti">Cifras <em>relevantes</em></h2>
       <div class="cif">${[["2008","Año de fundación"],["Top 5","Ranking ByMA, siete años consecutivos"],["+6 trill","Volumen operado por año en ByMA, MAV y A3"],["+70","Colaboradores especializados"],["+5.000","Clientes"],["+USD 1.000 M","Colocaciones en mercado de capitales"]].map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join("")}</div>
       <div class="nota">Great Place To Work desde 2020. Agente de Liquidación y Compensación registrado ante la CNV bajo el N° 145.</div></div>`));
@@ -1737,7 +1738,7 @@ function deckSlides(){
 }
 function refreshDeck(){
   const d = $("#deck"); if (!d) return;
-  if (!S._pzFont) { S._pzFont = 1; cpdFuentes().then(() => { S._haloSl = ""; refreshDeck(); }); }
+  if (!S._pzFont) { S._pzFont = 1; cpdFuentes().then(() => refreshDeck()); }
   if (!S.pz.items.length) { d.innerHTML = `<div class="empty" style="background:var(--surface)">Elegí productos o empezá con una de las selecciones sugeridas.</div>`; const n=$("#pzCount"); if(n) n.textContent="Vista previa"; return; }
   const sl = deckSlides(); d.innerHTML = sl.map(h=>`<div class="slide-wrap">${h}</div>`).join("");
   const n = $("#pzCount"); if (n) n.textContent = `Vista previa · ${sl.length} diapositivas`;
