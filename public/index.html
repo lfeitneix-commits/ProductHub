@@ -625,8 +625,8 @@ const S = {
   prop: {cliente:"", asesor:"", mail:"", tel:"", mensaje:"", items:[]},
   sim: "caucion",
   simv: {
-    caucion:{modo:"colocar", monto:50000000, tna:32, dias:7, arancel:0.5, garantia:100000000, aforo:85},
-    descuento:{vn:20000000, dias:90, tna:38, comision:0.6, aval:false, sgr:4},
+    caucion:{mon:"ARS", modo:"colocar", monto:50000000, tna:32, dias:7, arancel:0.5, garantia:100000000, aforo:85},
+    descuento:{mon:"ARS", vn:20000000, dias:90, tna:38, comision:0.6, aval:false, sgr:4},
     fal:{emp:120, sal:1800000, tipo:"pyme", fondo:"I", aj:25, rot:8, ant:5, meses:36},
     cpd:{precio:80000000, tasaNeix:28, tasaBanco:28, fNeg:"", fVto:"", cobro:"T0", comTipo:"tna", comNeg:3, comDir:1, comMer:0.0315, cliente:"", asesor:"", tel:"", mail:""}
   }
@@ -640,6 +640,11 @@ const $ = (s, r=document) => r.querySelector(s);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt = (n, d=0) => (isFinite(n) ? Number(n) : 0).toLocaleString("es-AR", {minimumFractionDigits:d, maximumFractionDigits:d});
 const ars = n => "$ " + fmt(n);
+/* Caución y descuento en pesos o en dólares: cambia el signo y las tasas de ejemplo; la cuenta es la misma. */
+const SIM_MON = {caucion:{ARS:{monto:50000000, garantia:100000000, tna:32}, USD:{monto:50000, garantia:100000, tna:2}}, descuento:{ARS:{vn:20000000, tna:38}, USD:{vn:20000, tna:8}}};
+const monSim = v => v && v.mon === "USD" ? (n => "US$ " + fmt(n, 2)) : ars;
+const sMon = v => v && v.mon === "USD" ? "US$" : "$";
+const segMon = v => `<div class="seg">${[["ARS","Pesos"],["USD","Dólares"]].map(([k,t])=>`<button data-act="simmon" data-v="${k}" aria-pressed="${(v.mon||"ARS")===k}">${t}</button>`).join("")}</div>`;
 const usd = n => "USD " + fmt(n);
 const todayISO = () => new Date().toISOString().slice(0,10);
 const daysTo = iso => iso ? Math.round((new Date(iso+"T12:00:00") - new Date(todayISO()+"T12:00:00"))/864e5) : null;
@@ -1262,10 +1267,10 @@ const numF = (id, l, v, hint, step) => `<label class="f" for="s_${id}">${l}<inpu
 function simForm(){
   const v = S.simv[S.sim];
   if (S.sim === "cpd") { if (!v.fNeg) { v.fNeg = isoHoy(); v.fVto = isoMas(v.fNeg, 30); } return cpdForm(v); }
-  if (S.sim === "caucion") return `<div class="seg">${[["colocar","Colocar fondos"],["tomar","Tomar fondos"]].map(([k,t])=>`<button data-act="simset" data-k="modo" data-v="${k}" aria-pressed="${v.modo===k}">${t}</button>`).join("")}</div>
-   ${v.modo==="colocar" ? moneyF("monto","Monto a colocar ($)",v.monto) : moneyF("garantia","Cartera en garantía ($)",v.garantia) + `<label class="f" for="s_aforo">Aforo del título<select class="input" id="s_aforo" data-s="aforo">${[[85,"AL30 · 85%"],[80,"Acciones Galicia · 80%"],[93,"T-Bills · 93%"],[70,"Otro · 70%"]].map(([a,t])=>`<option value="${a}" ${Number(v.aforo)===a?"selected":""}>${t}</option>`).join("")}</select><span class="hint">Aforos de ejemplo. Los fija el mercado.</span></label>`}
+  if (S.sim === "caucion") return `${segMon(v)}<div class="seg">${[["colocar","Colocar fondos"],["tomar","Tomar fondos"]].map(([k,t])=>`<button data-act="simset" data-k="modo" data-v="${k}" aria-pressed="${v.modo===k}">${t}</button>`).join("")}</div>
+   ${v.modo==="colocar" ? moneyF("monto",`Monto a colocar (${sMon(v)})`,v.monto) : moneyF("garantia",`Cartera en garantía (${sMon(v)})`,v.garantia) + `<label class="f" for="s_aforo">Aforo del título<select class="input" id="s_aforo" data-s="aforo">${[[85,"AL30 · 85%"],[80,"Acciones Galicia · 80%"],[93,"T-Bills · 93%"],[70,"Otro · 70%"]].map(([a,t])=>`<option value="${a}" ${Number(v.aforo)===a?"selected":""}>${t}</option>`).join("")}</select><span class="hint">Aforos de ejemplo. Los fija el mercado.</span></label>`}
    ${numF("tna","TNA (%)",v.tna,"Valor de ejemplo")}${numF("dias","Plazo (días)",v.dias,"De 1 a 30 días",1)}${numF("arancel","Aranceles y derechos (% anual)",v.arancel,"Valor de ejemplo")}`;
-  if (S.sim === "descuento") return `<p class="small muted">Cheques de pago diferido, pagarés y facturas de crédito electrónicas.</p>${moneyF("vn","Valor del documento ($)",v.vn)}${numF("dias","Días al vencimiento",v.dias,"",1)}${numF("tna","Tasa de descuento (TNA %)",v.tna,"Valor de ejemplo")}${numF("comision","Comisiones y aranceles (% del nominal)",v.comision,"Valor de ejemplo")}
+  if (S.sim === "descuento") return `${segMon(v)}<p class="small muted">${v.mon==="USD"?"Cheques y pagarés en dólares.":"Cheques de pago diferido, pagarés y facturas de crédito electrónicas."}</p>${moneyF("vn",`Valor del documento (${sMon(v)})`,v.vn)}${numF("dias","Días al vencimiento",v.dias,"",1)}${numF("tna","Tasa de descuento (TNA %)",v.tna,"Valor de ejemplo")}${numF("comision","Comisiones y aranceles (% del nominal)",v.comision,"Valor de ejemplo")}
    <label class="f" style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="s_aval" data-s="aval" ${v.aval?"checked":""}> Con aval de SGR</label>${v.aval?numF("sgr","Costo del aval (TNA %)",v.sgr,"Aprox. 4% según one pager"):""}`;
   return `${numF("emp","Empleados con más de 12 meses",v.emp,"",1)}${moneyF("sal","Salario bruto promedio ($)",v.sal)}
    <div class="q"><h4>Tipo de empresa</h4><div class="seg">${[["pyme","Micro y pyme · 2,5%"],["grande","Grande · 1%"]].map(([k,t])=>`<button data-act="simset" data-k="tipo" data-v="${k}" aria-pressed="${v.tipo===k}">${t}</button>`).join("")}</div></div>
@@ -1276,6 +1281,7 @@ const stat = (l, v, hl, sub) => `<div class="stat ${hl?"hl":""}"><div class="eye
 function calcSim(){
   const out = $("#simOut"); if (!out) return;
   const v = S.simv[S.sim];
+  const ars = monSim(v);
   if (S.sim === "caucion") {
     const d = Math.max(1, +v.dias), tna = +v.tna/100, ar = +v.arancel/100;
     if (v.modo === "colocar") {
@@ -2159,6 +2165,7 @@ document.addEventListener("click", e => {
   else if (a==="pzClear") { S.pz.items = []; pzSave(); render(); }
   else if (a==="pzPDF") pzPDF();
   else if (a==="openSim") { S.sim = v; }
+  else if (a==="simmon") { const sv = S.simv[S.sim]; if (sv.mon !== v) { sv.mon = v; Object.assign(sv, (SIM_MON[S.sim]||{})[v] || {}); } $("#simForm").innerHTML = simForm(); calcSim(); }
   else if (a==="simset") { S.simv[S.sim][b.dataset.k] = v; $("#simForm").innerHTML = simForm(); calcSim(); }
 });
 document.addEventListener("input", e => {
