@@ -66,17 +66,34 @@
     impuestos: "data/config/impuestos.json",
     onepagers: "data/config/onepagers.local.json",
   };
+  /* ── Base de datos de Gestión (Vercel: /api/datos) ──
+     Lo guardado ahí (fichas editadas, validaciones, notas) se superpone a los archivos del repo.
+     Sin base conectada (o en local) todo sigue funcionando como antes, con los cambios en memoria. */
+  let remotoP = null;
+  const cargarRemoto = () => remotoP || (remotoP = fetch("api/datos", { cache: "no-store", credentials: "same-origin" })
+    .then((r) => (r.ok ? r.json() : null)).then((j) => (j && j.base ? j : null)).catch(() => null));
+  async function guardarRemoto(col, id, data) {
+    const r = await fetch("api/datos", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ col, id, data: enc(data) }) });
+    if (!r.ok) { const e = new Error("guardar"); e.code = r.status === 403 ? "permission_denied" : "save_failed"; throw e; }
+  }
+  window.neixBase = () => cargarRemoto().then((r) => !!r);
+
   function createStaticDb() {
-    const store = { productos: null, validaciones: {}, notas: {}, config: {} };
+    const store = { productos: null, validaciones: null, notas: null, config: {} };
     const listeners = [];
     async function loadCollection(name) {
-      if (name === "validaciones") return store.validaciones;
-      if (name === "notas") return store.notas;
+      const remoto = await cargarRemoto();
+      if (name === "validaciones") return store.validaciones || (store.validaciones = remoto ? dec(remoto.validaciones || {}) : {});
+      if (name === "notas") {
+        if (!store.notas) { store.notas = {}; ((remoto && remoto.notas) || []).forEach((n) => { if (n && n.id) store.notas[n.id] = Object.assign({ enviada: true }, n, { autor: n.autor || "" }); }); }
+        return store.notas;
+      }
       if (name !== "productos") return {};
       if (!store.productos) {
         const ids = await getJSON("data/productos/index.json");
         const docs = await Promise.all(ids.map((id) => getJSON("data/productos/" + id + ".json").then((d) => [id, d])));
         store.productos = Object.fromEntries(docs);
+        if (remoto && remoto.fichas) Object.entries(dec(remoto.fichas)).forEach(([id, d]) => { store.productos[id] = d; }); // lo editado en Gestión manda
       }
       return store.productos;
     }
@@ -122,10 +139,11 @@
         return consulta({});
       },
       doc: (path) => {
-        const guardar = async (data, merge) => { // queda en memoria hasta recargar
+        const guardar = async (data, merge) => { // con base: se guarda para todos; sin base: queda en memoria hasta recargar
           const [col, id] = path.split("/");
           const base = merge ? (await loadDoc(path)) || {} : {};
           const nuevo = Object.assign(clone(base), clone(data));
+          if ((col === "productos" || col === "validaciones") && (await cargarRemoto())) await guardarRemoto(col, id, nuevo);
           if (col === "config") store.config[id] = nuevo;
           else (await loadCollection(col))[id] = nuevo;
           notify(path);
@@ -142,8 +160,16 @@
     const devUser = /[?&]editor=1\b/.test(location.search)
       ? { canEdit: async () => true, id: async () => "editor-local", me: async () => ({ name: "", email: "" }), search: async () => [], profiles: async (ids) => perfiles(ids) }
       : null;
-    // Archivos subidos en local: URL temporal del navegador (se pierde al recargar).
-    const assets = { async upload(file) { return { id: URL.createObjectURL(file) }; } };
+    // Archivos: con base conectada se guardan en Vercel Blob (privados, /api/archivo); si no, URL temporal del navegador.
+    const assets = { async upload(file, producto) {
+      if (await cargarRemoto()) {
+        const r = await fetch("api/subir", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/octet-stream", "x-producto": producto || "producto" }, body: file });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.id) { const e = new Error(j.error || "subir"); e.code = "upload_failed"; throw e; }
+        return { id: j.id };
+      }
+      return { id: URL.createObjectURL(file) };
+    } };
     return { db: async () => createStaticDb(), user: async () => devUser, assets: async () => assets };
   };
 

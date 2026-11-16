@@ -2,6 +2,7 @@
 // Publica la nota de una ficha en el canal de Teams de Marketing (flujo "Post to a channel when a webhook request is received").
 // Quién la escribe sale de la sesión de Microsoft (no lo manda el navegador). Requiere TEAMS_WEBHOOK_URL en Vercel.
 import { SESION, verificar, leerCookie, origen } from "../lib/auth.js";
+import { hayBase, pipeline, K } from "../lib/datos.js";
 
 const limpio = (t, max) => String(t || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, max);
 
@@ -11,7 +12,7 @@ export default async function handler(req, res) {
   const s = await verificar(leerCookie(req.headers.cookie, SESION));
   if (!s) return res.status(401).json({ error: "Iniciá sesión con tu cuenta de Neix" });
   const url = process.env.TEAMS_WEBHOOK_URL;
-  if (!url) return res.status(503).json({ error: "Falta TEAMS_WEBHOOK_URL en Vercel" });
+  if (!url && !hayBase()) return res.status(503).json({ error: "Falta TEAMS_WEBHOOK_URL en Vercel" });
 
   const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
   const texto = String(body.texto || "").trim().slice(0, 2000);
@@ -31,14 +32,23 @@ export default async function handler(req, res) {
     ],
     actions: [{ type: "Action.OpenUrl", title: "Editar en Gestión", url: gestion }],
   };
-  try {
-    const r = await fetch(url, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "message", attachments: [{ contentType: "application/vnd.microsoft.card.adaptive", content: card }] }),
-    });
-    if (!r.ok) { console.error("teams", r.status, await r.text().catch(() => "")); return res.status(502).json({ error: "Teams no aceptó la nota" }); }
-    return res.status(200).json({ ok: true });
-  } catch (e) {
-    console.error(e); return res.status(502).json({ error: "No pudimos conectar con Teams" });
+  // 1) Queda guardada en la base (Gestión la lista) y 2) se publica en Teams. Alcanza con que una de las dos funcione.
+  let guardada = false, enTeams = false;
+  if (hayBase()) {
+    try {
+      const nota = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), producto: id, productoNombre: nombre, texto, fecha: new Date().toISOString(), autor: s.email, autorNombre: s.nombre || "" };
+      await pipeline([["LPUSH", K.notas, JSON.stringify(nota)], ["LTRIM", K.notas, "0", "299"]]); guardada = true;
+    } catch (e) { console.error(e); }
   }
+  if (url) {
+    try {
+      const r = await fetch(url, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "message", attachments: [{ contentType: "application/vnd.microsoft.card.adaptive", content: card }] }),
+      });
+      if (r.ok) enTeams = true; else console.error("teams", r.status, await r.text().catch(() => ""));
+    } catch (e) { console.error(e); }
+  }
+  if (!guardada && !enTeams) return res.status(502).json({ error: "No pudimos enviar la nota" });
+  return res.status(200).json({ ok: true, guardada, enTeams });
 }

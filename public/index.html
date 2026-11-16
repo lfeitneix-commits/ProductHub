@@ -610,7 +610,7 @@ const puedeGestionar = () => S.canEdit || (S.me ? !!S.me.editor : GESTION_ABIERT
 const UNI_COLOR = {"Banca Corporativa":"#003F61" /* Azul profundo */, "Banca Privada":"#004836" /* Verde inglés */, "Financial Advisors":"#9A8E7D" /* Arena */, "Mercado de Capitales":"#476785" /* Azul acero */};
 const units = p => p.unidades.map(u=>`<span class="utag" style="--u:${UNI_COLOR[u]||"#999"}" title="${esc(u)}">${UNI[u]||esc(u)}</span>`).join("");
 
-const blobUrl = id => /^(https?:|blob:|\/|onepagers\/)/.test(String(id)) ? id : "/_blob/" + id;
+const blobUrl = id => /^(https?:|blob:|\/|onepagers\/|api\/archivo)/.test(String(id)) ? id : "/_blob/" + id;
 async function dlPdf(id){
   const p = S.byId[id]; if (!p || !p.onePager) return;
   if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
@@ -844,6 +844,7 @@ function vEditar(id){
 }
 async function save(id){
   const p = JSON.parse(JSON.stringify(S.byId[id]));
+  if (p.onePager && p.onePager.repo) delete p.onePager; // el one pager que viene del repo no se copia a la base
   document.querySelectorAll("#editForm [data-k]").forEach(el => {
     const t = el.dataset.t, raw = el.value; let v = raw.trim();
     if (t==="list") v = raw.split("\n").map(s=>s.trim()).filter(Boolean);
@@ -881,10 +882,10 @@ async function upOP(id){
   if (!S.assets || !S.db) { toast("No tenés permiso para subir archivos"); return; }
   const b = document.querySelector('[data-act="upOP"]'); if (b) { b.disabled = true; b.textContent = "Subiendo"; }
   try {
-    const a = await S.assets.upload(pdf), p = S.byId[id];
+    const a = await S.assets.upload(pdf, id), p = S.byId[id];
     const op = {pdf:a.id, archivo: p.nombre+" - Neix.pdf", fecha: todayISO()};
     await S.db.doc("productos/"+id).update({onePager: op, onePagerQuitado: false}); toast("One pager cargado"); go("editar-"+id);
-  } catch(e) { toast("No se pudo subir. Revisá el archivo y probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Subir one pager"; } }
+  } catch(e) { toast(e && e.message && e.message !== "subir" ? e.message : "No se pudo subir. Revisá el archivo y probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Subir one pager"; } }
 }
 /* Las notas de las fichas se publican en el canal de Teams de Marketing (api/nota.js), con el nombre de quien las escribe. */
 function abrirLink(href, nueva){ const l = document.createElement("a"); l.href = href; if (nueva) { l.target = "_blank"; l.rel = "noopener"; } document.body.appendChild(l); l.click(); l.remove(); }
@@ -1820,10 +1821,12 @@ function waProp(){ const P = S.prop, it = P.items.map(i=>S.byId[i.id]).filter(Bo
 function vGestion(){
   const rows = S.productos.map(p=>({p, e:estadoDe(p)})).sort((a,b)=>(a.e.d??999)-(b.e.d??999));
   const n = k => rows.filter(r=>r.e.k===k).length, pronto = rows.filter(r=>r.e.d!==null && r.e.d>=0 && r.e.d<=30).length, obs = rows.reduce((a,r)=>a+r.p.observaciones.length,0);
+  const aviso = S.base === true ? `<div class="alert okb" style="margin-bottom:16px"><b>Base de datos conectada</b>Lo que edites, subas o valides acá se guarda y lo ven todos los asesores.</div>`
+    : S.base === false ? `<div class="alert warn" style="margin-bottom:16px"><b>Sin base de datos</b>Los cambios de Gestión se ven solo en esta pantalla y se pierden al recargar.</div>` : "";
   return `<div class="page-head"><div><div class="eyebrow">Gestión · solo administradores</div><h1>Vigencia de las fichas</h1>
   <p class="muted">Cada ficha tiene un validador de negocio y una fecha de revisión. Cuando vence, el Hub la marca para que nadie envíe información desactualizada.</p></div></div>
-  <div class="tiles">${stat("Validadas", n("validado"))}${stat("A validar", n("a_validar"))}${stat("Vencen en 30 días", pronto)}${stat("Vencidas", n("vencida"), n("vencida")>0)}${stat("Con one pager oficial", S.productos.filter(p=>p.onePager).length + " de " + S.productos.length)}${stat("Pendientes del relevamiento", obs)}</div>
-  ${S.notas.length?`<div class="panel" style="margin-bottom:18px"><h3>Notas de los asesores <span class="tiny muted">${S.notas.filter(n=>!n.enviada).length} sin enviar por mail</span></h3><div class="stack" style="gap:10px">${S.notas.slice(0,15).map(n=>`<div style="border-top:1px solid var(--line);padding-top:10px"><div class="tiny muted"><a href="#p-${esc(n.producto)}">${esc(n.productoNombre)}</a> · ${esc(S.names[n.autor]||"Asesor")} · ${new Date(n.fecha).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"})}${n.enviada?" · enviada":""}</div><p class="small" style="margin-top:4px;white-space:pre-line">${esc(n.texto)}</p></div>`).join("")}</div></div>`:""}
+  ${aviso}<div class="tiles">${stat("Validadas", n("validado"))}${stat("A validar", n("a_validar"))}${stat("Vencen en 30 días", pronto)}${stat("Vencidas", n("vencida"), n("vencida")>0)}${stat("Con one pager oficial", S.productos.filter(p=>p.onePager).length + " de " + S.productos.length)}${stat("Pendientes del relevamiento", obs)}</div>
+  ${S.notas.length?`<div class="panel" style="margin-bottom:18px"><h3>Notas de los asesores <span class="tiny muted">${S.notas.filter(n=>!n.enviada).length} sin enviar por mail</span></h3><div class="stack" style="gap:10px">${S.notas.slice(0,15).map(n=>`<div style="border-top:1px solid var(--line);padding-top:10px"><div class="tiny muted"><a href="#p-${esc(n.producto)}">${esc(n.productoNombre)}</a> · ${esc(n.autorNombre || S.names[n.autor] || n.autor || "Asesor")} · ${new Date(n.fecha).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"})}${n.enviada?" · enviada":""}</div><p class="small" style="margin-top:4px;white-space:pre-line">${esc(n.texto)}</p></div>`).join("")}</div></div>`:""}
   <div class="tw"><table><thead><tr><th>Ficha</th><th>Tipo</th><th>Unidades</th><th>Estado</th><th>One pager</th><th>Validador</th><th>Revisar antes</th><th class="r">Pend.</th><th></th></tr></thead><tbody>
   ${rows.map(({p,e})=>`<tr><td><a href="#editar-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td>${esc(p.validador||"Sin asignar")}</td><td class="num">${fdate(e.vence)}</td><td class="r num">${p.observaciones.length}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`).join("")}
   </tbody></table></div>`;
@@ -1921,7 +1924,7 @@ document.addEventListener("keydown", e => { if (e.key==="Enter" && e.target.id==
 
 /* ── Arranque ── */
 /* One pagers originales (config/onepagers: id -> ruta, o {pdf, fecha}) para fichas sin uno subido desde Gestión. */
-function conOnePager(p){ const r = S.onepagers && S.onepagers[p.id]; if (!p.onePager && r && !p.onePagerQuitado) { const o = typeof r === "string" ? {pdf:r} : r; p.onePager = {pdf:o.pdf, archivo:p.nombre+" - Neix.pdf", fecha:o.fecha||p.ultimaRevision||""}; } return p; }
+function conOnePager(p){ const r = S.onepagers && S.onepagers[p.id]; if (!p.onePager && r && !p.onePagerQuitado) { const o = typeof r === "string" ? {pdf:r} : r; p.onePager = {pdf:o.pdf, archivo:p.nombre+" - Neix.pdf", fecha:o.fecha||p.ultimaRevision||"", repo:true}; } return p; }
 function setProductos(list){ S.raw = list; list = list.map(p=>conOnePager(Object.assign({}, p))); S.productos = list.sort((a,b)=>a.nombre.localeCompare(b.nombre,"es")); S.byId = {}; list.forEach(p=>S.byId[p.id]=p); }
 /* ── Acceso de editores (Firebase: link al mail) ── */
 function vIngresar(){
@@ -1962,6 +1965,7 @@ async function boot(){
   const st = document.createElement("style"); st.textContent = PP_CSS; document.head.appendChild(st);
   render(true);
   // Quién está usando el Hub (ingreso con Microsoft en Vercel). En local no existe y se ignora.
+  if (window.neixBase) window.neixBase().then(b => { S.base = b; if (route() === "gestion") softRender(); });
   fetch("api/me", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(me => { if (me && me.email) { S.me = me; render(); } }).catch(()=>{});
   const c = window.neixRuntime;
   if (!c || !c.use) { S.loading = false; S.dbMissing = true; render(); return; }

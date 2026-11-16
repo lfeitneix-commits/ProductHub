@@ -135,3 +135,17 @@ Configuración (una vez):
 3. Vercel › Settings › Environments › Production › Environment Variables › `TEAMS_WEBHOOK_URL` = esa URL › Save › Redeploy.
 
 La URL funciona como una clave: no la compartas ni la pegues en el repo.
+
+## Base de datos de Gestión (Vercel Blob + Upstash Redis, planes gratis)
+Con la base conectada, lo que se hace en Gestión queda guardado y lo ven todos: fichas editadas, one pagers subidos o eliminados,
+validaciones y notas de los asesores. Lo que no se cambió sigue saliendo de los archivos del repo (`public/data`, `public/onepagers`).
+Sin base, el Hub funciona igual y los cambios de Gestión quedan solo en esa pantalla.
+
+- `api/datos.js`: lee lo guardado y guarda fichas y validaciones (solo `EDITORES`). Cada cambio queda registrado con quién y cuándo.
+- `api/subir.js` y `api/archivo.js`: one pagers en Vercel Blob como archivos **privados**; se ven solo con sesión iniciada.
+- `api/nota.js`: además de Teams, guarda la nota (Gestión muestra las últimas 100).
+
+Configuración (una vez), en Vercel › proyecto › **Storage**:
+1. **Create Database › Upstash for Redis** (Marketplace) › plan **Free** › conectarla al proyecto (Production). Carga sola `KV_REST_API_URL` y `KV_REST_API_TOKEN`.
+2. **Create › Blob** › si pregunta el acceso, **Private** › conectarlo al proyecto. Carga solo `BLOB_READ_WRITE_TOKEN`.
+3. **Redeploy**. En Gestión tiene que aparecer "Base de datos conectada".
