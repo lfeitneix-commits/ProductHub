@@ -1,0 +1,114 @@
+{
+  "categoria": "Información",
+  "cliente": {
+    "aTener": [
+      "El alta requiere firmar previamente el acuerdo de uso entre NEIX y el cliente, que define comitentes, consultas habilitadas y condiciones de uso.",
+      "Límite de 30 consultas por minuto por proveedor.",
+      "Las credenciales se custodian fuera del código publicado; el Client Secret se entrega por única vez."
+    ],
+    "bajada": "Acceso seguro y en tiempo real a la información de tus cuentas comitentes: tenencias, saldos, resultados, movimientos y operaciones, por API.",
+    "beneficios": [
+      [
+        "Consolidación",
+        "La posición de varios comitentes en un único tablero, sin carga manual."
+      ],
+      [
+        "Reportería",
+        "Reportes automáticos de posición, resultados y movimientos."
+      ],
+      [
+        "Conciliación",
+        "Cruce de movimientos y boletos contra tus registros contables."
+      ],
+      [
+        "Producto propio",
+        "Datos de cuenta para alimentar tu aplicación, portal o modelo."
+      ]
+    ],
+    "comoFunciona": [
+      "Firmás el acuerdo de uso con NEIX, que define el alcance de la habilitación.",
+      "NEIX te entrega la dirección del servicio, las credenciales y la nómina de comitentes y consultas habilitadas.",
+      "Tu sistema pide el dato por API y lo recibe estructurado, en el momento."
+    ],
+    "enNeix": "El equipo de IT de NEIX gestiona el alta del proveedor, los comitentes habilitados y el soporte técnico de la integración.",
+    "ficha": {
+      "liquidez": "Datos en tiempo real",
+      "mercado": "API sobre HTTPS",
+      "minimo": "Según acuerdo de uso",
+      "moneda": "No aplica",
+      "plazo": "Servicio continuo",
+      "riesgo": "No aplica (servicio de información)"
+    },
+    "paraQuien": "Instituciones, asesores financieros y equipos de desarrollo que necesitan la información de sus cuentas comitentes en sus propios sistemas, sin entrar al portal ni exportar planillas.",
+    "queEs": "NEIX Connect es el servicio que permite consultar por API la información de las cuentas comitentes. En lugar de ingresar al portal y exportar planillas, tu sistema pide el dato y lo recibe estructurado, en el momento: posición y tenencia, resultados y rendimiento, cuenta corriente y saldos, operatoria del día y órdenes.",
+    "titular": "Los datos de tus cuentas, directo en tu sistema"
+  },
+  "estado": "validado",
+  "fuente": "Manual de uso NEIX Connect v1.0 (sep 2026)",
+  "impuestos": [],
+  "interno": {
+    "objeciones": [
+      [
+        "Ya exportamos planillas desde el portal.",
+        "Con Connect el dato llega solo y estructurado a su sistema: se terminan la carga manual y los errores de copiar y pegar."
+      ]
+    ],
+    "operativa": [
+      "Firma del acuerdo de uso (alcance: comitentes, consultas y condiciones).",
+      "Alta del proveedor y de los comitentes habilitados por el equipo de IT de NEIX.",
+      "Entrega de dirección del servicio, Client ID y Client Secret (por única vez), usuario y contraseña.",
+      "Límite: 30 consultas por minuto por proveedor. Consultas registradas y auditables."
+    ],
+    "perfiles": [
+      "Instituciones y family offices",
+      "Asesores financieros independientes con varios comitentes",
+      "Empresas que concilian movimientos contra su contabilidad",
+      "Equipos que arman su propio tablero o aplicación"
+    ],
+    "pitch": "Conectamos tu sistema a tus cuentas en NEIX: tenencias, resultados y movimientos por API, sin exportar planillas.",
+    "preguntas": [
+      "¿Cómo consolidan hoy la información de sus cuentas?",
+      "¿Tienen un sistema, tablero o equipo de desarrollo propio?"
+    ],
+    "relacionados": [
+      "research",
+      "operaciones-bloque"
+    ],
+    "senales": [
+      "Pide planillas o reportes seguido",
+      "Consolida varias cuentas a mano",
+      "Tiene equipo de sistemas o desarrollo propio"
+    ],
+    "video": ""
+  },
+  "match": {
+    "eventos": [],
+    "horizonte": [],
+    "minimoUSD": null,
+    "objetivos": [
+      "tesoreria"
+    ],
+    "perfiles": [
+      "conservador",
+      "moderado",
+      "agresivo"
+    ],
+    "tenencia": [],
+    "tipos": [
+      "grande",
+      "fa"
+    ]
+  },
+  "nombre": "NEIX Connect",
+  "observaciones": [],
+  "riesgoNivel": null,
+  "simulador": null,
+  "ultimaRevision": "2026-11-16",
+  "unidades": [
+    "Financial Advisors",
+    "Banca Corporativa",
+    "Banca Privada"
+  ],
+  "validador": "lfeit@neix.com.ar",
+  "vence": "2027-02-14"
+}
