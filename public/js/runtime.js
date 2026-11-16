@@ -73,10 +73,13 @@
   const cargarRemoto = () => remotoP || (remotoP = fetch("api/datos", { cache: "no-store", credentials: "same-origin" })
     .then((r) => (r.ok ? r.json() : null)).then((j) => (j && j.base ? j : null)).catch(() => null));
   async function guardarRemoto(col, id, data) {
-    const r = await fetch("api/datos", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ col, id, data: enc(data) }) });
+    const que = window.neixQue || ""; window.neixQue = "";
+    const r = await fetch("api/datos", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ col, id, data: enc(data), que }) });
+    if (r.ok) { const j = await r.clone().json().catch(() => ({})); if (j.cambio && window.neixCambio) window.neixCambio(j.cambio); }
     if (!r.ok) { const j = await r.json().catch(() => ({})); const e = new Error(j.detalle || j.error || "guardar"); e.code = r.status === 403 ? "permission_denied" : "save_failed"; console.error("No se pudo guardar:", j); throw e; }
   }
   window.neixBase = () => cargarRemoto().then((r) => !!r);
+  window.neixCambios = () => cargarRemoto().then((r) => (r && r.cambios) || []);
 
   function createStaticDb() {
     const store = { productos: null, validaciones: null, notas: null, config: {} };

@@ -853,7 +853,7 @@ async function save(id){
   });
   p.ultimaRevision = todayISO();
   const b = document.querySelector('[data-act="save"]'); if (b) { b.disabled = true; b.textContent = "Guardando"; }
-  try { await S.db.doc("productos/"+id).set(p); toast("Ficha guardada"); go("gestion"); }
+  try { window.neixQue = "editó la ficha"; await S.db.doc("productos/"+id).set(p); toast("Ficha guardada"); go("gestion"); }
   catch(e) { toast(e && e.code === "permission_denied" ? "No tenés permiso para editar fichas" : "No se pudo guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); if (b) { b.disabled = false; b.textContent = "Guardar cambios"; } }
 }
 /* Ver el one pager en una ventana emergente, y eliminarlo para subir otro. */
@@ -873,7 +873,7 @@ function opVer(id){
 async function opQuitar(id){
   const p = S.byId[id]; if (!p || !p.onePager || !S.db) return;
   if (!confirm(`¿Eliminar el one pager de ${p.nombre}? Después podés subir otro.`)) return;
-  try { await S.db.doc("productos/"+id).update({onePager: null, onePagerQuitado: true}); toast("One pager eliminado. Ya podés subir otro."); render(); }
+  try { window.neixQue = "eliminó el one pager"; await S.db.doc("productos/"+id).update({onePager: null, onePagerQuitado: true}); toast("One pager eliminado. Ya podés subir otro."); render(); }
   catch(e) { toast("No se pudo eliminar. Probá de nuevo."); }
 }
 async function upOP(id){
@@ -884,7 +884,7 @@ async function upOP(id){
   try {
     const a = await S.assets.upload(pdf, id), p = S.byId[id];
     const op = {pdf:a.id, archivo: p.nombre+" - Neix.pdf", fecha: todayISO()};
-    await S.db.doc("productos/"+id).update({onePager: op, onePagerQuitado: false}); toast("One pager cargado"); go("editar-"+id);
+    window.neixQue = "subió un one pager"; await S.db.doc("productos/"+id).update({onePager: op, onePagerQuitado: false}); toast("One pager cargado"); go("editar-"+id);
   } catch(e) { toast(e && e.message && e.message !== "subir" ? e.message : "No se pudo subir. Revisá el archivo y probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Subir one pager"; } }
 }
 /* Las notas de las fichas se publican en el canal de Teams de Marketing (api/nota.js), con el nombre de quien las escribe. */
@@ -905,7 +905,7 @@ async function notaMkt(id){
 async function validar(id){
   if (!S.db) return;
   const nota = ($("#valNota")||{}).value || "", d = new Date(); d.setDate(d.getDate()+90);
-  try { await S.db.doc("validaciones/"+id).set({estado:"validado", fecha:todayISO(), vence:d.toISOString().slice(0,10), por:S.uid||"", nota:nota.trim()}); toast("Ficha validada por 90 días"); }
+  try { window.neixQue = "validó la ficha"; await S.db.doc("validaciones/"+id).set({estado:"validado", fecha:todayISO(), vence:d.toISOString().slice(0,10), por:S.uid||"", nota:nota.trim()}); toast("Ficha validada por 90 días"); }
   catch(e) { toast("No pudimos registrar la validación. Pedí acceso al Hub."); }
 }
 
@@ -1827,9 +1827,23 @@ function vGestion(){
   <p class="muted">Cada ficha tiene un validador de negocio y una fecha de revisión. Cuando vence, el Hub la marca para que nadie envíe información desactualizada.</p></div></div>
   ${aviso}<div class="tiles">${stat("Validadas", n("validado"))}${stat("A validar", n("a_validar"))}${stat("Vencen en 30 días", pronto)}${stat("Vencidas", n("vencida"), n("vencida")>0)}${stat("Con one pager oficial", S.productos.filter(p=>p.onePager).length + " de " + S.productos.length)}${stat("Pendientes del relevamiento", obs)}</div>
   ${S.notas.length?`<div class="panel" style="margin-bottom:18px"><h3>Notas de los asesores <span class="tiny muted">${S.notas.filter(n=>!n.enviada).length} sin enviar por mail</span></h3><div class="stack" style="gap:10px">${S.notas.slice(0,15).map(n=>`<div style="border-top:1px solid var(--line);padding-top:10px"><div class="tiny muted"><a href="#p-${esc(n.producto)}">${esc(n.productoNombre)}</a> · ${esc(n.autorNombre || S.names[n.autor] || n.autor || "Asesor")} · ${new Date(n.fecha).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"})}${n.enviada?" · enviada":""}</div><p class="small" style="margin-top:4px;white-space:pre-line">${esc(n.texto)}</p></div>`).join("")}</div></div>`:""}
-  <div class="tw"><table><thead><tr><th>Ficha</th><th>Tipo</th><th>Unidades</th><th>Estado</th><th>One pager</th><th>Validador</th><th>Revisar antes</th><th class="r">Pend.</th><th></th></tr></thead><tbody>
-  ${rows.map(({p,e})=>`<tr><td><a href="#editar-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td>${esc(p.validador||"Sin asignar")}</td><td class="num">${fdate(e.vence)}</td><td class="r num">${p.observaciones.length}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`).join("")}
+  ${historialHTML()}
+  <div class="tw"><table><thead><tr><th>Ficha</th><th>Tipo</th><th>Unidades</th><th>Estado</th><th>One pager</th><th>Revisar antes</th><th>Última modificación</th><th></th></tr></thead><tbody>
+  ${rows.map(({p,e})=>{ const c = ultimoCambio(p.id); return `<tr><td><a href="#editar-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td class="num">${fdate(e.vence)}</td><td>${c ? `<span class="small">${esc(nombreDe(c))}</span><br><span class="tiny muted">${fechaHora(c.fecha)}</span>` : `<span class="tiny muted">Sin cambios</span>`}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`; }).join("")}
   </tbody></table></div>`;
+}
+
+/* ── Historial de cambios de Gestión (quién, qué y cuándo) ── */
+S.cambios = [];
+window.neixCambio = c => { S.cambios.unshift(c); };
+const fechaHora = iso => iso ? new Date(iso).toLocaleString("es-AR", {day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit", hour12:false, timeZone:"America/Argentina/Buenos_Aires"}).replace(",", " ·") + " hs" : "";
+const nombreDe = c => c.nombre || ((S.asesores||[]).find(a => a.mail === c.quien) || {}).nombre || c.quien || "";
+const ultimoCambio = id => S.cambios.find(c => c.id === id) || null;
+function historialHTML(){
+  if (!S.cambios.length) return "";
+  const que = c => c.que || (c.col === "validaciones" ? "validó" : "editó");
+  return `<details class="fold" style="margin-bottom:18px"><summary>Historial de cambios <span class="tiny muted">(${S.cambios.length})</span></summary><div class="in"><div class="tw"><table class="hist"><thead><tr><th>Fecha y hora</th><th>Quién</th><th>Qué</th><th>Ficha</th></tr></thead><tbody>
+   ${S.cambios.slice(0, 50).map(c => `<tr><td class="num">${fechaHora(c.fecha)}</td><td>${esc(nombreDe(c))}</td><td>${esc(que(c))}</td><td><a href="#editar-${esc(c.id)}">${esc((S.byId[c.id] || {}).nombre || c.id)}</a></td></tr>`).join("")}</tbody></table></div></div></details>`;
 }
 
 /* ── Eventos ── */
@@ -1966,6 +1980,7 @@ async function boot(){
   render(true);
   // Quién está usando el Hub (ingreso con Microsoft en Vercel). En local no existe y se ignora.
   if (window.neixBase) window.neixBase().then(b => { S.base = b; if (route() === "gestion") softRender(); });
+  if (window.neixCambios) window.neixCambios().then(c => { S.cambios = (c || []).concat(S.cambios.filter(x => !(c || []).some(y => y.fecha === x.fecha && y.id === x.id))).sort((a,b) => String(b.fecha).localeCompare(String(a.fecha))); if (route() === "gestion") softRender(); });
   fetch("api/me", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(me => { if (me && me.email) { S.me = me; render(); } }).catch(()=>{});
   const c = window.neixRuntime;
   if (!c || !c.use) { S.loading = false; S.dbMissing = true; render(); return; }
