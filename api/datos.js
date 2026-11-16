@@ -26,6 +26,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Método no permitido" });
   } catch (e) {
     console.error(e);
-    return res.status(502).json({ error: "No pudimos conectar con la base de datos" });
+    return res.status(502).json({ error: "No pudimos guardar en la base de datos", detalle: u.editor ? String((e && (e.name + ": " + e.message)) || e).slice(0, 300) : undefined });
   }
 }

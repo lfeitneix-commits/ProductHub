@@ -854,7 +854,7 @@ async function save(id){
   p.ultimaRevision = todayISO();
   const b = document.querySelector('[data-act="save"]'); if (b) { b.disabled = true; b.textContent = "Guardando"; }
   try { await S.db.doc("productos/"+id).set(p); toast("Ficha guardada"); go("gestion"); }
-  catch(e) { toast(e && e.code === "permission_denied" ? "No tenés permiso para editar fichas" : "No se pudo guardar. Probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Guardar cambios"; } }
+  catch(e) { toast(e && e.code === "permission_denied" ? "No tenés permiso para editar fichas" : "No se pudo guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); if (b) { b.disabled = false; b.textContent = "Guardar cambios"; } }
 }
 /* Ver el one pager en una ventana emergente, y eliminarlo para subir otro. */
 function opVer(id){
