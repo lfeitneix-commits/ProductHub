@@ -2,7 +2,7 @@
 // Publica la nota de una ficha en el canal de Teams de Marketing (flujo "Post to a channel when a webhook request is received").
 // Quién la escribe sale de la sesión de Microsoft (no lo manda el navegador). Requiere TEAMS_WEBHOOK_URL en Vercel.
 import { SESION, verificar, leerCookie, origen } from "../lib/auth.js";
-import { hayBase, pipeline, K } from "../lib/datos.js";
+import { hayBase, agregarNota } from "../lib/datos.js";
 
 const limpio = (t, max) => String(t || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, max);
 
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   if (hayBase()) {
     try {
       const nota = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), producto: id, productoNombre: nombre, texto, fecha: new Date().toISOString(), autor: s.email, autorNombre: s.nombre || "" };
-      await pipeline([["LPUSH", K.notas, JSON.stringify(nota)], ["LTRIM", K.notas, "0", "299"]]); guardada = true;
+      await agregarNota(nota); guardada = true;
     } catch (e) { console.error(e); }
   }
   if (url) {
