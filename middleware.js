@@ -1,6 +1,6 @@
 // Controla cada pedido al Hub (páginas, fichas, PDF y /api) en Vercel.
 // Sin sesión válida: las páginas van a la pantalla de entrada (api/auth/ingresar) y los datos responden 401.
-// /api/auth/* queda afuera para poder iniciar y cerrar sesión.
+// /api/auth/* queda afuera para poder iniciar y cerrar sesión, y /api/resumen para el aviso semanal de Vercel Cron.
 // En local (npm run dev) no corre: el Hub queda abierto para probar.
 import { next } from "@vercel/functions";
 import { CFG, SESION, verificar, leerCookie, habilitado } from "./lib/auth.js";
@@ -21,4 +21,4 @@ export default async function middleware(request) {
   return new Response(JSON.stringify({ error: "Iniciá sesión con tu cuenta de Neix" }), { status: 401, headers: { "content-type": "application/json" } });
 }
 
-export const config = { matcher: ["/((?!api/auth/).*)"] };
+export const config = { matcher: ["/((?!api/auth/|api/resumen).*)"] }; // api/resumen: lo llama Vercel Cron (tiene su propio control)

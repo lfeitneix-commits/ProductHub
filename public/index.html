@@ -254,7 +254,9 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 .pend-it .btn-row{flex-shrink:0;flex-wrap:nowrap}
 @media (max-width:640px){.pend-it{flex-direction:column;align-items:flex-start}}
 .ges-search{margin:0 0 12px}.ges-tabla tr[hidden]{display:none}
+.uso-tabla td.num,.uso-tabla th.num{text-align:right}
 @media (max-width:640px){
+  .uso-tabla th,.uso-tabla td{display:table-cell!important}
   table.cpd{font-size:12px}table.cpd th,table.cpd td{padding:6px 8px}table.cpd th{font-size:10px}
   .ges-tabla th:nth-child(2),.ges-tabla td:nth-child(2),.ges-tabla th:nth-child(3),.ges-tabla td:nth-child(3),.ges-tabla th:nth-child(6),.ges-tabla td:nth-child(6){display:none}
   .ges-tabla{font-size:12.5px}
@@ -738,7 +740,7 @@ function render(anim){
   else if (S.loading && !S.productos.length) html = stateMsg(S.slow ? "No pudimos conectar con la base de fichas" : "Cargando productos", S.slow ? "Revisá tu conexión. El Hub se actualiza solo cuando la base responda." : "Un momento.");
   else if (!S.productos.length) html = stateMsg("Todavía no hay fichas cargadas", "Marketing las carga desde Gestión.");
   else if (r === "soluciones") html = vSoluciones();
-  else if (r.startsWith("p-")) html = vProducto(r.slice(2));
+  else if (r.startsWith("p-")) { html = vProducto(r.slice(2)); if (S._vista !== r) { S._vista = r; uso(r.slice(2), "v"); } }
   else if (r.startsWith("editar-")) html = vEditar(r.slice(7));
   else if (r === "cliente") html = vCliente();
   else if (r === "simuladores") html = vSimuladores();
@@ -752,6 +754,7 @@ function render(anim){
   if (r === "propuesta") refreshPreview();
   if (r === "presentaciones") { refreshDeck(); pzFiltrar(); }
   if (r === "gestion") gesFiltrar();
+  if (!r.startsWith("p-")) S._vista = "";
 }
 /* Pie interno: solo la sesión (quién entró y Salir). El "Hablemos" con datos de contacto no hace falta en una herramienta interna. */
 function footer(r){
@@ -1867,6 +1870,7 @@ function cerrarEnvio(){ const m = $("#shm"); if (m) m.remove(); S.envio = null; 
 function telWA(t){ let d = String(t||"").replace(/\D/g, ""); if (!d) return ""; if (d.startsWith("0")) d = d.slice(1); if (d.length === 10) d = "549" + d; else if (d.length === 11 && d.startsWith("9")) d = "54" + d; return d; }
 async function enviar(b){
   const E = S.envio; if (!E) return;
+  (E.tipo === "op" ? [E.id] : E.tipo === "pz" ? S.pz.items : S.prop.items.map(x => x.id)).forEach(id => uso(id, "e"));
   const to = (($("#shTo")||{}).value || "").trim(), msg = ($("#shMsg")||{}).value || "", wa = E.canal === "wa";
   if (E.archivo && navigator.canShare && navigator.canShare({files:[E.archivo]})) {
     /* WhatsApp y Outlook suelen ignorar el texto cuando hay un archivo: el mensaje queda copiado para pegarlo. */
@@ -1888,6 +1892,7 @@ async function enviar(b){
   toast(E.archivo ? "Se descargó el archivo: arrastralo al mensaje para adjuntarlo" : "Se abrió el mensaje");
 }
 document.addEventListener("keydown", e => { if (e.key === "Escape" && S.envio) cerrarEnvio(); });
+document.addEventListener("toggle", e => { if (e.target.matches && e.target.matches("details.uso")) S.usoAbierto = e.target.open; }, true);
 /* Tampoco cambian con las flechas del teclado ni con la rueda del mouse. */
 document.addEventListener("keydown", e => { if ((e.key === "ArrowUp" || e.key === "ArrowDown") && e.target.matches && e.target.matches('input[type="number"]')) e.preventDefault(); });
 /* En los montos, borrar al lado de un punto de miles borra el número, no el punto. */
@@ -1987,6 +1992,27 @@ async function notaResolver(id, resuelta, b){
     toast(resuelta ? "Nota resuelta" : "Nota reabierta"); render();
   } catch(e) { if (b) b.disabled = false; toast("No se pudo guardar: " + (e && e.message !== "guardar" ? e.message : "probá de nuevo.")); }
 }
+/* Uso del Hub en Gestión: qué fichas se miran, qué one pagers se abren o se envían y qué se suma a propuestas. */
+function usoHTML(){
+  if (S.uso === undefined) { S.uso = null; fetch("api/uso", {cache:"no-store", credentials:"same-origin"}).then(r => r.ok ? r.json() : {uso:{}}).catch(() => ({uso:{}})).then(j => { S.uso = (j && j.uso) || {}; if (route() === "gestion") softRender(); }); }
+  const meses = Object.keys(S.uso || {}).sort().reverse(), mes = S.usoMes && meses.includes(S.usoMes) ? S.usoMes : meses[0];
+  const nomMes = m => { const [y, n] = m.split("-"); const t = new Date(+y, +n - 1, 1).toLocaleDateString("es-AR", {month:"long", year:"numeric"}); return t.charAt(0).toUpperCase() + t.slice(1); };
+  let cuerpo;
+  if (S.uso === null) cuerpo = `<p class="small muted" style="margin:0">Cargando…</p>`;
+  else if (!mes) cuerpo = `<p class="small muted" style="margin:0">Todavía no hay datos. Cada asesor manda lo que usó una vez por día, así que los números aparecen de un día para el otro.</p>`;
+  else {
+    const m = S.uso[mes] || {}, filas = S.productos.map(p => { const c = m[p.id] || {}; return {p, v:c.v||0, o:c.o||0, e:c.e||0, pr:c.p||0}; });
+    const tot = k => filas.reduce((a, f) => a + f[k], 0), act = filas.filter(f => f.v + f.o + f.e + f.pr).sort((a, b) => (b.v + b.o*2 + b.e*3 + b.pr*3) - (a.v + a.o*2 + a.e*3 + a.pr*3));
+    const sin = filas.filter(f => !(f.v + f.o + f.e + f.pr));
+    cuerpo = `${meses.length > 1 ? `<div class="seg" style="margin-bottom:12px">${meses.slice(0, 6).map(x => `<button data-act="usoMes" data-v="${x}" aria-pressed="${x === mes}">${nomMes(x)}</button>`).join("")}</div>` : `<div class="tiny muted" style="margin-bottom:10px">${nomMes(mes)}</div>`}
+      <div class="tiles" style="margin-bottom:12px">${stat("Fichas vistas", tot("v"))}${stat("One pagers abiertos o descargados", tot("o"))}${stat("Envíos por WhatsApp o mail", tot("e"))}${stat("Sumados a propuestas o presentaciones", tot("pr"))}</div>
+      ${act.length ? `<div class="tw"><table class="ges-tabla uso-tabla"><thead><tr><th>Producto</th><th class="num">Vistas</th><th class="num">One pager</th><th class="num">Enviado</th><th class="num">En propuestas</th></tr></thead><tbody>
+        ${act.slice(0, S.usoTodo ? 999 : 10).map(f => `<tr><td><a href="#p-${f.p.id}">${esc(f.p.nombre)}</a></td><td class="num">${f.v}</td><td class="num">${f.o}</td><td class="num">${f.e}</td><td class="num">${f.pr}</td></tr>`).join("")}</tbody></table></div>
+        ${act.length > 10 ? `<button class="btn ghost" data-act="usoTodo" style="margin-top:8px">${S.usoTodo ? "Ver los 10 primeros" : `Ver los ${act.length}`}</button>` : ""}` : ""}
+      ${sin.length ? `<details class="fold" style="margin-top:12px"><summary>Sin movimiento este mes <span class="tiny muted">(${sin.length})</span></summary><div class="in small">${sin.map(f => `<a href="#p-${f.p.id}">${esc(f.p.nombre)}</a>`).join(" · ")}</div></details>` : ""}`;
+  }
+  return `<details class="fold uso" style="margin-bottom:18px" ${S.usoAbierto ? "open" : ""}><summary>Uso del Hub <span class="tiny muted">qué fichas se miran y qué se envía</span></summary><div class="in">${cuerpo}</div></details>`;
+}
 function vGestion(){
   const rows = S.productos.map(p=>({p, e:estadoDe(p)})).sort((a,b)=>(a.e.d??999)-(b.e.d??999));
   const n = k => rows.filter(r=>r.e.k===k).length, pronto = rows.filter(r=>r.e.d!==null && r.e.d>=0 && r.e.d<=30).length, obs = rows.reduce((a,r)=>a+r.p.observaciones.length,0);
@@ -1999,7 +2025,7 @@ function vGestion(){
   ${aviso}<div class="tiles">${stat("Validadas", n("validado"))}${stat("A validar", n("a_validar"))}${stat("Vencen en 30 días", pronto)}${stat("Vencidas", n("vencida"), n("vencida")>0)}${stat("Con one pager oficial", S.productos.filter(p=>p.onePager).length + " de " + S.productos.length)}${stat("Pendientes del relevamiento", obs)}</div>
   ${pendientesHTML(rows)}
   <div class="btn-row" style="margin-bottom:18px"><button class="btn primary" data-act="prodNuevo">${ico("_plus")}Nuevo producto</button></div>
-  ${historialHTML()}${eliminados}${instEditorHTML()}
+  ${usoHTML()}${historialHTML()}${eliminados}${instEditorHTML()}
   <div class="search ges-search">${ico("_search")}<input class="input" id="ges_q" type="search" placeholder="Buscá una ficha por nombre, categoría o área" value="${esc(S.gesQ||"")}" aria-label="Buscar fichas" autocomplete="off"></div>
   <div class="tw"><table class="ges-tabla"><thead><tr><th>Ficha</th><th>Tipo</th><th>Unidades</th><th>Estado</th><th>One pager</th><th>Revisar antes</th><th>Última modificación</th><th></th></tr></thead><tbody>
   ${rows.map(({p,e})=>{ const c = ultimoCambio(p.id); return `<tr data-q="${esc(sinAcento([p.nombre, p.categoria, p.unidades.join(" "), p.unidades.map(u=>UNI[u]||"").join(" "), e.txt, c ? nombreDe(c) : ""].join(" ")))}"><td><a href="#editar-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td class="num">${fdate(e.vence)}</td><td>${c ? `<span class="small">${esc(nombreDe(c))}</span><br><span class="tiny muted">${fechaHora(c.fecha)}</span>` : `<span class="tiny muted">Sin cambios</span>`}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`; }).join("")}
@@ -2117,21 +2143,23 @@ document.addEventListener("click", e => {
   else if (a==="clearF") { S.q=""; S.fUnidad=""; S.fCat=""; S.fEstado=""; S.fNeeds=[]; render(); }
   else if (a==="view") { S.view = v; render(); }
   else if (a==="persona") { S.persona = v; persist(); render(); }
-  else if (a==="toggleProp") { const i = S.prop.items.findIndex(x=>x.id===id); if (i>=0) S.prop.items.splice(i,1); else { S.prop.items.push({id, nota:""}); toast("Sumada a la propuesta"); } persist(); render(); }
+  else if (a==="toggleProp") { const i = S.prop.items.findIndex(x=>x.id===id); if (i>=0) S.prop.items.splice(i,1); else { S.prop.items.push({id, nota:""}); uso(id, "p"); toast("Sumada a la propuesta"); } persist(); render(); }
   else if (a==="mv") { const i = +b.dataset.i, d = +b.dataset.d, it = S.prop.items; [it[i], it[i+d]] = [it[i+d], it[i]]; persist(); render(); }
   else if (a==="copyWA") copy(waOnePager(S.byId[id]));
   else if (a==="copyText") copy(b.dataset.t);
-  else if (a==="dlPdf") dlPdf(id);
+  else if (a==="dlPdf") { uso(id, "o"); dlPdf(id); }
   else if (a==="upOP") upOP(id);
-  else if (a==="dlOnePager") dlOnePagerPDF(b, S.byId[id]);
+  else if (a==="dlOnePager") { uso(id, "o"); dlOnePagerPDF(b, S.byId[id]); }
   else if (a==="copyPropWA") copy(waProp());
   else if (a==="dlProp") dlPropPDF(b);
+  else if (a==="usoMes") { S.usoMes = v; S.usoAbierto = true; render(); }
+  else if (a==="usoTodo") { S.usoTodo = !S.usoTodo; S.usoAbierto = true; render(); }
   else if (a==="notaRes") notaResolver(b.dataset.id, b.dataset.v==="1", b);
   else if (a==="share") abrirEnvio(v, b.dataset.k, id);
   else if (a==="shClose" || (a==="shBg" && e.target===b)) cerrarEnvio();
   else if (a==="shSend" || a==="shShare") enviar(b);
   else if (a==="back") volver();
-  else if (a==="opVer") opVer(id);
+  else if (a==="opVer") { uso(id, "o"); opVer(id); }
   else if (a==="instVer") { e.preventDefault(); const l = b.dataset.ed ? S.instEd : S.instructivos, x = l && l[+v]; if (x && x.url) verArchivo(x.url, x.titulo || "Instructivo"); }
   else if (a==="instAdd") { S.instEd.push({titulo:"", url:""}); render(); }
   else if (a==="instDel") { S.instEd.splice(+v, 1); render(); }
@@ -2203,7 +2231,7 @@ document.addEventListener("change", e => {
   if (t.id === "up_pdf") { pdfElegido(t.files[0]); return; }
   if (t.dataset.instpdf !== undefined) { instSubirPdf(+t.dataset.instpdf, t.files[0]); return; }
   if (t.id==="fEstado") { S.fEstado = t.value; render(); }
-  else if (t.dataset.pzp) { const i = S.pz.items.indexOf(t.dataset.pzp); if (t.checked && i<0) S.pz.items.push(t.dataset.pzp); if (!t.checked && i>=0) S.pz.items.splice(i,1); pzSave(); render(); }
+  else if (t.dataset.pzp) { const i = S.pz.items.indexOf(t.dataset.pzp); if (t.checked && i<0) { S.pz.items.push(t.dataset.pzp); uso(t.dataset.pzp, "p"); } if (!t.checked && i>=0) S.pz.items.splice(i,1); pzSave(); render(); }
   else if (t.id==="pz_inst") { S.pz.inst = t.checked; pzSave(); refreshDeck(); }
   else if (t.id==="pz_area") { S.pz.area = t.value; pzSave(); refreshDeck(); }
   else if (t.id==="patrimonio") { S.cliente.patrimonio = t.value; persist(); render(); }
@@ -2250,6 +2278,24 @@ function watchNotas(){
   }, ()=>{});
 }
 function softRender(){ const a = document.activeElement; if (a && (a.tagName==="TEXTAREA" || (a.tagName==="INPUT" && a.type!=="checkbox"))) return; render(); }
+/* ── Uso del Hub ──
+   Cada navegador suma en el teléfono o la compu qué fichas se miran y qué se envía, y lo manda una vez por día
+   (así no se gastan las escrituras del plan gratis). Solo totales por producto, sin datos de quién. */
+const USO_KEY = "neix-hub-uso";
+function uso(id, k){
+  if (!id) return;
+  try { const u = JSON.parse(localStorage.getItem(USO_KEY) || "{}"); u.ev = u.ev || {}; const d = u.ev[id] = u.ev[id] || {}; d[k] = (d[k] || 0) + 1; localStorage.setItem(USO_KEY, JSON.stringify(u)); } catch(_) {}
+}
+function usoEnviar(){
+  let u; try { u = JSON.parse(localStorage.getItem(USO_KEY) || "{}"); } catch(_) { return; }
+  if (!u.ev || !Object.keys(u.ev).length || Date.now() - (u.ultimo || 0) < 20*3600*1000) return;
+  const ev = u.ev;
+  fetch("api/uso", {method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body: JSON.stringify({eventos: ev})})
+    .then(r => { if (!r.ok) return; let a; try { a = JSON.parse(localStorage.getItem(USO_KEY) || "{}"); } catch(_) { a = {}; }
+      const resto = a.ev || {}; Object.entries(ev).forEach(([id,c]) => { if (!resto[id]) return; Object.keys(c).forEach(k => { resto[id][k] = (resto[id][k]||0) - c[k]; if (resto[id][k] <= 0) delete resto[id][k]; }); if (!Object.keys(resto[id]).length) delete resto[id]; });
+      try { localStorage.setItem(USO_KEY, JSON.stringify({ultimo: Date.now(), ev: resto})); } catch(_) {} })
+    .catch(()=>{});
+}
 async function boot(){
   const st = document.createElement("style"); st.textContent = PP_CSS; document.head.appendChild(st);
   render(true);
@@ -2257,6 +2303,7 @@ async function boot(){
   if (window.neixBase) window.neixBase().then(b => { S.base = b; if (route() === "gestion") softRender(); });
   if (window.neixCambios) window.neixCambios().then(c => { S.cambios = (c || []).concat(S.cambios.filter(x => !(c || []).some(y => y.fecha === x.fecha && y.id === x.id))).sort((a,b) => String(b.fecha).localeCompare(String(a.fecha))); if (route() === "gestion") softRender(); });
   fetch("api/me", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(me => { if (me && me.email) { S.me = me; render(); } }).catch(()=>{});
+  setTimeout(usoEnviar, 4000);
   const c = window.neixRuntime;
   if (!c || !c.use) { S.loading = false; S.dbMissing = true; render(); return; }
   c.use("downloads").then(d => { S.dl = d; });
