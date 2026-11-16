@@ -234,6 +234,7 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 .op-pop{background:var(--surface);border-radius:12px;width:min(960px,100%);height:min(92vh,1100px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
 .op-pop-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line)}.op-pop-h b{font-size:14px;font-weight:500}
 .op-pop iframe{flex:1;border:0;width:100%;background:#525659}
+.vid-pop{height:auto;max-height:92vh}.vid-pop video{display:block;width:100%;max-height:calc(92vh - 60px);background:#000}
 .drop{display:flex;align-items:center;gap:14px;border:1.5px dashed var(--line-2);border-radius:12px;padding:14px 16px;cursor:pointer;background:var(--surface);transition:border-color .15s,background .15s}
 .drop:hover,.drop.over{border-color:var(--ink-3);background:var(--surface-2)}.drop.ok{border-style:solid;border-color:#2E9E5B;background:#F1F8F3}
 .drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}.drop .op-ic{opacity:.85}.drop.ok .op-ic{opacity:1}
@@ -2041,15 +2042,23 @@ function gesFiltrar(){
 /* ── Instructivos generales (se cargan desde Gestión; se ven en "Cómo se opera" de todas las fichas) ── */
 S.instructivos = [];
 const esArchivoHub = u => /^api\/archivo/.test(String(u || ""));
+const esVideo = u => /\.(mp4|webm|mov)(\?|#|$)/i.test(String(u || ""));
+/* Videos del repo (public/instructivos). Si en Gestión el instructivo quedó sin link, se usa el video. */
+const INST_VIDEO = {"apertura de cuenta comitente":"instructivos/apertura-de-cuenta.mp4", "como operar en home banking y app":"instructivos/como-operar.mp4"};
+const instUrl = x => (x && x.url) || INST_VIDEO[sinAcento(String((x && x.titulo) || "").trim())] || "";
 function instructivosHTML(){
   const l = S.instructivos || [];
   if (!l.length) return `<p class="small muted">Todavía no hay instructivos cargados.${puedeGestionar() ? ` Cargalos desde <a href="#gestion">Gestión</a>.` : ""}</p>`;
-  return `<ul class="clean small inst-list">${l.map((x, i) => x.url
-    ? `<li><a href="${esc(x.url)}" ${esArchivoHub(x.url) ? `data-act="instVer" data-v="${i}"` : `target="_blank" rel="noopener"`}>${esc(x.titulo || "Instructivo")}</a> <span class="tiny muted">${esArchivoHub(x.url) ? "PDF" : "↗"}</span></li>`
-    : `<li class="muted">${esc(x.titulo || "Instructivo")} <span class="tiny">· próximamente</span></li>`).join("")}</ul>`;
+  return `<ul class="clean small inst-list">${l.map((x, i) => { const u = instUrl(x); return u
+    ? `<li><a href="${esc(u)}" ${esArchivoHub(u) || esVideo(u) ? `data-act="instVer" data-v="${i}"` : `target="_blank" rel="noopener"`}>${esc(x.titulo || "Instructivo")}</a> <span class="tiny muted">${esVideo(u) ? "Video" : esArchivoHub(u) ? "PDF" : "↗"}</span></li>`
+    : `<li class="muted">${esc(x.titulo || "Instructivo")} <span class="tiny">· próximamente</span></li>`; }).join("")}</ul>`;
 }
 function verArchivo(url, titulo){
   const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
+  if (esVideo(url)) {
+    div.innerHTML = `<div class="op-pop vid-pop" role="dialog" aria-modal="true" aria-label="${esc(titulo)}"><div class="op-pop-h"><b>${esc(titulo)}</b><span class="btn-row"><a class="btn" href="${esc(url)}" download="${esc(titulo)}.mp4">${ico("_dl")}Descargar</a><button class="btn ghost" data-act="shClose">Cerrar</button></span></div><video src="${esc(url)}" controls autoplay playsinline preload="metadata"></video></div>`;
+    document.body.appendChild(div); S.envio = {ver:true}; return;
+  }
   div.innerHTML = `<div class="op-pop" role="dialog" aria-modal="true" aria-label="${esc(titulo)}"><div class="op-pop-h"><b>${esc(titulo)}</b><span class="btn-row"><a class="btn" href="${esc(url)}" download="${esc(titulo)}.pdf">${ico("_dl")}Descargar</a><button class="btn ghost" data-act="shClose">Cerrar</button></span></div><iframe src="${esc(url)}#view=FitH" title="${esc(titulo)}"></iframe></div>`;
   document.body.appendChild(div); S.envio = {ver:true};
 }
@@ -2160,7 +2169,7 @@ document.addEventListener("click", e => {
   else if (a==="shSend" || a==="shShare") enviar(b);
   else if (a==="back") volver();
   else if (a==="opVer") { uso(id, "o"); opVer(id); }
-  else if (a==="instVer") { e.preventDefault(); const l = b.dataset.ed ? S.instEd : S.instructivos, x = l && l[+v]; if (x && x.url) verArchivo(x.url, x.titulo || "Instructivo"); }
+  else if (a==="instVer") { e.preventDefault(); const l = b.dataset.ed ? S.instEd : S.instructivos, x = l && l[+v]; const u = instUrl(x); if (u) verArchivo(u, x.titulo || "Instructivo"); }
   else if (a==="instAdd") { S.instEd.push({titulo:"", url:""}); render(); }
   else if (a==="instDel") { S.instEd.splice(+v, 1); render(); }
   else if (a==="instSinPdf") { S.instEd[+v].url = ""; render(); }

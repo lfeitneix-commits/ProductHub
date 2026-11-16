@@ -1,7 +1,7 @@
 {
  "lista": [
-  {"titulo": "Apertura de cuenta comitente", "url": ""},
-  {"titulo": "Cómo operar en home banking y app", "url": ""},
+  {"titulo": "Apertura de cuenta comitente", "url": "instructivos/apertura-de-cuenta.mp4"},
+  {"titulo": "Cómo operar en home banking y app", "url": "instructivos/como-operar.mp4"},
   {"titulo": "Alta de empresas en EPYME", "url": ""}
  ]
 }
