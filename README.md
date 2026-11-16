@@ -156,11 +156,6 @@ y qué se suma a propuestas o presentaciones. Son totales por producto, sin dato
 Cada navegador junta lo que usó y lo manda una vez por día (`api/datos.js` con `accion: "uso"`, archivo privado `datos/uso.json`),
 para no gastar las escrituras del plan gratis de Vercel Blob. Por eso los números aparecen de un día para el otro.
 
-## Resumen semanal en Teams
-Los lunes a las 9 (Argentina), Vercel Cron llama a `api/resumen.js` (ver `vercel.json`). Si hay notas sin resolver,
-fichas vencidas o fichas que vencen en los próximos 7 días, publica un resumen en el mismo canal de Teams de las notas.
-Si no hay nada para informar, no manda nada. Usa `TEAMS_WEBHOOK_URL`.
-Opcional: `CRON_SECRET` en Vercel (un texto largo al azar) para que solo Vercel Cron pueda llamarla.
 
-Ojo: el plan Hobby de Vercel permite hasta 12 funciones y el middleware cuenta como una. Hoy hay 11 en `api/` más el middleware (12).
+Ojo: el plan Hobby de Vercel permite hasta 12 funciones y el middleware cuenta como una. Hoy hay 10 en `api/` más el middleware (11).
 Para sumar otra (por ejemplo, la tenencia de NEIX Connect), unir antes las de `api/auth/` en una sola.
