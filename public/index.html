@@ -447,7 +447,7 @@ td:first-child{color:var(--ink)}
 .sl{width:1280px;height:720px;font-family:"Inter","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;color:#2A2927;background:#F7F5F2;box-sizing:border-box;overflow:hidden;position:relative}
 .sl *{box-sizing:border-box}
 .sl.dk{background:#232323 no-repeat center/100% 100%;color:#F3F0EB}
-.sl .lg{position:absolute;top:50px;right:80px;height:20px}
+.sl .lg{position:absolute;top:44px;right:80px;height:30px}
 .sl .ey{font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:#8C7F6B;font-weight:600}
 .sl.dk .ey{color:#CFC6B8}
 .sl .pf{font-family:"Playfair Display",Georgia,serif;font-weight:400;letter-spacing:-.005em;margin:0}
@@ -480,7 +480,7 @@ td:first-child{color:var(--ink)}
 .sl .qs .lft{padding:104px 0 96px 80px;display:flex;flex-direction:column}
 .sl .qs .lft p{font-size:16.5px;line-height:1.65;color:#4A4640;margin:0 0 16px}
 .sl .qs .rgt{background:#232323 no-repeat center/100% 100%;color:#F3F0EB;display:flex;flex-direction:column;justify-content:flex-end;padding:0 56px 96px}
-.sl .qs .rgt img{height:24px;align-self:flex-start;margin-bottom:28px}
+.sl .qs .rgt img{height:34px;align-self:flex-start;margin-bottom:28px}
 .sl .lst{margin-top:40px;display:grid;grid-auto-flow:column;column-gap:56px}
 .sl .lst>div{display:grid;grid-template-columns:48px 1fr;align-items:baseline;padding:13px 0;border-bottom:1px solid #DCD6CD}
 .sl .lst i{font-family:"Playfair Display",Georgia,serif;font-size:17px;color:#8C7F6B}
@@ -1680,7 +1680,7 @@ function deckSlides(){
   const pie = ["Neix", area || "Inteligencia Financiera", P.cliente].filter(Boolean).join(" · ");
   const foot = `<div class="ft"><span>${esc(pie)}</span><span>%%N%%</span></div>`;
   const halo = `style="background-image:url(${haloSlide()})"`;
-  const dk = (h, cls="") => `<div class="sl dk ${cls}" ${halo}><img class="lg" src="${LOGO_LIGHT}" alt="NEIX">${h}</div>`;
+  const dk = (h, logo = true) => `<div class="sl dk" ${halo}>${logo?`<img class="lg" src="${LOGO_LIGHT}" alt="NEIX">`:""}${h}</div>`;
   const lt = h => `<div class="sl lt"><img class="lg" src="${LOGO_DARK}" alt="NEIX">${h}${foot}</div>`;
   const pad2 = n => String(n).padStart(2,"0");
   const verToc = P.inst || items.length > 1, verLista = items.length > 1;
@@ -1730,10 +1730,10 @@ function deckSlides(){
   });
 
   const mail = P.mail || (P.area ? AREAS[P.area] : "info@neix.com.ar");
-  out.push(dk(`<div class="fin"><img src="${LOGO_LIGHT}" alt="NEIX" style="height:34px"><div class="pf" style="font-size:30px">Inteligencia <em>Financiera</em></div>
+  out.push(dk(`<div class="fin"><img src="${LOGO_LIGHT}" alt="NEIX" style="height:50px"><div class="pf" style="font-size:30px">Inteligencia <em>Financiera</em></div>
     <div class="ey" style="margin-top:20px">${esc(area || "Neix")}</div>
     <div class="ct">${[P.asesor?esc(P.asesor):"", mailLink(mail), P.tel?telLink(P.tel):"", "P8 Buenavista, Uruguay 6901, piso 5", "San Fernando, Provincia de Buenos Aires", `<a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a>`].filter(Boolean).join("<br>")}</div></div>
-    <p class="leg">${esc(LEYENDA)}</p>`));
+    <p class="leg">${esc(LEYENDA)}</p>`, false));
   return out.map((h,i) => h.replace("%%N%%", pad2(i+1)));
 }
 function refreshDeck(){
