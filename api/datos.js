@@ -1,8 +1,9 @@
 // /api/datos  (protegido por middleware.js)
 //   GET   lo guardado desde Gestión: fichas editadas, validaciones y (para editores) las últimas notas.
 //   POST  { col: "productos" | "validaciones", id, data }  guarda un documento (solo EDITORES).
+//   POST  { accion: "resolverNota", id, resuelta }  marca una nota como resuelta o la reabre (solo EDITORES).
 // Lo que no está guardado acá sale de los archivos del repo (public/data). Almacenamiento: lib/datos.js.
-import { hayBase, leerTodo, guardarDoc, colValida, quien, idValido, CONFIG_EDITABLE } from "../lib/datos.js";
+import { hayBase, leerTodo, guardarDoc, colValida, quien, idValido, CONFIG_EDITABLE, resolverNota } from "../lib/datos.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -17,6 +18,11 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
       if (!u.editor) return res.status(403).json({ error: "Solo los editores pueden guardar cambios" });
       const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+      if (body.accion === "resolverNota") {   // Pendientes de Gestión: marcar una nota como resuelta o reabrirla
+        if (!/^[a-z0-9]{4,24}$/.test(String(body.id || ""))) return res.status(400).json({ error: "Nota inválida" });
+        await resolverNota(body.id, !!body.resuelta, u.email, u.nombre);
+        return res.status(200).json({ ok: true });
+      }
       if (!colValida(body.col) || !idValido(body.id) || !body.data || typeof body.data !== "object") return res.status(400).json({ error: "Datos inválidos" });
       if (body.col === "config" && !CONFIG_EDITABLE.includes(body.id)) return res.status(400).json({ error: "Esa configuración no se edita desde Gestión" });
       if (JSON.stringify(body.data).length > 200000) return res.status(413).json({ error: "La ficha es demasiado grande" });

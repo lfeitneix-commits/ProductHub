@@ -34,9 +34,10 @@ export default async function handler(req, res) {
   };
   // 1) Queda guardada en la base (Gestión la lista) y 2) se publica en Teams. Alcanza con que una de las dos funcione.
   let guardada = false, enTeams = false;
+  const notaId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   if (hayBase()) {
     try {
-      const nota = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), producto: id, productoNombre: nombre, texto, fecha: new Date().toISOString(), autor: s.email, autorNombre: s.nombre || "" };
+      const nota = { id: notaId, producto: id, productoNombre: nombre, texto, fecha: new Date().toISOString(), autor: s.email, autorNombre: s.nombre || "" };
       await agregarNota(nota); guardada = true;
     } catch (e) { console.error(e); }
   }
@@ -50,5 +51,5 @@ export default async function handler(req, res) {
     } catch (e) { console.error(e); }
   }
   if (!guardada && !enTeams) return res.status(502).json({ error: "No pudimos enviar la nota" });
-  return res.status(200).json({ ok: true, guardada, enTeams });
+  return res.status(200).json({ ok: true, id: notaId, guardada, enTeams });
 }
