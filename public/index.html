@@ -1994,7 +1994,7 @@ async function notaResolver(id, resuelta, b){
 }
 /* Uso del Hub en Gestión: qué fichas se miran, qué one pagers se abren o se envían y qué se suma a propuestas. */
 function usoHTML(){
-  if (S.uso === undefined) { S.uso = null; fetch("api/uso", {cache:"no-store", credentials:"same-origin"}).then(r => r.ok ? r.json() : {uso:{}}).catch(() => ({uso:{}})).then(j => { S.uso = (j && j.uso) || {}; if (route() === "gestion") softRender(); }); }
+  if (S.uso === undefined) { S.uso = null; fetch("api/datos?uso=1", {cache:"no-store", credentials:"same-origin"}).then(r => r.ok ? r.json() : {uso:{}}).catch(() => ({uso:{}})).then(j => { S.uso = (j && j.uso) || {}; if (route() === "gestion") softRender(); }); }
   const meses = Object.keys(S.uso || {}).sort().reverse(), mes = S.usoMes && meses.includes(S.usoMes) ? S.usoMes : meses[0];
   const nomMes = m => { const [y, n] = m.split("-"); const t = new Date(+y, +n - 1, 1).toLocaleDateString("es-AR", {month:"long", year:"numeric"}); return t.charAt(0).toUpperCase() + t.slice(1); };
   let cuerpo;
@@ -2290,7 +2290,7 @@ function usoEnviar(){
   let u; try { u = JSON.parse(localStorage.getItem(USO_KEY) || "{}"); } catch(_) { return; }
   if (!u.ev || !Object.keys(u.ev).length || Date.now() - (u.ultimo || 0) < 20*3600*1000) return;
   const ev = u.ev;
-  fetch("api/uso", {method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body: JSON.stringify({eventos: ev})})
+  fetch("api/datos", {method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body: JSON.stringify({accion:"uso", eventos: ev})})
     .then(r => { if (!r.ok) return; let a; try { a = JSON.parse(localStorage.getItem(USO_KEY) || "{}"); } catch(_) { a = {}; }
       const resto = a.ev || {}; Object.entries(ev).forEach(([id,c]) => { if (!resto[id]) return; Object.keys(c).forEach(k => { resto[id][k] = (resto[id][k]||0) - c[k]; if (resto[id][k] <= 0) delete resto[id][k]; }); if (!Object.keys(resto[id]).length) delete resto[id]; });
       try { localStorage.setItem(USO_KEY, JSON.stringify({ultimo: Date.now(), ev: resto})); } catch(_) {} })

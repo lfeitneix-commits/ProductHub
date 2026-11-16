@@ -153,7 +153,7 @@ En Gestión tiene que aparecer "Base de datos conectada".
 ## Uso del Hub (Gestión)
 "Uso del Hub" muestra por mes qué fichas se miran, qué one pagers se abren o descargan, qué se envía por WhatsApp o mail
 y qué se suma a propuestas o presentaciones. Son totales por producto, sin datos de quién.
-Cada navegador junta lo que usó y lo manda una vez por día (`api/uso.js`, archivo privado `datos/uso.json`),
+Cada navegador junta lo que usó y lo manda una vez por día (`api/datos.js` con `accion: "uso"`, archivo privado `datos/uso.json`),
 para no gastar las escrituras del plan gratis de Vercel Blob. Por eso los números aparecen de un día para el otro.
 
 ## Resumen semanal en Teams
@@ -161,3 +161,5 @@ Los lunes a las 9 (Argentina), Vercel Cron llama a `api/resumen.js` (ver `vercel
 fichas vencidas o fichas que vencen en los próximos 7 días, publica un resumen en el mismo canal de Teams de las notas.
 Si no hay nada para informar, no manda nada. Usa `TEAMS_WEBHOOK_URL`.
 Opcional: `CRON_SECRET` en Vercel (un texto largo al azar) para que solo Vercel Cron pueda llamarla.
+
+Ojo: el plan Hobby de Vercel permite hasta 12 funciones en `api/`. Hoy hay 12; para sumar otra, hay que unirla con una existente.
