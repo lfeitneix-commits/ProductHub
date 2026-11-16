@@ -243,6 +243,8 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 .nueva-ver{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:70;display:flex;align-items:center;gap:14px;background:var(--sel);color:var(--sel-ink);padding:10px 12px 10px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:13.5px;max-width:calc(100% - 32px)}
 .nueva-ver .btn.primary{background:#fff;color:#1F1E1C;border-color:#fff}
 @media (min-width:900px){.nueva-ver{bottom:24px}}
+.pz-tools{display:flex;gap:8px;align-items:center;margin-bottom:10px}.pz-search{flex:1;margin:0}.pz-search .input{padding-top:9px;padding-bottom:9px}
+.pz-list label[hidden],.pz-list .cat[hidden]{display:none!important}
 .dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
 .busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
 @media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
@@ -696,7 +698,7 @@ function render(anim){
   footer(r);
   if (r === "simuladores") calcSim();
   if (r === "propuesta") refreshPreview();
-  if (r === "presentaciones") refreshDeck();
+  if (r === "presentaciones") { refreshDeck(); pzFiltrar(); }
 }
 /* Pie interno: solo la sesión (quién entró y Salir). El "Hablemos" con datos de contacto no hace falta en una herramienta interna. */
 function footer(r){
@@ -1575,6 +1577,18 @@ const AREAS = {"Banca Privada":"bancaprivada@neix.com.ar","Banca Corporativa":"b
 const PZ_SUG = [["Tesorería corporativa",["cauciones","fci","fondo-dedicado"]],["Financiamiento pyme",["cheques","pagares","avales-sgr","facturas-fce"]],["Cobertura cambiaria",["futuros-dolar","bonos-cer-dl","pricing-fx"]],["Dolarizar e invertir afuera",["t-bills","cedears","cuentas-offshore","operatoria-internacional"]]];
 S.pz = {titulo:"Soluciones de inversión y financiamiento", bajada:"Banca Corporativa · Banca Privada · Financial Advisors", cliente:"", inst:true, asesor:"", mail:"", tel:"", area:"", items:[]};
 try { const sv = JSON.parse(localStorage.getItem("neix-hub-pz")||"null"); if (sv) Object.assign(S.pz, sv); } catch(e) {}
+/* Buscador de productos en Presentaciones: oculta los que no coinciden y las categorías vacías. */
+function pzFiltrar(){
+  const q = sinAcento((S.pzQ || "").trim()), list = $(".pz-list"); if (!list) return;
+  let vis = 0, cat = null, catVis = 0;
+  const cerrar = () => { if (cat) cat.hidden = !catVis; };
+  [...list.children].forEach(el => {
+    if (el.classList.contains("cat")) { cerrar(); cat = el; catVis = 0; return; }
+    if (el.tagName !== "LABEL") return;
+    const ok = !q || q.split(/\s+/).every(w => el.dataset.q.includes(w)); el.hidden = !ok; if (ok) { vis++; catVis++; }
+  });
+  cerrar(); const n = list.querySelector(".pz-nada"); if (n) n.hidden = vis > 0;
+}
 function pzSave(){ try { localStorage.setItem("neix-hub-pz", JSON.stringify(S.pz)); } catch(e) {} }
 function vPresentaciones(){
   const P = S.pz, byCat = {};
@@ -1594,8 +1608,8 @@ function vPresentaciones(){
     <label class="f" for="pz_tel">Teléfono<input class="input" id="pz_tel" data-pz="tel" type="tel" value="${esc(P.tel||"")}" placeholder="+54 9 11 …"></label>
     <label class="f" for="pz_area">Área<select class="input" id="pz_area"><option value="">Elegir área</option>${Object.keys(AREAS).map(a=>`<option ${P.area===a?"selected":""}>${esc(a)}</option>`).join("")}</select><span class="hint">Si elegís tu nombre de la lista, se completan mail, teléfono y área.</span></label></div>
    <div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><h3 style="margin:0">Productos</h3><span class="tiny muted">${P.items.length} elegidos</span></div>
-    <div class="chips" style="margin-bottom:10px">${PZ_SUG.map(([n,ids],i)=>`<button class="chip" data-act="pzSug" data-v="${i}">${esc(n)}</button>`).join("")}${S.prop.items.length?`<button class="chip" data-act="pzProp">Usar los de mi propuesta (${S.prop.items.length})</button>`:""}${P.items.length?`<button class="chip" data-act="pzClear">Limpiar</button>`:""}</div>
-    <div class="pz-list">${cats.map(c=>`<div class="cat">${esc(c)}</div>${byCat[c].map(p=>`<label><input type="checkbox" data-pzp="${p.id}" ${P.items.includes(p.id)?"checked":""}> ${esc(p.nombre)}</label>`).join("")}`).join("")}</div></div>
+    <div class="pz-tools"><div class="search pz-search">${ico("_search")}<input class="input" id="pz_q" type="search" placeholder="Buscá un producto" value="${esc(S.pzQ||"")}" aria-label="Buscar productos" autocomplete="off"></div>${P.items.length?`<button class="chip" data-act="pzClear">Limpiar</button>`:""}</div>
+    <div class="pz-list">${cats.map(c=>`<div class="cat">${esc(c)}</div>${byCat[c].map(p=>`<label data-q="${esc(sinAcento(p.nombre+" "+p.categoria+" "+p.cliente.titular))}"><input type="checkbox" data-pzp="${p.id}" ${P.items.includes(p.id)?"checked":""}> ${esc(p.nombre)}</label>`).join("")}`).join("")}<p class="tiny muted pz-nada" hidden>No hay productos con esa búsqueda.</p></div></div>
   </div><div style="min-width:0"><div class="paper-label"><span id="pzCount">Vista previa</span><span class="tiny">16:9 · formato Neix</span></div><div id="deck" class="slides"></div></div></div>`;
 }
 function slideFoot(n){ return `<div class="ft"><span>NEIX S.A. · ALyC Propio N° 145 CNV · ACyDI FCI N° 14 CNV</span><span>${n}</span></div>`; }
@@ -1873,6 +1887,7 @@ document.addEventListener("input", e => {
     calcSim(); }
   else if (t.dataset.money) { S.simv[S.sim][t.dataset.s] = formatearMonto(t); calcSim(); }
   else if (t.dataset.s && t.type!=="checkbox" && t.tagName!=="SELECT") { S.simv[S.sim][t.dataset.s] = t.value; calcSim(); }
+  else if (t.id === "pz_q") { S.pzQ = t.value; pzFiltrar(); }
   else if (t.dataset.pz) { S.pz[t.dataset.pz] = t.value;
     if (t.dataset.pz==="asesor") { const a = findAsesor(t.value); if (a && t.value !== a.nombre) { t.value = S.pz.asesor = a.nombre; } if (a) { S.pz.mail = a.mail || ""; S.pz.tel = a.tel || ""; const m = $("#pz_mail"), te = $("#pz_tel"); if (m) m.value = S.pz.mail; if (te) te.value = S.pz.tel; } if (a && AREAS[a.area]) { S.pz.area = a.area; const sel = $("#pz_area"); if (sel) sel.value = a.area; } }
     pzSave(); refreshDeck(); }
