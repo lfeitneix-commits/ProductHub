@@ -1821,11 +1821,10 @@ async function archivoOP(p){
 function abrirEnvio(canal, tipo, id){
   const p = tipo === "op" ? S.byId[id] : null; if (tipo === "op" && !p) return;
   const P = tipo === "pz" ? S.pz : S.prop, nombre = P.cliente && tipo === "prop" ? P.cliente.split(" ")[0] : "";
-  const firma = tipo === "prop" && P.asesor && canal === "wa" ? `\n\n${P.asesor}` : ""; // en el mail la firma la pone Outlook
   const msg = tipo === "op"
     ? `Hola, te comparto el one pager de ${p.nombre}: ${p.cliente.titular.charAt(0).toLowerCase()+p.cliente.titular.slice(1)}. Si te interesa, lo vemos con tus números.`
-    : tipo === "pz" ? `Hola, te comparto la presentación de Neix${P.cliente?" para "+P.cliente.trim().replace(/\.+$/,""):""}. Cualquier duda, me escribís.${firma}`
-    : `Hola${nombre?" "+nombre:""}, te comparto la propuesta que armamos a partir de lo que conversamos. Cualquier duda, me escribís.${firma}`;
+    : tipo === "pz" ? `Hola, te comparto la presentación de Neix${P.cliente?" para "+P.cliente.trim().replace(/\.+$/,""):""}. Cualquier duda, me escribís.`
+    : `Hola${nombre?" "+nombre:""}, te comparto la propuesta que armamos a partir de lo que conversamos. Cualquier duda, me escribís.`;
   const asunto = tipo === "op" ? `${p.nombre} · Neix` : `${tipo === "pz" ? "Presentación" : "Propuesta"} Neix${P.cliente?" para "+P.cliente:""}`;
   const E = S.envio = {canal, tipo, id, asunto, archivo: null};
   const listo = (txt) => { if (S.envio !== E) return; const n = $("#shAtt"); if (n) n.textContent = txt; ["#shSend","#shShare"].forEach(q => { const bt = $(q); if (bt) bt.disabled = false; }); };
