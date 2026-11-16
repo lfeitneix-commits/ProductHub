@@ -766,7 +766,7 @@ function vProducto(id){
    <div style="min-width:0"><div class="units" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px">${units(p)}</div><p class="lead">${esc(p.cliente.titular)}<span>${esc(p.cliente.bajada)}</span></p>
    <div class="btn-row"><button class="btn" data-act="toggleProp" data-id="${p.id}">${ico(inProp?"_check":"_plus")}${inProp?"En la propuesta":"Agregar a propuesta"}</button></div></div></div>
   <div class="p-bar"><div class="seg" role="tablist">${tabs.map(([k,t])=>`<button role="tab" data-act="view" data-v="${k}" aria-pressed="${S.view===k}">${t}</button>`).join("")}</div>
-   <div class="btn-row"><button class="btn" data-act="opVer" data-id="${p.id}">${ico("_prop")}Ver one pager</button>${p.onePager?`<button class="btn" data-act="dlPdf" data-id="${p.id}">${ico("_dl")}Descargar</button>`:`<button class="btn" data-act="dlOnePager" data-id="${p.id}">${ico("_dl")}Descargar</button>`}<button class="btn" data-act="share" data-v="wa" data-k="op" data-id="${p.id}">${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="op" data-id="${p.id}">${ico("_mail")}Mail</button>${p.simulador?`<a class="btn" href="#simuladores" data-act="openSim" data-v="${p.simulador}">${ico("_calc")}Simular</a>`:""}</div></div>
+   <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="op" data-id="${p.id}">${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="op" data-id="${p.id}">${ico("_mail")}Mail</button>${p.simulador?`<a class="btn" href="#simuladores" data-act="openSim" data-v="${p.simulador}">${ico("_calc")}Simular</a>`:""}</div></div>
   ${S.view==="cliente" ? `<div class="p-grid full"><div style="min-width:0">${clienteView(p)}</div></div>` : `<div class="p-grid"><div style="min-width:0">${S.view==="interno"?playbook(p):operativa(p)}</div>${aside(p,e)}</div>`}`;
 }
 function aside(p, e){
@@ -778,7 +778,8 @@ function aside(p, e){
 }
 function facts(f){ return `<dl class="facts">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Monto",f.minimo],["Liquidez",f.liquidez],["Dónde opera",f.mercado]].map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`; }
 function clienteView(p){
-  const o = p.onePager; if (!o) return onePager(p);
+  const o = p.onePager;
+  if (!o) return `<div class="opstrip"><div><b>One pager</b><span>Armado con el contenido de esta ficha</span></div><span class="btn-row"><button class="btn ghost" data-act="opVer" data-id="${p.id}">Ver one pager</button><button class="btn" data-act="dlOnePager" data-id="${p.id}">${ico("_dl")}Descargar PDF</button></span></div>${onePager(p)}`;
   return `<div class="opstrip"><div><b>One pager oficial</b><span>Actualizado ${fdate(o.fecha)}</span></div><span class="btn-row"><button class="btn ghost" data-act="opVer" data-id="${p.id}">Ver one pager</button><button class="btn" data-act="dlPdf" data-id="${p.id}">${ico("_dl")}Descargar PDF</button></span></div>${onePager(p)}`;
 }
 function onePager(p){
