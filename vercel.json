@@ -1,4 +1,3 @@
 {
-  "crons": [{ "path": "/api/resumen", "schedule": "0 12 * * 1" }],
-  "functions": { "api/resumen.js": { "includeFiles": "public/data/productos/**" } }
+  "crons": [{ "path": "/api/resumen", "schedule": "0 12 * * 1" }]
 }

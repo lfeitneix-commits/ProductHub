@@ -5,7 +5,6 @@
 // Sin CRON_SECRET, solo acepta el pedido de Vercel Cron, y nunca publica dos veces el mismo día.
 // La respuesta no muestra datos: solo si publicó o no.
 import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { hayArchivos, leerParaResumen, marcarResumen } from "../lib/datos.js";
 import { origen } from "../lib/auth.js";
 
@@ -14,10 +13,10 @@ const dias = (iso, hoy) => (iso ? Math.round((Date.parse(iso + "T00:00:00Z") - D
 const fecha = (iso) => iso.split("-").reverse().join("/");
 
 async function fichasDelRepo() {
-  const dir = path.join(process.cwd(), "public", "data", "productos");
-  const ids = JSON.parse(await readFile(path.join(dir, "index.json"), "utf8"));
+  // Rutas relativas a este archivo: Vercel incluye solo esos archivos en la función.
+  const ids = JSON.parse(await readFile(new URL("../public/data/productos/index.json", import.meta.url), "utf8"));
   const out = {};
-  await Promise.all(ids.map(async (id) => { try { out[id] = JSON.parse(await readFile(path.join(dir, id + ".json"), "utf8")); } catch {} }));
+  await Promise.all(ids.map(async (id) => { try { out[id] = JSON.parse(await readFile(new URL(`../public/data/productos/${id}.json`, import.meta.url), "utf8")); } catch {} }));
   return out;
 }
 
