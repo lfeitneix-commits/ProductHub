@@ -444,33 +444,64 @@ td:first-child{color:var(--ink)}
 .slides{display:grid;gap:14px}
 .slide-wrap{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;border-radius:10px;box-shadow:0 8px 24px -14px rgba(0,0,0,.35);background:#fff}
 .slide-wrap .sl{position:absolute;top:0;left:0;transform-origin:0 0}
-.sl{width:1280px;height:720px;font-family:"Inter","Helvetica Neue",Arial,sans-serif;color:#2A2927;background:#fff;box-sizing:border-box;overflow:hidden;position:relative}
-.sl.dk{background:radial-gradient(70% 90% at 50% 125%, rgba(196,178,148,.55), transparent 62%) #262523;color:#F3F0EB}
-.sl .lg{position:absolute;top:56px;left:72px;height:22px}
-.sl .tg{position:absolute;top:58px;right:72px;font-size:15px;color:#A9A196}
-.sl .ey{font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:#8C7F6B;font-weight:600}
-.sl.dk .ey{color:#A9A196}
-.sl h1,.sl h2{font-weight:300;letter-spacing:-.025em;margin:0}
-.sl .pad{position:absolute;inset:150px 72px 96px 72px;display:flex;flex-direction:column}
-.sl .kick{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border-radius:999px;padding:8px 18px;font-size:16px;align-self:flex-start}
-.sl .kick::before{content:"";width:7px;height:7px;border-radius:50%;background:#D9CDB8}
-.sl.lt .kick{background:#F4F2EF;color:#2A2927}
-.sl .ft{position:absolute;left:72px;right:72px;bottom:40px;display:flex;justify-content:space-between;font-size:12px;color:#9A9389}
-.sl.dk .ft{color:#A9A196}
-.sl .ben{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:auto}
-.sl .ben div{border-top:1.5px solid #2A2927;padding-top:14px}
-.sl .ben b{display:block;font-weight:500;font-size:20px;margin-bottom:6px}
-.sl .ben span{font-size:16px;color:#6B655D;line-height:1.45}
-.sl .fx{display:grid;grid-template-columns:repeat(4,1fr);margin-top:34px}
-.sl .fx div{border-left:1px solid #E7E3DD;padding:0 20px}.sl .fx div:first-child{border-left:0;padding-left:0}
-.sl .fx dt{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8C7F6B;margin-bottom:6px}
-.sl .fx dd{margin:0;font-size:18px;line-height:1.3}
-.sl .big{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:auto}
-.sl .big b{display:block;font-weight:300;font-size:56px;letter-spacing:-.03em;line-height:1}
-.sl .big span{display:block;font-size:16px;color:#A9A196;margin-top:10px;line-height:1.35}
-.sl .agenda{display:grid;gap:0;margin-top:30px}
-.sl .agenda div{display:grid;grid-template-columns:60px 1fr auto;padding:16px 0;border-top:1px solid #E7E3DD;font-size:22px;align-items:baseline}
-.sl .agenda span{color:#8C7F6B;font-size:15px}
+.sl{width:1280px;height:720px;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#2A2927;background:#F7F5F2;box-sizing:border-box;overflow:hidden;position:relative}
+.sl *{box-sizing:border-box}
+.sl.dk{background:#232323 no-repeat center/100% 100%;color:#F3F0EB}
+.sl .lg{position:absolute;top:50px;right:80px;height:20px}
+.sl .ey{font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:#8C7F6B;font-weight:600}
+.sl.dk .ey{color:#CFC6B8}
+.sl .pf{font-family:"Playfair Display",Georgia,serif;font-weight:400;letter-spacing:-.005em;margin:0}
+.sl .ti{font-size:44px;line-height:1.12}
+.sl .ti::after{content:"";display:block;width:46px;height:1.5px;background:#2A2927;margin-top:22px}
+.sl .pad{position:absolute;left:80px;right:80px;top:104px;bottom:82px;display:flex;flex-direction:column}
+.sl .ft{position:absolute;left:80px;right:80px;bottom:38px;display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#9A9389}
+.sl.dk .ft{color:#A39A8E}
+.sl .lead{font-size:16.5px;line-height:1.6;color:#4A4640;max-width:74ch;margin:22px 0 0}
+.sl.dk .lead{color:#E6E1D9}
+.sl .nota{margin-top:auto;background:#fff;border-left:2px solid #2A2927;padding:13px 22px;font-size:13.5px;line-height:1.5;color:#4A4640}
+.sl .nota b{display:block;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#8C7F6B;font-weight:600;margin-bottom:5px}
+.sl .cov{position:absolute;left:80px;right:80px;bottom:92px}
+.sl .cov h1{font-size:92px;line-height:1.02;margin:18px 0 22px}
+.sl .conf{position:absolute;left:80px;bottom:38px;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#CFC6B8}
+.sl .toc{margin-top:46px;border-bottom:1px solid #DCD6CD}
+.sl .toc>div{display:grid;grid-template-columns:76px 1fr auto;align-items:baseline;padding:26px 0;border-top:1px solid #DCD6CD}
+.sl .toc i{font-family:"Playfair Display",Georgia,serif;font-size:24px;color:#8C7F6B}
+.sl .toc b{display:block;font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:27px;margin-bottom:6px}
+.sl .toc span{font-size:14.5px;color:#6B655D}
+.sl .toc em{font-style:normal;font-size:12.5px;letter-spacing:.18em;color:#9A9389}
+.sl .cif{display:grid;grid-template-columns:repeat(3,1fr);gap:40px 56px;margin-top:52px}
+.sl .cif div{border-top:1px solid #CFC8BD;padding-top:20px}
+.sl .cif b{display:block;font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:52px;line-height:1.05}
+.sl .cif span{display:block;font-size:13.5px;color:#6B655D;margin-top:8px}
+.sl .cols{display:grid;gap:36px;margin-top:auto}
+.sl .cols h3{font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:21px;color:#004836;border-top:1.5px solid #004836;padding-top:14px;margin:0 0 10px}
+.sl .cols p{font-size:14.5px;line-height:1.55;color:#4A4640;margin:0}
+.sl .qs{display:grid;grid-template-columns:1fr 470px;gap:64px;position:absolute;inset:0}
+.sl .qs .lft{padding:104px 0 96px 80px;display:flex;flex-direction:column}
+.sl .qs .lft p{font-size:16.5px;line-height:1.65;color:#4A4640;margin:0 0 16px}
+.sl .qs .rgt{background:#232323 no-repeat center/100% 100%;color:#F3F0EB;display:flex;flex-direction:column;justify-content:flex-end;padding:0 56px 96px}
+.sl .qs .rgt img{height:24px;align-self:flex-start;margin-bottom:28px}
+.sl .lst{margin-top:40px;display:grid;grid-auto-flow:column;column-gap:56px}
+.sl .lst>div{display:grid;grid-template-columns:48px 1fr;align-items:baseline;padding:13px 0;border-bottom:1px solid #DCD6CD}
+.sl .lst i{font-family:"Playfair Display",Georgia,serif;font-size:17px;color:#8C7F6B}
+.sl .lst b{font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:19px}
+.sl .lst span{display:block;font-size:13px;color:#6B655D;margin-top:3px}
+.sl .prd{display:grid;grid-template-columns:150px 1fr;margin-top:10px}
+.sl .prd .num{font-family:"Playfair Display",Georgia,serif;font-size:88px;line-height:.9;color:#D6CFC5}
+.sl .prd h2{font-size:38px;line-height:1.1;padding-top:24px}
+.sl .prd .lead{font-size:15px;line-height:1.55;margin-top:12px}
+.sl .fx{display:grid;grid-template-columns:repeat(4,1fr);margin:18px 0 0 150px}
+.sl .fx div{padding:0 18px;border-left:1px solid #DCD6CD}.sl .fx div:first-child{padding-left:0;border-left:0}
+.sl .fx dt{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#8C7F6B;font-weight:600;margin-bottom:6px}
+.sl .fx dd{margin:0;font-family:"Playfair Display",Georgia,serif;font-size:18px;line-height:1.25}
+.sl .ben{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin:18px 0 14px 150px;padding-top:14px;border-top:1px solid #2A2927}
+.sl .ben b{display:block;font-weight:600;font-size:14px;margin-bottom:5px}
+.sl .ben span{font-size:13px;color:#5E5850;line-height:1.5}
+.sl .fin{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.sl .fin img{height:30px;margin-bottom:22px}
+.sl .fin .ct{margin-top:26px;font-size:15px;line-height:1.75;color:#E6E1D9}
+.sl a.web{color:inherit;text-decoration:none}
+.sl .leg{position:absolute;left:120px;right:120px;bottom:36px;font-size:9.5px;line-height:1.55;color:#B5AC9F;text-align:center;margin:0}
 @media (max-width:900px){.pz-grid,.cart{grid-template-columns:minmax(0,1fr)}.cart svg{margin:0 auto}}
 /* Hablemos */
 .xfoot{background:radial-gradient(60% 140% at 80% -30%, rgba(196,178,148,.28), transparent 60%) var(--dark);color:var(--dark-ink);margin-top:88px}
@@ -1620,31 +1651,93 @@ function vPresentaciones(){
     <div class="pz-list">${cats.map(c=>`<div class="cat">${esc(c)}</div>${byCat[c].map(p=>`<label data-q="${esc(sinAcento(p.nombre+" "+p.categoria+" "+p.cliente.titular))}"><input type="checkbox" data-pzp="${p.id}" ${P.items.includes(p.id)?"checked":""}> ${esc(p.nombre)}</label>`).join("")}`).join("")}<p class="tiny muted pz-nada" hidden>No hay productos con esa búsqueda.</p></div></div>
   </div><div style="min-width:0"><div class="paper-label"><span id="pzCount">Vista previa</span><span class="tiny">16:9 · formato Neix</span></div><div id="deck" class="slides"></div></div></div>`;
 }
-function slideFoot(n){ return `<div class="ft"><span>NEIX S.A. · ALyC Propio N° 145 CNV · ACyDI FCI N° 14 CNV</span><span>${n}</span></div>`; }
+/* Presentación con el diseño de los one pagers (banda gris con halo arena, títulos en Playfair)
+   y la estructura de las presentaciones comerciales: portada, contenido, Neix, propuesta por producto y cierre. */
+function haloSlide(){
+  if (S._haloSl) return S._haloSl;
+  const w = 640, ht = 360, c = document.createElement("canvas"); c.width = w; c.height = ht;
+  const g = c.getContext("2d"), img = g.createImageData(w, ht), d = img.data;
+  const cx = 0.5 * w, cy = ht + 0.042 * w, rx = 0.5 * w, ry = 0.128 * w * 1.6, A = [143.6, 129.0, 108.1];
+  for (let y = 0; y < ht; y++) for (let x = 0; x < w; x++) {
+    const k = Math.exp(-(((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2)), o = (y * w + x) * 4;
+    d[o] = 35 + A[0] * k; d[o+1] = 35 + A[1] * k; d[o+2] = 35 + A[2] * k; d[o+3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  return (S._haloSl = c.toDataURL("image/png"));
+}
+/* Título en dos líneas, la segunda en itálica: "Soluciones de inversión / *y financiamiento*". */
+function tituloPF(t){
+  const w = String(t||"").trim().split(/\s+/).filter(Boolean); if (w.length < 2) return esc(t||"");
+  let best = 1, dif = 1e9; const tot = w.join(" ").length;
+  for (let i = 1; i < w.length; i++) { const a = w.slice(0,i).join(" ").length, d = Math.abs(a - (tot - a)); if (d < dif) { dif = d; best = i; } }
+  return `${esc(w.slice(0,best).join(" "))}<br><em>${esc(w.slice(best).join(" "))}</em>`;
+}
 function deckSlides(){
   const P = S.pz, items = P.items.map(id=>S.byId[id]).filter(Boolean), out = [];
-  const fecha = new Date().toLocaleDateString("es-AR",{month:"long",year:"numeric"});
-  out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><div class="pad" style="justify-content:flex-end;padding-bottom:30px"><div class="ey">${esc(P.cliente?("Para "+P.cliente):"Presentación")} · ${esc(fecha)}</div><h1 style="font-size:84px;line-height:1.02;margin-top:22px;max-width:15ch">${esc(P.titulo||"Neix")}</h1><p style="font-size:22px;color:#A9A196;margin:22px 0 0">${esc(P.bajada)}</p>${P.asesor?`<p style="font-size:17px;margin-top:28px">${esc(P.asesor)}${P.area?" · "+esc(P.area):""}</p>`:""}</div></div>`);
-  if (P.inst) {
-    out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><span class="tg">Quiénes somos</span><div class="pad"><span class="kick">Neix</span><h2 style="font-size:52px;line-height:1.1;margin-top:26px;max-width:22ch">Una ALyC boutique que acompaña a familias, empresas e inversores desde hace 18 años.</h2>
-     <div class="big"><div><b>18</b><span>años en el mercado de capitales</span></div><div><b>Top 5</b><span>en ByMA</span></div><div><b>Top 10</b><span>en A3 Mercados</span></div><div><b>7°</b><span>año consecutivo Great Place to Work</span></div></div></div>${slideFoot("")}</div>`);
-    out.push(`<div class="sl lt"><img class="lg" src="${LOGO_DARK}" alt="NEIX"><span class="tg" style="color:#9A9389">Cómo trabajamos</span><div class="pad"><span class="kick">Unidades de negocio</span><h2 style="font-size:46px;margin-top:22px">Cuatro equipos, una misma forma de trabajar.</h2>
-     <div class="ben" style="grid-template-columns:repeat(4,1fr)"><div><b>Banca Privada</b><span>Wealth management para familias y patrimonios, local e internacional.</span></div><div><b>Banca Corporativa</b><span>Financiamiento, tesorería y cobertura para empresas.</span></div><div><b>Financial Advisors</b><span>Plataforma y respaldo para asesores independientes.</span></div><div><b>Mercado de Capitales</b><span>Mesa propia, market making y ejecución en ByMA, A3 y MAV.</span></div></div></div>${slideFoot("")}</div>`);
+  const fecha = new Date().toLocaleDateString("es-AR",{day:"numeric",month:"long",year:"numeric"});
+  const area = P.area && P.area !== "Estrategia" ? P.area.replace("Mesa · ","") : "";
+  const pie = ["Neix", area || "Inteligencia Financiera", P.cliente].filter(Boolean).join(" · ");
+  const foot = `<div class="ft"><span>${esc(pie)}</span><span>%%N%%</span></div>`;
+  const halo = `style="background-image:url(${haloSlide()})"`;
+  const dk = (h, cls="") => `<div class="sl dk ${cls}" ${halo}><img class="lg" src="${LOGO_LIGHT}" alt="NEIX">${h}</div>`;
+  const lt = h => `<div class="sl lt"><img class="lg" src="${LOGO_DARK}" alt="NEIX">${h}${foot}</div>`;
+  const pad2 = n => String(n).padStart(2,"0");
+  const verToc = P.inst || items.length > 1, verLista = items.length > 1;
+  const nInst = P.inst ? 4 : 0, iniInst = 2 + (verToc?1:0), iniProp = iniInst + nInst, nProp = (P.inst?1:0) + (verLista?1:0) + items.length;
+
+  out.push(dk(`<div class="cov"><div class="ey">${esc(area || "Neix · Inteligencia Financiera")}</div><h1 class="pf">${tituloPF(P.titulo)}</h1>
+    ${P.bajada?`<p class="lead" style="margin:0;font-size:18px">${esc(P.bajada)}</p>`:""}</div>
+    <div class="conf">${esc([P.cliente?"Preparado para "+P.cliente:"Presentación", fecha].join(" · "))}</div>`));
+
+  if (verToc) {
+    const filas = [];
+    if (P.inst) filas.push(["I","Neix","Quiénes somos, cifras relevantes y cómo trabajamos.",[iniInst, iniInst+nInst-1]]);
+    filas.push([P.inst?"II":"I", items.length>1?"La propuesta":esc(items[0].nombre), items.length>1?items.map(p=>p.nombre).join(", ")+".":esc(items[0].cliente.titular||""), [iniProp, iniProp+nProp-1]]);
+    out.push(lt(`<div class="pad"><h2 class="pf ti">Contenido</h2>
+      <div class="toc">${filas.map(f=>`<div><i>${f[0]}</i><div><b>${f[1]}</b><span>${esc(f[2])}</span></div><em>${pad2(f[3][0])} — ${pad2(f[3][1])}</em></div>`).join("")}</div>
+      ${P.cliente||P.asesor?`<div class="nota">${esc(`Material preparado${P.cliente?" para "+P.cliente:""}${P.asesor?" por "+P.asesor:""}${area?", "+area+" de Neix":""}.`)}</div>`:""}</div>`));
   }
-  if (items.length > 1) out.push(`<div class="sl lt"><img class="lg" src="${LOGO_DARK}" alt="NEIX"><div class="pad"><span class="kick">Agenda</span><h2 style="font-size:46px;margin-top:22px">Lo que vamos a ver</h2><div class="agenda">${items.map((p,i)=>`<div><span>${String(i+1).padStart(2,"0")}</span>${esc(p.nombre)}<span>${esc(p.categoria)}</span></div>`).join("")}</div></div>${slideFoot("")}</div>`);
-  items.forEach(p => { const c = p.cliente, f = c.ficha;
-    out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><span class="tg">${esc(p.unidades[0])}</span><div class="pad" style="justify-content:flex-end;padding-bottom:20px"><span class="kick">${esc(p.categoria)}</span><h2 style="font-size:72px;line-height:1.04;margin-top:24px;max-width:16ch">${esc(p.nombre)}</h2><p style="font-size:24px;color:#F3F0EB;margin:22px 0 0;max-width:40ch;font-weight:400">${esc(c.titular)}</p></div></div>`);
-    out.push(`<div class="sl lt"><img class="lg" src="${LOGO_DARK}" alt="NEIX"><span class="tg" style="color:#9A9389">${esc(p.nombre)}</span><div class="pad"><p style="font-size:24px;line-height:1.45;margin:0;max-width:52ch;color:#2A2927">${esc(c.queEs)}</p>
-     <dl class="fx">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Dónde opera",f.mercado]].map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
-     <div class="ben">${c.beneficios.slice(0,3).map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div></div>${slideFoot("")}</div>`); });
-  const mail = P.area ? AREAS[P.area] : "info@neix.com.ar";
-  out.push(`<div class="sl dk"><img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><div class="pad" style="justify-content:flex-end"><h2 style="font-size:92px">Hablemos.</h2>
-   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:44px;font-size:19px">${P.asesor?`<div><div class="ey">Tu asesor</div><div style="margin-top:8px">${[P.asesor ? esc(P.asesor) : "", P.mail ? mailLink(P.mail) : "", P.tel ? telLink(P.tel) : ""].filter(Boolean).join("<br>")}</div></div>`:""}<div><div class="ey">Contacto</div><div style="margin-top:8px">(011) 4859-1552<br>${esc(mail)}</div></div><div><div class="ey">Oficinas</div><div style="margin-top:8px">Don Francisco 3345, piso 5<br>San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div></div>
-   <p style="font-size:12px;color:#A9A196;margin-top:40px">${esc(LEYENDA)}</p></div></div>`);
-  return out;
+
+  if (P.inst) {
+    out.push(dk(`<div class="cov"><div class="ey">Parte I</div><h1 class="pf" style="font-size:80px">NEIX<br><em>Inteligencia Financiera</em></h1>
+      <p class="lead" style="margin:0;max-width:52ch">Una ALyC con perfil bancario, foco en empresas, familias e inversores, y estándares de compliance de primera línea.</p></div>${foot}`));
+    out.push(`<div class="sl lt"><div class="qs"><div class="lft"><h2 class="pf ti" style="margin-bottom:34px">Quiénes <em>somos</em></h2>
+      <p>NEIX nace en 2008 como Sociedad de Bolsa y opera como Agente de Liquidación y Compensación bajo regulación de la Comisión Nacional de Valores de la Argentina.</p>
+      <p>Acompañamos a empresas, individuos y familias, clientes institucionales y Financial Advisors con asesoramiento y ejecución en el mercado financiero local e internacional.</p>
+      <p>Desde 2018 sostenemos una posición de liderazgo en el ranking ByMA, con presencia en ByMA, MAV y A3.</p></div>
+      <div class="rgt" ${halo}><img src="${LOGO_LIGHT}" alt="NEIX"><div class="pf" style="font-size:40px;line-height:1.12">Inteligencia<br><em>Financiera</em></div></div></div>${foot.replace('class="ft"','class="ft" style="right:550px"')}</div>`);
+    out.push(lt(`<div class="pad"><h2 class="pf ti">Cifras <em>relevantes</em></h2>
+      <div class="cif">${[["2008","Año de fundación"],["Top 5","Ranking ByMA, siete años consecutivos"],["+6 trill","Volumen operado por año en ByMA, MAV y A3"],["+70","Colaboradores especializados"],["+5.000","Clientes"],["+USD 1.000 M","Colocaciones en mercado de capitales"]].map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join("")}</div>
+      <div class="nota">Great Place To Work desde 2020. Agente de Liquidación y Compensación registrado ante la CNV bajo el N° 145.</div></div>`));
+    out.push(lt(`<div class="pad"><h2 class="pf ti">Cómo <em>trabajamos</em></h2><p class="lead">Cuatro equipos especializados, con una misma forma de trabajar: asesoramiento cercano y ejecución propia en el mercado.</p>
+      <div class="cols" style="grid-template-columns:repeat(4,1fr);margin-top:64px">${[["Banca Privada","Wealth management para familias y patrimonios, en el mercado local e internacional."],["Banca Corporativa","Financiamiento, tesorería, inversiones y cobertura para empresas y pymes."],["Financial Advisors","Plataforma, operación y respaldo para asesores financieros independientes."],["Mercado de Capitales","Mesa propia, market making y ejecución en ByMA, A3 y MAV."]].map(([a,b])=>`<div><h3>${a}</h3><p>${b}</p></div>`).join("")}</div></div>`));
+  }
+
+  if (P.inst) out.push(dk(`<div class="cov"><div class="ey">Parte II</div><h1 class="pf" style="font-size:80px">La <em>propuesta</em></h1>
+      <p class="lead" style="margin:0;max-width:56ch">${esc(items.length>1?`${items.length} soluciones de Neix${P.cliente?" para "+P.cliente:""}.`:items[0]?items[0].cliente.titular||items[0].nombre:"")}</p></div>${foot}`));
+  if (verLista) {
+    const filas = Math.ceil(items.length / (items.length > 7 ? 2 : 1));
+    out.push(lt(`<div class="pad"><div class="ey" style="margin-bottom:16px">Propuesta</div><h2 class="pf ti">${items.length} líneas de <em>trabajo</em></h2>
+      <div class="lst" style="grid-template-rows:repeat(${filas},auto)">${items.map((p,i)=>`<div><i>${pad2(i+1)}</i><div><b>${esc(p.nombre)}</b>${items.length<=7&&p.cliente.titular?`<span>${esc(p.cliente.titular)}</span>`:""}</div></div>`).join("")}</div></div>`));
+  }
+  items.forEach((p,i) => { const c = p.cliente, f = c.ficha || {};
+    out.push(lt(`<div class="pad"><div class="ey">Propuesta · ${esc(p.categoria)}</div>
+      <div class="prd"><div class="num">${pad2(i+1)}</div><div><h2 class="pf">${esc(p.nombre)}</h2><p class="lead">${esc(c.queEs||c.bajada||"")}</p></div></div>
+      <dl class="fx">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Dónde opera",f.mercado]].filter(x=>x[1]).map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+      <div class="ben">${(c.beneficios||[]).slice(0,3).map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div>
+      ${c.enNeix?`<div class="nota"><b>En Neix</b>${esc(c.enNeix)}</div>`:""}</div>`));
+  });
+
+  const mail = P.mail || (P.area ? AREAS[P.area] : "info@neix.com.ar");
+  out.push(dk(`<div class="fin"><img src="${LOGO_LIGHT}" alt="NEIX" style="height:34px"><div class="pf" style="font-size:30px">Inteligencia <em>Financiera</em></div>
+    <div class="ey" style="margin-top:20px">${esc(area || "Neix")}</div>
+    <div class="ct">${[P.asesor?esc(P.asesor):"", mailLink(mail), P.tel?telLink(P.tel):"", "P8 Buenavista, Uruguay 6901, piso 5", "San Fernando, Provincia de Buenos Aires", `<a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a>`].filter(Boolean).join("<br>")}</div></div>
+    <p class="leg">${esc(LEYENDA)}</p>`));
+  return out.map((h,i) => h.replace("%%N%%", pad2(i+1)));
 }
 function refreshDeck(){
   const d = $("#deck"); if (!d) return;
+  if (!S._pzFont) { S._pzFont = 1; cpdFuentes().then(() => { S._haloSl = ""; refreshDeck(); }); }
   if (!S.pz.items.length) { d.innerHTML = `<div class="empty" style="background:var(--surface)">Elegí productos o empezá con una de las selecciones sugeridas.</div>`; const n=$("#pzCount"); if(n) n.textContent="Vista previa"; return; }
   const sl = deckSlides(); d.innerHTML = sl.map(h=>`<div class="slide-wrap">${h}</div>`).join("");
   const n = $("#pzCount"); if (n) n.textContent = `Vista previa · ${sl.length} diapositivas`;
@@ -1781,7 +1874,7 @@ async function pzPDF(){
   try {
     await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
     await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
-    try { await document.fonts.ready; } catch(_) {}
+    await cpdFuentes();
     const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0;width:1280px"; document.body.appendChild(host);
     const pdf = new window.jspdf.jsPDF({orientation:"landscape", unit:"px", format:[1280,720], hotfixes:["px_scaling"]});
     const sl = deckSlides();
