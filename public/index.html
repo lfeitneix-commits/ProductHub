@@ -1614,8 +1614,8 @@ const findAsesor = n => { const k = normNom(n); return k ? (S.asesores||[]).find
 const asesoresList = () => `<datalist id="asesoresList">${(S.asesores||[]).map(a=>`<option value="${esc(a.nombre)}">${esc(a.area||"")}</option>`).join("")}</datalist>`;
 const AREAS = {"Banca Privada":"bancaprivada@neix.com.ar","Banca Corporativa":"bancacorporativa@neix.com.ar","Financial Advisors":"fas@neix.com.ar","Mesa · Mercado de Capitales":"info@neix.com.ar","Estrategia":"info@neix.com.ar"};
 const PZ_SUG = [["Tesorería corporativa",["cauciones","fci","fondo-dedicado"]],["Financiamiento pyme",["cheques","pagares","avales-sgr","facturas-fce"]],["Cobertura cambiaria",["futuros-dolar","bonos-cer-dl","pricing-fx"]],["Dolarizar e invertir afuera",["t-bills","cedears","cuentas-offshore","operatoria-internacional"]]];
-S.pz = {titulo:"Soluciones de inversión y financiamiento", bajada:"Banca Corporativa · Banca Privada · Financial Advisors", cliente:"", inst:true, asesor:"", mail:"", tel:"", area:"", items:[]};
-try { const sv = JSON.parse(localStorage.getItem("neix-hub-pz")||"null"); if (sv) Object.assign(S.pz, sv); } catch(e) {}
+S.pz = {titulo:"Soluciones de inversión y financiamiento", bajada:"Banca Corporativa · Banca Privada · Financial Advisors · Mercado de Capitales", cliente:"", inst:true, asesor:"", mail:"", tel:"", area:"", items:[]};
+try { const sv = JSON.parse(localStorage.getItem("neix-hub-pz")||"null"); if (sv) { if (sv.bajada === "Banca Corporativa · Banca Privada · Financial Advisors") delete sv.bajada; Object.assign(S.pz, sv); } } catch(e) {}
 /* Buscador de productos en Presentaciones: oculta los que no coinciden y las categorías vacías. */
 function pzFiltrar(){
   const q = sinAcento((S.pzQ || "").trim()), list = $(".pz-list"); if (!list) return;
