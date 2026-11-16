@@ -1821,7 +1821,7 @@ async function archivoOP(p){
 function abrirEnvio(canal, tipo, id){
   const p = tipo === "op" ? S.byId[id] : null; if (tipo === "op" && !p) return;
   const P = tipo === "pz" ? S.pz : S.prop, nombre = P.cliente && tipo === "prop" ? P.cliente.split(" ")[0] : "";
-  const firma = tipo !== "op" && P.asesor && canal === "wa" ? `\n\n${P.asesor}` : ""; // en el mail la firma la pone Outlook
+  const firma = tipo === "prop" && P.asesor && canal === "wa" ? `\n\n${P.asesor}` : ""; // en el mail la firma la pone Outlook
   const msg = tipo === "op"
     ? `Hola, te comparto el one pager de ${p.nombre}: ${p.cliente.titular.charAt(0).toLowerCase()+p.cliente.titular.slice(1)}. Si te interesa, lo vemos con tus números.`
     : tipo === "pz" ? `Hola, te comparto la presentación de Neix${P.cliente?" para "+P.cliente.trim().replace(/\.+$/,""):""}. Cualquier duda, me escribís.${firma}`
