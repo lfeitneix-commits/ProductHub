@@ -1242,15 +1242,21 @@ function vSimuladores(){
   <div class="seg" style="margin-bottom:16px">${tabs.map(([k,t])=>`<button data-act="sim" data-v="${k}" aria-pressed="${S.sim===k}">${t}</button>`).join("")}</div>
   <div class="sim"><div class="panel stack" id="simForm">${simForm()}</div><div id="simOut" style="min-width:0"></div></div>`;
 }
-/* Montos en pesos: se escriben con puntos de miles (80.000.000) y se guardan como número. */
-const moneyF = (id, l, v, hint) => `<label class="f" for="s_${id}">${l}<input class="input num" id="s_${id}" data-s="${id}" data-money="1" type="text" inputmode="numeric" autocomplete="off" value="${fmt(+v||0)}">${hint?`<span class="hint">${hint}</span>`:""}</label>`;
+/* Montos en pesos: se escriben con puntos de miles y coma decimal (80.000.000,50) y se guardan como número.
+   Si se escribe un punto al final (teclados con punto decimal), se toma como coma. */
+const fmtMonto = v => { v = +v || 0; return fmt(v, Number.isInteger(v) ? 0 : 2); };
+const moneyF = (id, l, v, hint) => `<label class="f" for="s_${id}">${l}<input class="input num" id="s_${id}" data-s="${id}" data-money="1" type="text" inputmode="decimal" autocomplete="off" value="${fmtMonto(v)}">${hint?`<span class="hint">${hint}</span>`:""}</label>`;
 function formatearMonto(t){
-  const pos = t.selectionStart || 0, digAntes = t.value.slice(0, pos).replace(/\D/g, "").length;
-  const dig = t.value.replace(/\D/g, "").replace(/^0+(?=\d)/, "").slice(0, 15);
-  t.value = dig ? fmt(+dig) : "";
-  let i = 0, n = 0; while (i < t.value.length && n < digAntes) { if (/\d/.test(t.value[i])) n++; i++; }
+  let v = t.value; const pos = t.selectionStart ?? v.length;
+  if (/\.$/.test(v) && !v.includes(",")) v = v.slice(0, -1) + ",";
+  const signif = str => str.replace(/[^\d,]/g, "").length;   // dígitos y coma antes del cursor
+  const antes = signif((t.value.endsWith(".") && pos === t.value.length ? v : t.value).slice(0, pos));
+  const coma = v.indexOf(","), ent = (coma < 0 ? v : v.slice(0, coma)).replace(/\D/g, "").replace(/^0+(?=\d)/, "").slice(0, 15);
+  const dec = coma < 0 ? "" : v.slice(coma + 1).replace(/\D/g, "").slice(0, 2);
+  t.value = coma < 0 ? (ent ? fmt(+ent) : "") : (ent ? fmt(+ent) : "0") + "," + dec;
+  let i = 0, n = 0; while (i < t.value.length && n < antes) { if (/[\d,]/.test(t.value[i])) n++; i++; }
   try { t.setSelectionRange(i, i); } catch(_) {}
-  return dig ? +dig : 0;
+  return (+ent || 0) + (dec ? +("0." + dec) : 0);
 }
 const numF = (id, l, v, hint, step) => `<label class="f" for="s_${id}">${l}<input class="input num" id="s_${id}" data-s="${id}" type="number" inputmode="decimal" step="${step||"any"}" value="${v}">${hint?`<span class="hint">${hint}</span>`:""}</label>`;
 function simForm(){
