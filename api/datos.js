@@ -2,7 +2,7 @@
 //   GET   lo guardado desde Gestión: fichas editadas, validaciones y (para editores) las últimas notas.
 //   POST  { col: "productos" | "validaciones", id, data }  guarda un documento (solo EDITORES).
 // Lo que no está guardado acá sale de los archivos del repo (public/data). Almacenamiento: lib/datos.js.
-import { hayBase, leerTodo, guardarDoc, colValida, quien, idValido } from "../lib/datos.js";
+import { hayBase, leerTodo, guardarDoc, colValida, quien, idValido, CONFIG_EDITABLE } from "../lib/datos.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -12,12 +12,13 @@ export default async function handler(req, res) {
   try {
     if (req.method === "GET") {
       const t = await leerTodo(u.editor);
-      return res.status(200).json({ base: true, fichas: t.fichas, validaciones: t.validaciones, notas: u.editor ? t.notas : [], cambios: u.editor ? t.cambios : [], editor: u.editor });
+      return res.status(200).json({ base: true, fichas: t.fichas, validaciones: t.validaciones, config: t.config || {}, notas: u.editor ? t.notas : [], cambios: u.editor ? t.cambios : [], editor: u.editor });
     }
     if (req.method === "POST") {
       if (!u.editor) return res.status(403).json({ error: "Solo los editores pueden guardar cambios" });
       const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
       if (!colValida(body.col) || !idValido(body.id) || !body.data || typeof body.data !== "object") return res.status(400).json({ error: "Datos inválidos" });
+      if (body.col === "config" && !CONFIG_EDITABLE.includes(body.id)) return res.status(400).json({ error: "Esa configuración no se edita desde Gestión" });
       if (JSON.stringify(body.data).length > 200000) return res.status(413).json({ error: "La ficha es demasiado grande" });
       const que = String(body.que || "").slice(0, 60);
       await guardarDoc(body.col, body.id, body.data, u.email, u.nombre, que);

@@ -65,6 +65,7 @@
     exterior: "data/config/exterior.json",
     impuestos: "data/config/impuestos.json",
     onepagers: "data/config/onepagers.local.json",
+    instructivos: "data/config/instructivos.json",
   };
   /* ── Base de datos de Gestión (Vercel: /api/datos) ──
      Lo guardado ahí (fichas editadas, validaciones, notas) se superpone a los archivos del repo.
@@ -103,7 +104,10 @@
     async function loadDoc(path) {
       const [col, id] = path.split("/");
       if (col === "config") {
-        if (!(id in store.config)) store.config[id] = CONFIG_FILES[id] ? await getJSON(CONFIG_FILES[id]).catch(() => null) : null;
+        if (!(id in store.config)) {
+          const remoto = await cargarRemoto();
+          store.config[id] = remoto && remoto.config && remoto.config[id] ? dec(remoto.config[id]) : CONFIG_FILES[id] ? await getJSON(CONFIG_FILES[id]).catch(() => null) : null;
+        }
         return store.config[id];
       }
       const all = await loadCollection(col);
@@ -146,7 +150,7 @@
           const [col, id] = path.split("/");
           const base = merge ? (await loadDoc(path)) || {} : {};
           const nuevo = Object.assign(clone(base), clone(data));
-          if ((col === "productos" || col === "validaciones") && (await cargarRemoto())) await guardarRemoto(col, id, nuevo);
+          if ((col === "productos" || col === "validaciones" || col === "config") && (await cargarRemoto())) await guardarRemoto(col, id, nuevo);
           if (col === "config") store.config[id] = nuevo;
           else (await loadCollection(col))[id] = nuevo;
           notify(path);

@@ -245,6 +245,9 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 @media (min-width:900px){.nueva-ver{bottom:24px}}
 .pz-tools{display:flex;gap:8px;align-items:center;margin-bottom:10px}.pz-search{flex:1;margin:0}.pz-search .input{padding-top:9px;padding-bottom:9px}
 .pz-list label[hidden],.pz-list .cat[hidden]{display:none!important}
+.inst-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;gap:8px;align-items:center}
+@media (max-width:760px){.inst-row{grid-template-columns:minmax(0,1fr)}}
+.inst-list li{margin-bottom:6px}.inst-list a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 .dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
 .busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
 @media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
@@ -818,7 +821,7 @@ function operativa(p){
   const i = p.interno;
   return `<div class="pb"><div class="panel"><h3>Paso a paso operativo</h3><ol class="steps">${i.operativa.map(s=>`<li><span>${esc(s)}</span></li>`).join("")}</ol></div>
   <div class="pb2"><div class="panel"><h3>Video o instructivo</h3>${i.video?`<a class="btn" href="${esc(i.video)}" target="_blank" rel="noopener">Abrir material ↗</a>`:`<p class="small muted">Este producto no tiene video propio. Si existe un instructivo, Marketing lo suma desde Editar.</p>`}</div>
-  <div class="panel"><h3>Instructivos generales</h3><ul class="clean small"><li>Apertura de cuenta comitente</li><li>Cómo operar en home banking y app</li><li>Alta de empresas en EPYME</li></ul><p class="tiny muted" style="margin-top:8px">Links a cargar por Marketing.</p></div></div></div>`;
+  <div class="panel"><h3>Instructivos generales</h3>${instructivosHTML()}</div></div></div>`;
 }
 
 /* ── Editor ── */
@@ -1828,10 +1831,53 @@ function vGestion(){
   <p class="muted">Cada ficha tiene un validador de negocio y una fecha de revisión. Cuando vence, el Hub la marca para que nadie envíe información desactualizada.</p></div></div>
   ${aviso}<div class="tiles">${stat("Validadas", n("validado"))}${stat("A validar", n("a_validar"))}${stat("Vencen en 30 días", pronto)}${stat("Vencidas", n("vencida"), n("vencida")>0)}${stat("Con one pager oficial", S.productos.filter(p=>p.onePager).length + " de " + S.productos.length)}${stat("Pendientes del relevamiento", obs)}</div>
   ${S.notas.length?`<div class="panel" style="margin-bottom:18px"><h3>Notas de los asesores <span class="tiny muted">${S.notas.filter(n=>!n.enviada).length} sin enviar por mail</span></h3><div class="stack" style="gap:10px">${S.notas.slice(0,15).map(n=>`<div style="border-top:1px solid var(--line);padding-top:10px"><div class="tiny muted"><a href="#p-${esc(n.producto)}">${esc(n.productoNombre)}</a> · ${esc(n.autorNombre || S.names[n.autor] || n.autor || "Asesor")} · ${new Date(n.fecha).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"})}${n.enviada?" · enviada":""}</div><p class="small" style="margin-top:4px;white-space:pre-line">${esc(n.texto)}</p></div>`).join("")}</div></div>`:""}
-  ${historialHTML()}
+  ${historialHTML()}${instEditorHTML()}
   <div class="tw"><table><thead><tr><th>Ficha</th><th>Tipo</th><th>Unidades</th><th>Estado</th><th>One pager</th><th>Revisar antes</th><th>Última modificación</th><th></th></tr></thead><tbody>
   ${rows.map(({p,e})=>{ const c = ultimoCambio(p.id); return `<tr><td><a href="#editar-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td class="num">${fdate(e.vence)}</td><td>${c ? `<span class="small">${esc(nombreDe(c))}</span><br><span class="tiny muted">${fechaHora(c.fecha)}</span>` : `<span class="tiny muted">Sin cambios</span>`}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`; }).join("")}
   </tbody></table></div>`;
+}
+
+/* ── Instructivos generales (se cargan desde Gestión; se ven en "Cómo se opera" de todas las fichas) ── */
+S.instructivos = [];
+const esArchivoHub = u => /^api\/archivo/.test(String(u || ""));
+function instructivosHTML(){
+  const l = S.instructivos || [];
+  if (!l.length) return `<p class="small muted">Todavía no hay instructivos cargados.${puedeGestionar() ? ` Cargalos desde <a href="#gestion">Gestión</a>.` : ""}</p>`;
+  return `<ul class="clean small inst-list">${l.map((x, i) => x.url
+    ? `<li><a href="${esc(x.url)}" ${esArchivoHub(x.url) ? `data-act="instVer" data-v="${i}"` : `target="_blank" rel="noopener"`}>${esc(x.titulo || "Instructivo")}</a> <span class="tiny muted">${esArchivoHub(x.url) ? "PDF" : "↗"}</span></li>`
+    : `<li class="muted">${esc(x.titulo || "Instructivo")} <span class="tiny">· próximamente</span></li>`).join("")}</ul>`;
+}
+function verArchivo(url, titulo){
+  const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
+  div.innerHTML = `<div class="op-pop" role="dialog" aria-modal="true" aria-label="${esc(titulo)}"><div class="op-pop-h"><b>${esc(titulo)}</b><span class="btn-row"><a class="btn" href="${esc(url)}" download="${esc(titulo)}.pdf">${ico("_dl")}Descargar</a><button class="btn ghost" data-act="shClose">Cerrar</button></span></div><iframe src="${esc(url)}#view=FitH" title="${esc(titulo)}"></iframe></div>`;
+  document.body.appendChild(div); S.envio = {ver:true};
+}
+/* Editor de Gestión */
+function instEditorHTML(){
+  if (!S.instEd) S.instEd = JSON.parse(JSON.stringify(S.instructivos || []));
+  const l = S.instEd;
+  return `<div class="panel" style="margin-bottom:18px"><h3>Instructivos generales</h3><p class="small muted" style="margin:-4px 0 12px">Se muestran en la pestaña "Cómo se opera" de todas las fichas. Cada uno puede tener un link o un PDF.</p>
+   <div class="stack" style="gap:10px">${l.map((x, i) => `<div class="inst-row">
+     <input class="input" data-inst="${i}" data-f="titulo" value="${esc(x.titulo || "")}" placeholder="Título del instructivo" aria-label="Título">
+     <input class="input" data-inst="${i}" data-f="url" value="${esc(esArchivoHub(x.url) ? "" : (x.url || ""))}" placeholder="${esArchivoHub(x.url) ? "PDF cargado" : "https://… (link al instructivo)"}" aria-label="Link" ${esArchivoHub(x.url) ? "disabled" : ""}>
+     <span class="btn-row">${esArchivoHub(x.url) ? `<button class="btn ghost" type="button" data-act="instVer" data-v="${i}" data-ed="1">Ver PDF</button><button class="btn ghost" type="button" data-act="instSinPdf" data-v="${i}">Quitar PDF</button>` : `<label class="btn ghost" style="cursor:pointer">Subir PDF<input type="file" accept="application/pdf" data-instpdf="${i}" hidden></label>`}<button class="btn ghost" type="button" data-act="instDel" data-v="${i}" aria-label="Eliminar">Eliminar</button></span></div>`).join("")}</div>
+   <div class="btn-row" style="margin-top:12px"><button class="btn" type="button" data-act="instAdd">${ico("_plus")}Agregar instructivo</button><button class="btn primary" type="button" data-act="instSave">Guardar instructivos</button></div></div>`;
+}
+async function instGuardar(b){
+  const lista = (S.instEd || []).map(x => ({titulo: String(x.titulo || "").trim(), url: String(x.url || "").trim()})).filter(x => x.titulo || x.url);
+  const mala = lista.find(x => x.url && !esArchivoHub(x.url) && !/^https?:\/\//i.test(x.url));
+  if (mala) { toast(`El link de "${mala.titulo || "un instructivo"}" tiene que empezar con https://`); return; }
+  if (!S.db) return;
+  b.disabled = true; b.textContent = "Guardando…";
+  try { window.neixQue = "editó los instructivos"; await S.db.doc("config/instructivos").set({lista}); S.instructivos = lista; S.instEd = null; toast("Instructivos guardados"); render(); }
+  catch(e) { toast("No se pudieron guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); b.disabled = false; b.textContent = "Guardar instructivos"; }
+}
+async function instSubirPdf(i, file){
+  if (!file || !S.assets) return;
+  if (!(file.type === "application/pdf" || /\.pdf$/i.test(file.name))) { toast("Tiene que ser un PDF"); return; }
+  toast("Subiendo PDF…");
+  try { const a = await S.assets.upload(file, "instructivo"); S.instEd[i].url = a.id; if (!S.instEd[i].titulo) S.instEd[i].titulo = file.name.replace(/\.pdf$/i, ""); toast("PDF cargado. Tocá Guardar instructivos."); render(); }
+  catch(e) { toast(e && e.message && e.message !== "subir" ? e.message : "No se pudo subir el PDF"); }
 }
 
 /* ── Historial de cambios de Gestión (quién, qué y cuándo) ── */
@@ -1839,12 +1885,12 @@ S.cambios = [];
 window.neixCambio = c => { S.cambios.unshift(c); };
 const fechaHora = iso => iso ? new Date(iso).toLocaleString("es-AR", {day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit", hour12:false, timeZone:"America/Argentina/Buenos_Aires"}).replace(",", " ·") + " hs" : "";
 const nombreDe = c => c.nombre || ((S.asesores||[]).find(a => a.mail === c.quien) || {}).nombre || c.quien || "";
-const ultimoCambio = id => S.cambios.find(c => c.id === id) || null;
+const ultimoCambio = id => S.cambios.find(c => c.id === id && c.col !== "config") || null;
 function historialHTML(){
   if (!S.cambios.length) return "";
   const que = c => c.que || (c.col === "validaciones" ? "validó" : "editó");
   return `<details class="fold" style="margin-bottom:18px"><summary>Historial de cambios <span class="tiny muted">(${S.cambios.length})</span></summary><div class="in"><div class="tw"><table class="hist"><thead><tr><th>Fecha y hora</th><th>Quién</th><th>Qué</th><th>Ficha</th></tr></thead><tbody>
-   ${S.cambios.slice(0, 50).map(c => `<tr><td class="num">${fechaHora(c.fecha)}</td><td>${esc(nombreDe(c))}</td><td>${esc(que(c))}</td><td><a href="#editar-${esc(c.id)}">${esc((S.byId[c.id] || {}).nombre || c.id)}</a></td></tr>`).join("")}</tbody></table></div></div></details>`;
+   ${S.cambios.slice(0, 50).map(c => `<tr><td class="num">${fechaHora(c.fecha)}</td><td>${esc(nombreDe(c))}</td><td>${esc(que(c))}</td><td>${c.col === "config" ? "Instructivos generales" : `<a href="#editar-${esc(c.id)}">${esc((S.byId[c.id] || {}).nombre || c.id)}</a>`}</td></tr>`).join("")}</tbody></table></div></div></details>`;
 }
 
 /* ── Eventos ── */
@@ -1871,6 +1917,11 @@ document.addEventListener("click", e => {
   else if (a==="shSend" || a==="shShare") enviar(b);
   else if (a==="back") volver();
   else if (a==="opVer") opVer(id);
+  else if (a==="instVer") { e.preventDefault(); const l = b.dataset.ed ? S.instEd : S.instructivos, x = l && l[+v]; if (x && x.url) verArchivo(x.url, x.titulo || "Instructivo"); }
+  else if (a==="instAdd") { S.instEd.push({titulo:"", url:""}); render(); }
+  else if (a==="instDel") { S.instEd.splice(+v, 1); render(); }
+  else if (a==="instSinPdf") { S.instEd[+v].url = ""; render(); }
+  else if (a==="instSave") instGuardar(b);
   else if (a==="opQuitar") opQuitar(id);
   else if (a==="cpdPDF") cpdPDF(b);
   else if (a==="cpdVer") cpdVer();
@@ -1906,6 +1957,7 @@ document.addEventListener("input", e => {
   else if (t.dataset.money) { S.simv[S.sim][t.dataset.s] = formatearMonto(t); calcSim(); }
   else if (t.dataset.s && t.type!=="checkbox" && t.tagName!=="SELECT") { S.simv[S.sim][t.dataset.s] = t.value; calcSim(); }
   else if (t.id === "pz_q") { S.pzQ = t.value; pzFiltrar(); }
+  else if (t.dataset.inst !== undefined && S.instEd) { S.instEd[+t.dataset.inst][t.dataset.f] = t.value; }
   else if (t.dataset.pz) { S.pz[t.dataset.pz] = t.value;
     if (t.dataset.pz==="asesor") { const a = findAsesor(t.value); if (a && t.value !== a.nombre) { t.value = S.pz.asesor = a.nombre; } if (a) { S.pz.mail = a.mail || ""; S.pz.tel = a.tel || ""; const m = $("#pz_mail"), te = $("#pz_tel"); if (m) m.value = S.pz.mail; if (te) te.value = S.pz.tel; } if (a && AREAS[a.area]) { S.pz.area = a.area; const sel = $("#pz_area"); if (sel) sel.value = a.area; } }
     pzSave(); refreshDeck(); }
@@ -1928,6 +1980,7 @@ function pdfElegido(f){
 document.addEventListener("change", e => {
   const t = e.target;
   if (t.id === "up_pdf") { pdfElegido(t.files[0]); return; }
+  if (t.dataset.instpdf !== undefined) { instSubirPdf(+t.dataset.instpdf, t.files[0]); return; }
   if (t.id==="fEstado") { S.fEstado = t.value; render(); }
   else if (t.dataset.pzp) { const i = S.pz.items.indexOf(t.dataset.pzp); if (t.checked && i<0) S.pz.items.push(t.dataset.pzp); if (!t.checked && i>=0) S.pz.items.splice(i,1); pzSave(); render(); }
   else if (t.id==="pz_inst") { S.pz.inst = t.checked; pzSave(); refreshDeck(); }
@@ -2009,6 +2062,7 @@ async function boot(){
   }, () => { if (src === db && usarRespaldo()) return; clearTimeout(timer); S.loading = false; if (!S.productos.length) S.dbMissing = true; render(); });
   src.collection("validaciones").onSnapshot(snap => { const v = {}; snap.docs.forEach(d=>v[d.id]=d.data()); S.vals = v; if (S.productos.length) softRender(); }, ()=>{});
   src.doc("config/asesores").onSnapshot(d => { S.asesores = d.exists ? (d.data().lista||[]) : []; const r = route(); if (r==="propuesta"||r==="presentaciones") softRender(); }, ()=>{});
+  src.doc("config/instructivos").onSnapshot(d => { S.instructivos = d.exists ? (d.data().lista || []) : []; S.instEd = null; softRender(); }, ()=>{});
   src.doc("config/impuestos").onSnapshot(d => { S.imp = d.exists ? d.data() : null; if (S.productos.length) softRender(); }, ()=>{});
   src.doc("config/onepagers").onSnapshot(d => { S.onepagers = d.exists ? (d.data().map||{}) : {}; if (S.raw) { setProductos(S.raw); softRender(); } }, ()=>{});
   };
