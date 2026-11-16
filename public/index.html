@@ -248,6 +248,7 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 .inst-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;gap:8px;align-items:center}
 @media (max-width:760px){.inst-row{grid-template-columns:minmax(0,1fr)}}
 .inst-list li{margin-bottom:6px}.inst-list a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.ges-search{margin:0 0 12px}.ges-tabla tr[hidden]{display:none}
 .dato{font-size:14px;font-weight:600;padding:8px 12px;background:var(--surface-2);border-radius:8px}.dato.vacio{font-weight:400;color:var(--ink-3);font-size:13px}
 .busca{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:12px}.busca h4{font-size:12px;font-weight:600;color:var(--ink-2);margin:0 0 6px}.busca .chips{gap:5px}
 @media (max-width:640px){.busca{grid-template-columns:minmax(0,1fr)}}
@@ -703,6 +704,7 @@ function render(anim){
   if (r === "simuladores") calcSim();
   if (r === "propuesta") refreshPreview();
   if (r === "presentaciones") { refreshDeck(); pzFiltrar(); }
+  if (r === "gestion") gesFiltrar();
 }
 /* Pie interno: solo la sesión (quién entró y Salir). El "Hablemos" con datos de contacto no hace falta en una herramienta interna. */
 function footer(r){
@@ -1836,9 +1838,16 @@ function vGestion(){
   ${S.notas.length?`<div class="panel" style="margin-bottom:18px"><h3>Notas de los asesores <span class="tiny muted">${S.notas.filter(n=>!n.enviada).length} sin enviar por mail</span></h3><div class="stack" style="gap:10px">${S.notas.slice(0,15).map(n=>`<div style="border-top:1px solid var(--line);padding-top:10px"><div class="tiny muted"><a href="#p-${esc(n.producto)}">${esc(n.productoNombre)}</a> · ${esc(n.autorNombre || S.names[n.autor] || n.autor || "Asesor")} · ${new Date(n.fecha).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"})}${n.enviada?" · enviada":""}</div><p class="small" style="margin-top:4px;white-space:pre-line">${esc(n.texto)}</p></div>`).join("")}</div></div>`:""}
   <div class="btn-row" style="margin-bottom:18px"><button class="btn primary" data-act="prodNuevo">${ico("_plus")}Nuevo producto</button></div>
   ${historialHTML()}${eliminados}${instEditorHTML()}
-  <div class="tw"><table><thead><tr><th>Ficha</th><th>Tipo</th><th>Unidades</th><th>Estado</th><th>One pager</th><th>Revisar antes</th><th>Última modificación</th><th></th></tr></thead><tbody>
-  ${rows.map(({p,e})=>{ const c = ultimoCambio(p.id); return `<tr><td><a href="#editar-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td class="num">${fdate(e.vence)}</td><td>${c ? `<span class="small">${esc(nombreDe(c))}</span><br><span class="tiny muted">${fechaHora(c.fecha)}</span>` : `<span class="tiny muted">Sin cambios</span>`}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`; }).join("")}
-  </tbody></table></div>`;
+  <div class="search ges-search">${ico("_search")}<input class="input" id="ges_q" type="search" placeholder="Buscá una ficha por nombre, categoría o área" value="${esc(S.gesQ||"")}" aria-label="Buscar fichas" autocomplete="off"></div>
+  <div class="tw"><table class="ges-tabla"><thead><tr><th>Ficha</th><th>Tipo</th><th>Unidades</th><th>Estado</th><th>One pager</th><th>Revisar antes</th><th>Última modificación</th><th></th></tr></thead><tbody>
+  ${rows.map(({p,e})=>{ const c = ultimoCambio(p.id); return `<tr data-q="${esc(sinAcento([p.nombre, p.categoria, p.unidades.join(" "), p.unidades.map(u=>UNI[u]||"").join(" "), e.txt, c ? nombreDe(c) : ""].join(" ")))}"><td><a href="#editar-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td class="num">${fdate(e.vence)}</td><td>${c ? `<span class="small">${esc(nombreDe(c))}</span><br><span class="tiny muted">${fechaHora(c.fecha)}</span>` : `<span class="tiny muted">Sin cambios</span>`}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`; }).join("")}
+  <tr class="ges-nada" hidden><td colspan="8" class="muted small">No hay fichas con esa búsqueda.</td></tr></tbody></table></div>`;
+}
+/* Buscador de Gestión: filtra la tabla sin volver a dibujarla (no se pierde el cursor). */
+function gesFiltrar(){
+  const q = sinAcento((S.gesQ || "").trim()), t = $(".ges-tabla"); if (!t) return;
+  let vis = 0; t.querySelectorAll("tbody tr[data-q]").forEach(tr => { const ok = !q || q.split(/\s+/).every(w => tr.dataset.q.includes(w)); tr.hidden = !ok; if (ok) vis++; });
+  const n = t.querySelector(".ges-nada"); if (n) n.hidden = vis > 0;
 }
 
 /* ── Instructivos generales (se cargan desde Gestión; se ven en "Cómo se opera" de todas las fichas) ── */
@@ -2004,6 +2013,7 @@ document.addEventListener("input", e => {
   else if (t.dataset.money) { S.simv[S.sim][t.dataset.s] = formatearMonto(t); calcSim(); }
   else if (t.dataset.s && t.type!=="checkbox" && t.tagName!=="SELECT") { S.simv[S.sim][t.dataset.s] = t.value; calcSim(); }
   else if (t.id === "pz_q") { S.pzQ = t.value; pzFiltrar(); }
+  else if (t.id === "ges_q") { S.gesQ = t.value; gesFiltrar(); }
   else if (t.dataset.inst !== undefined && S.instEd) { S.instEd[+t.dataset.inst][t.dataset.f] = t.value; }
   else if (t.dataset.pz) { S.pz[t.dataset.pz] = t.value;
     if (t.dataset.pz==="asesor") { const a = findAsesor(t.value); if (a && t.value !== a.nombre) { t.value = S.pz.asesor = a.nombre; } if (a) { S.pz.mail = a.mail || ""; S.pz.tel = a.tel || ""; const m = $("#pz_mail"), te = $("#pz_tel"); if (m) m.value = S.pz.mail; if (te) te.value = S.pz.tel; } if (a && AREAS[a.area]) { S.pz.area = a.area; const sel = $("#pz_area"); if (sel) sel.value = a.area; } }
