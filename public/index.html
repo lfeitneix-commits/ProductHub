@@ -815,14 +815,17 @@ function vProducto(id){
    <div class="btn-row"><button class="btn" data-act="toggleProp" data-id="${p.id}">${ico(inProp?"_check":"_plus")}${inProp?"En la propuesta":"Agregar a propuesta"}</button></div></div></div>
   <div class="p-bar"><div class="seg" role="tablist">${tabs.map(([k,t])=>`<button role="tab" data-act="view" data-v="${k}" aria-pressed="${S.view===k}">${t}</button>`).join("")}</div>
    <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="op" data-id="${p.id}">${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="op" data-id="${p.id}">${ico("_mail")}Mail</button>${p.simulador?`<a class="btn" href="#simuladores" data-act="openSim" data-v="${p.simulador}">${ico("_calc")}Simular</a>`:""}</div></div>
-  ${S.view==="cliente" ? `<div class="p-grid full"><div style="min-width:0">${clienteView(p)}</div></div>` : `<div class="p-grid"><div style="min-width:0">${S.view==="interno"?playbook(p):operativa(p)}</div>${aside(p,e)}</div>`}`;
+  ${(() => { const cuerpo = S.view==="cliente" ? clienteView(p) : S.view==="interno" ? playbook(p) : operativa(p), lado = aside(p, e, S.view==="cliente");
+     return lado ? `<div class="p-grid"><div style="min-width:0">${cuerpo}</div>${lado}</div>` : `<div class="p-grid full"><div style="min-width:0">${cuerpo}</div></div>`; })()}`;
 }
-function aside(p, e){
-  return `<aside class="aside"><div class="panel"><h3 class="ph">¿Algo para corregir o sumar?</h3><p class="small muted" style="margin-bottom:12px">Dejá una nota sobre esta ficha.</p>
+/* Columna lateral de la ficha. La nota para Marketing va en "Para el cliente"; en las otras pestañas, solo los pendientes del relevamiento (editores). */
+function aside(p, e, conNota){
+  const nota = conNota ? `<div class="panel"><h3 class="ph">¿Algo para corregir o sumar?</h3><p class="small muted" style="margin-bottom:12px">Dejá una nota sobre esta ficha.</p>
    <div style="display:grid;gap:8px"><textarea class="input" id="mkNota" placeholder="Ej.: cambió el mínimo, falta un dato, un cliente preguntó por…" aria-label="Nota sobre esta ficha"></textarea>
    <button class="btn" data-act="notaMkt" data-id="${p.id}">Enviar</button>
-   </div></div>
-   ${S.canEdit && p.observaciones.length?`<details class="warnbox"><summary>${p.observaciones.length} pendientes del relevamiento</summary><ul class="clean small">${p.observaciones.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></details>`:""}</aside>`;
+   </div></div>` : "";
+  const obs = S.canEdit && p.observaciones.length ? `<details class="warnbox"><summary>${p.observaciones.length} pendientes del relevamiento</summary><ul class="clean small">${p.observaciones.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></details>` : "";
+  return nota || obs ? `<aside class="aside">${nota}${obs}</aside>` : "";
 }
 function facts(f){ return `<dl class="facts">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Monto",f.minimo],["Liquidez",f.liquidez],["Dónde opera",f.mercado]].map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`; }
 function clienteView(p){
