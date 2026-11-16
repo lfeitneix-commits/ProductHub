@@ -1933,7 +1933,7 @@ function waProp(){ const P = S.prop, it = P.items.map(i=>S.byId[i.id]).filter(Bo
 function vGestion(){
   const rows = S.productos.map(p=>({p, e:estadoDe(p)})).sort((a,b)=>(a.e.d??999)-(b.e.d??999));
   const n = k => rows.filter(r=>r.e.k===k).length, pronto = rows.filter(r=>r.e.d!==null && r.e.d>=0 && r.e.d<=30).length, obs = rows.reduce((a,r)=>a+r.p.observaciones.length,0);
-  const aviso = S.base === true ? `<div class="alert okb" style="margin-bottom:16px"><b>Base de datos conectada</b>Lo que edites, subas o valides acá se guarda y lo ven todos los asesores.</div>`
+  const aviso = S.base === true ? ""
     : S.base === false ? `<div class="alert warn" style="margin-bottom:16px"><b>Sin base de datos</b>Los cambios de Gestión se ven solo en esta pantalla y se pierden al recargar.</div>` : "";
   const ocultos = S.ocultos || [];
   const eliminados = ocultos.length ? `<details class="fold" style="margin-bottom:18px"><summary>Productos eliminados <span class="tiny muted">(${ocultos.length})</span></summary><div class="in stack" style="gap:8px">${ocultos.map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span>${esc(p.nombre)} <span class="tiny muted">· ${esc(p.categoria)}</span></span><button class="btn ghost" data-act="prodRestaurar" data-id="${p.id}">Restaurar</button></div>`).join("")}</div></details>` : "";
