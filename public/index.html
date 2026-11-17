@@ -269,6 +269,7 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 @media (max-width:640px){.pend-it{flex-direction:column;align-items:flex-start}}
 .cv-row{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:10px}.cv-row .h{display:flex;justify-content:space-between;align-items:center}
 .fmt-seg{display:inline-flex}
+.box .chk{display:inline-flex;align-items:center;gap:8px;font-size:14px;margin-right:18px;color:var(--ink);font-weight:400}
 @media (min-width:901px){.pres-col{position:sticky;top:84px;max-height:calc(100vh - 100px);display:flex;flex-direction:column}.pres-col #preview{overflow:auto;flex:1;min-height:0;padding:4px 8px 4px 4px;display:block}.pres-col #preview .slide-wrap{margin-bottom:14px;flex:none}}
 .slide-wrap.editando{outline:3px solid #9A8E7D;outline-offset:3px}
 .ges-search{margin:0 0 12px}.ges-tabla tr[hidden]{display:none}
@@ -2086,29 +2087,42 @@ function abrirEnvio(canal, tipo, id){
   const asunto = tipo === "op" ? `${p.nombre} · Neix` : `${tipo === "pz" ? "Presentación" : "Propuesta"} Neix${P.cliente?" para "+P.cliente:""}`;
   const E = S.envio = {canal, tipo, id, asunto, archivo: null};
   const listo = (txt) => { if (S.envio !== E) return; const n = $("#shAtt"); if (n) n.textContent = txt; ["#shSend","#shShare"].forEach(q => { const bt = $(q); if (bt) bt.disabled = false; }); };
-  (tipo === "op" ? archivoOP(p) : tipo === "pz" ? pzPDFBlob().then(b => new File([b], pzNombre(), {type:"application/pdf"})) : (S.propFmt === "pres" ? laminasPDFBlob(deckSlides(propCfg())).then(b => new File([b], propPresNombre(), {type:"application/pdf"})) : propPDFBlob().then(b => new File([b], propNombre(), {type:"application/pdf"}))))
+  if (tipo === "prop") {   // la propuesta se puede mandar como documento, como presentación o las dos juntas
+    E.files = {doc: null, pres: null}; E.err = {}; E.sel = {doc: true, pres: true};
+    propPDFBlob().then(b => { E.files.doc = new File([b], propNombre(), {type:"application/pdf"}); propListo(); }).catch(() => { E.err.doc = true; propListo(); });
+    laminasPDFBlob(deckSlides(propCfg())).then(b => { E.files.pres = new File([b], propPresNombre(), {type:"application/pdf"}); propListo(); }).catch(() => { E.err.pres = true; propListo(); });
+  } else (tipo === "op" ? archivoOP(p) : pzPDFBlob().then(b => new File([b], pzNombre(), {type:"application/pdf"})))
     .then(f => { E.archivo = f; listo("PDF listo: " + f.name); })
     .catch(() => listo("No pudimos preparar el archivo. Se envía solo el mensaje."));
   const cel = puedeCompartir(), wa = canal === "wa";
   const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
   div.innerHTML = `<div class="box" role="dialog" aria-modal="true" aria-labelledby="shT"><h3 id="shT">${wa?"Enviar por WhatsApp":"Enviar por mail"}</h3>
     <label class="f" for="shMsg">Mensaje<textarea class="input" id="shMsg">${esc(msg)}</textarea></label>
-    <div class="att" id="shAtt">Preparando el archivo…</div>
+    ${tipo === "prop" ? `<div class="f"><span>Adjuntar</span><label class="chk"><input type="checkbox" id="shDoc" checked> Documento</label><label class="chk"><input type="checkbox" id="shPres" checked> Presentación</label></div>` : ""}
+    <div class="att" id="shAtt">${tipo === "prop" ? "Preparando el documento y la presentación…" : "Preparando el archivo…"}</div>
     <p class="tiny muted" style="margin:0">${cel ? `Al tocar Enviar se abre el menú para compartir con el PDF adjunto: elegí ${wa?"WhatsApp":"Outlook"} y el contacto. El mensaje queda copiado; si no aparece, pegalo con Ctrl+V.` : `Este navegador no permite adjuntar archivos: se abre ${wa?"WhatsApp":"tu mail"} con el mensaje${tipo==="op"&&p&&p.onePager?" y el link al PDF":""}, y el PDF se descarga para arrastrarlo. Para adjuntarlo directo, usá Chrome o Edge.`}</p>
     <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button><button class="btn primary" id="shSend" data-act="shSend" disabled>${wa?ico("_wa"):ico("_mail")}Enviar</button></div></div>`;
   document.body.appendChild(div);
   const f = $("#shSend"); if (f) f.focus();
 }
+function propListo(){
+  const E = S.envio; if (!E || E.tipo !== "prop") return;
+  const est = k => E.files[k] ? "listo" : E.err[k] ? "no se pudo preparar" : "preparando…", sel = ["doc","pres"].filter(k => E.sel[k]);
+  const n = $("#shAtt"); if (n) n.textContent = sel.length ? sel.map(k => (k === "doc" ? "Documento: " : "Presentación: ") + est(k)).join(" · ") : "Elegí qué adjuntar.";
+  const bt = $("#shSend"); if (bt) bt.disabled = !sel.length || sel.some(k => !E.files[k] && !E.err[k]);
+}
+const archivosEnvio = E => E.tipo === "prop" ? ["doc","pres"].filter(k => E.sel[k] && E.files[k]).map(k => E.files[k]) : (E.archivo ? [E.archivo] : []);
 function cerrarEnvio(){ const m = $("#shm"); if (m) m.remove(); S.envio = null; }
 function telWA(t){ let d = String(t||"").replace(/\D/g, ""); if (!d) return ""; if (d.startsWith("0")) d = d.slice(1); if (d.length === 10) d = "549" + d; else if (d.length === 11 && d.startsWith("9")) d = "54" + d; return d; }
 async function enviar(b){
   const E = S.envio; if (!E) return;
   (E.tipo === "op" ? [E.id] : E.tipo === "pz" ? S.pz.items : S.prop.items.map(x => x.id)).forEach(id => uso(id, "e"));
   const to = (($("#shTo")||{}).value || "").trim(), msg = ($("#shMsg")||{}).value || "", wa = E.canal === "wa";
-  if (E.archivo && navigator.canShare && navigator.canShare({files:[E.archivo]})) {
+  const archivos = archivosEnvio(E);
+  if (archivos.length && navigator.canShare && navigator.canShare({files: archivos})) {
     /* WhatsApp y Outlook suelen ignorar el texto cuando hay un archivo: el mensaje queda copiado para pegarlo. */
     const copiado = navigator.clipboard ? navigator.clipboard.writeText(msg).then(()=>true, ()=>false) : Promise.resolve(false);
-    try { await navigator.share({files:[E.archivo], text: msg, title: E.asunto}); cerrarEnvio(); if (await copiado) toast("Si el mensaje no aparece, pegalo con Ctrl+V: ya está copiado"); }
+    try { await navigator.share({files: archivos, text: msg, title: E.asunto}); cerrarEnvio(); if (await copiado) toast("Si el mensaje no aparece, pegalo con Ctrl+V: ya está copiado"); }
     catch(e) { if (!(e && e.name === "AbortError")) toast("No se pudo abrir el menú para compartir"); }
     return;
   }
@@ -2120,9 +2134,9 @@ async function enviar(b){
     ? (esCelular() ? `https://wa.me/${telWA(to)}?text=${encodeURIComponent(texto)}` : `https://web.whatsapp.com/send?${to?"phone="+telWA(to)+"&":""}text=${encodeURIComponent(texto)}`)
     : `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(E.asunto)}&body=${encodeURIComponent(texto)}`;
   if (wa) { if (!window.open(url, "_blank", "noopener")) abrirLink(url, true); } else abrirLink(url);
-  if (E.archivo && S.dl) { try { await S.dl.save({filename: E.archivo.name, data: E.archivo}); } catch(_) {} }
+  if (S.dl) for (const f of archivos) { try { await S.dl.save({filename: f.name, data: f}); } catch(_) {} }
   cerrarEnvio();
-  toast(E.archivo ? "Se descargó el archivo: arrastralo al mensaje para adjuntarlo" : "Se abrió el mensaje");
+  toast(archivos.length > 1 ? "Se descargaron los archivos: arrastralos al mensaje para adjuntarlos" : archivos.length ? "Se descargó el archivo: arrastralo al mensaje para adjuntarlo" : "Se abrió el mensaje");
 }
 document.addEventListener("keydown", e => { if (e.key === "Escape" && S.envio) cerrarEnvio(); });
 document.addEventListener("toggle", e => { if (e.target.matches && e.target.matches("details.uso")) S.usoAbierto = e.target.open; }, true);
@@ -2548,6 +2562,7 @@ function pdfElegido(f){
 document.addEventListener("change", e => {
   const t = e.target;
   if (t.id === "up_pdf") { pdfElegido(t.files[0]); return; }
+  if ((t.id === "shDoc" || t.id === "shPres") && S.envio && S.envio.tipo === "prop") { S.envio.sel[t.id === "shDoc" ? "doc" : "pres"] = t.checked; propListo(); return; }
   if (t.dataset.instpdf !== undefined) { instSubirPdf(+t.dataset.instpdf, t.files[0]); return; }
   if (t.id==="fEstado") { S.fEstado = t.value; render(); }
   else if (t.dataset.pzp) { const i = S.pz.items.indexOf(t.dataset.pzp); if (t.checked && i<0) { S.pz.items.push(t.dataset.pzp); uso(t.dataset.pzp, "p"); } if (!t.checked && i>=0) S.pz.items.splice(i,1); pzSave(); render(); }
