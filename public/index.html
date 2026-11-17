@@ -269,6 +269,8 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 @media (max-width:640px){.pend-it{flex-direction:column;align-items:flex-start}}
 .cv-row{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:10px}.cv-row .h{display:flex;justify-content:space-between;align-items:center}
 .fmt-seg{display:inline-flex}
+@media (min-width:901px){.pres-col{position:sticky;top:84px;max-height:calc(100vh - 100px);display:flex;flex-direction:column}.pres-col #preview{overflow:auto;flex:1;min-height:0;padding:4px 8px 4px 4px;display:block}.pres-col #preview .slide-wrap{margin-bottom:14px;flex:none}}
+.slide-wrap.editando{outline:3px solid #9A8E7D;outline-offset:3px}
 .ges-search{margin:0 0 12px}.ges-tabla tr[hidden]{display:none}
 .uso-tabla td.num,.uso-tabla th.num{text-align:right}
 @media (max-width:640px){
@@ -1711,7 +1713,7 @@ function vPropuesta(){
      ${S.propFmt==="pres" ? "" : `<textarea class="input" id="pn_${i}" data-pi="${i}" style="min-height:58px" aria-label="Por qué para este cliente" placeholder="Por qué para este cliente. Ej.: para que los dólares de la venta del campo rindan mientras definís la estructura.">${esc(it.nota||"")}</textarea>`}</div>`; }).join("") : `<div class="empty small">Todavía no sumaste productos. <a href="#soluciones">Explorar</a>.</div>`}</div>
    ${Object.keys(sug).length?`<div class="panel"><h3>Suelen ir juntas</h3><div class="stack" style="gap:8px">${Object.entries(sug).slice(0,5).map(([id,from])=>`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div class="small"><b>${esc(S.byId[id].nombre)}</b><div class="tiny muted">Complementa ${esc(from.join(", "))}</div></div><button class="btn" data-act="toggleProp" data-id="${id}">${ico("_plus")}</button></div>`).join("")}</div></div>`:""}
   </div>
-  <div style="min-width:0"><div class="paper-label"><div class="seg fmt-seg">${[["doc","Documento"],["pres","Presentación"]].map(([k,t]) => `<button data-act="propFmt" data-v="${k}" aria-pressed="${(S.propFmt||"doc")===k}">${t}</button>`).join("")}</div><span class="tiny">${S.propFmt==="pres" ? "Diapositivas 16:9 · se descarga en PDF" : "Documento A4 · se descarga en PDF"}</span></div><div class="${S.propFmt==="pres" ? "" : "paper-wrap"}" id="preview"></div></div></div>`;
+  <div style="min-width:0" class="${S.propFmt==="pres" ? "pres-col" : ""}"><div class="paper-label"><div class="seg fmt-seg">${[["doc","Documento"],["pres","Presentación"]].map(([k,t]) => `<button data-act="propFmt" data-v="${k}" aria-pressed="${(S.propFmt||"doc")===k}">${t}</button>`).join("")}</div><span class="tiny">${S.propFmt==="pres" ? "Diapositivas 16:9 · se descarga en PDF" : "Documento A4 · se descarga en PDF"}</span></div><div class="${S.propFmt==="pres" ? "" : "paper-wrap"}" id="preview"></div></div></div>`;
 }
 function propDoc(){
   const P = S.prop, items = P.items.map(i=>({it:i, p:S.byId[i.id]})).filter(x=>x.p);
@@ -1747,12 +1749,24 @@ function conversamosHTML(){
       <textarea class="input" data-cv="${i}" data-f="d" style="min-height:64px" placeholder="Qué te contó. Ej.: Buscan que sus proveedores cobren antes sin sumar deuda al balance." aria-label="Detalle del punto ${i + 1}">${esc(x.d || "")}</textarea></div>`).join("")}
     ${l.length < 6 ? `<button class="btn" type="button" data-act="cvAdd" style="justify-self:start">${ico("_plus")}Agregar punto</button>` : `<span class="tiny muted">Hasta 6 puntos.</span>`}</div>`;
 }
+/* Mientras se escribe en "Lo que conversamos", la vista previa (fija al costado) muestra esa diapositiva y la marca. */
+function verConversamos(){
+  const pv = $("#preview"); if (!pv) return;
+  const w = [...pv.querySelectorAll(".slide-wrap")].find(x => /Lo que conversamos/.test(x.querySelector("h2") ? x.querySelector("h2").textContent : ""));
+  pv.querySelectorAll(".slide-wrap.editando").forEach(x => { if (x !== w) x.classList.remove("editando"); });
+  if (!w) return; w.classList.add("editando");
+  if (pv.scrollHeight > pv.clientHeight + 4) { const dest = w.offsetTop - pv.offsetTop - 8; if (Math.abs(pv.scrollTop - dest) > 4) pv.scrollTo({top: dest, behavior: "smooth"}); }
+  else { const r = w.getBoundingClientRect(); if (r.top < 70 || r.bottom > innerHeight) w.scrollIntoView({block: "nearest", behavior: "smooth"}); }
+}
+document.addEventListener("focusin", e => { if (e.target.dataset && e.target.dataset.cv !== undefined) { S._cvFoco = true; verConversamos(); } });
+document.addEventListener("focusout", e => { if (e.target.dataset && e.target.dataset.cv !== undefined) { S._cvFoco = false; setTimeout(() => { if (!S._cvFoco) document.querySelectorAll(".slide-wrap.editando").forEach(x => x.classList.remove("editando")); }, 150); } });
 function refreshPreview(){
   const pv = $("#preview"); if (!pv) return;
   if (!S.prop.items.length) { pv.innerHTML = `<div class="empty" style="background:var(--surface)">La vista previa aparece cuando sumás productos.</div>`; return; }
   if (S.propFmt === "pres") {
     if (!S._pzFont) { S._pzFont = 1; cpdFuentes().then(() => refreshPreview()); }
-    pv.className = "slides"; pv.innerHTML = deckSlides(propCfg()).map(h => `<div class="slide-wrap">${h}</div>`).join(""); scaleDeck(); return;
+    const top = pv.scrollTop; pv.className = "slides"; pv.innerHTML = deckSlides(propCfg()).map(h => `<div class="slide-wrap">${h}</div>`).join(""); scaleDeck(); pv.scrollTop = top;
+    if (S._cvFoco) verConversamos(); return;
   }
   pv.className = "paper-wrap"; pv.innerHTML = propDoc();
 }
