@@ -199,6 +199,7 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .fav{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--ink-3);cursor:pointer;padding:2px;border-radius:6px}
 .fav .ico{width:17px;height:17px;fill:none}.fav[aria-pressed="true"]{color:#C9962B}.fav[aria-pressed="true"] .ico{fill:currentColor}
 .fav:hover{color:var(--ink)}.fav.fav-g{border:1px solid rgba(255,255,255,.25);color:#F3F0EB;padding:9px 16px;border-radius:999px;font-size:14px}.fav.fav-g[aria-pressed="true"]{color:#F1CC74}
+.favchip{display:inline-flex;align-items:center;gap:6px}.favchip .ico{width:14px;height:14px;fill:none}.favchip[aria-pressed="true"] .ico{fill:currentColor}
 .otros{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 0}.otros .chips{display:flex;flex-wrap:wrap;gap:6px}.otros .chip{display:inline-flex;align-items:center;gap:6px;text-decoration:none}.otros .chip .ico{width:15px;height:15px}
 .optag{font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:4px;padding:2px 6px}
 .upl{display:grid;gap:10px;border:1px dashed var(--line-2);border-radius:10px;padding:12px 14px}
@@ -804,6 +805,7 @@ function filtrar(){
     if (S.fUnidad && !p.unidades.includes(S.fUnidad)) return false;
     if (S.fCat && p.categoria !== S.fCat) return false;
     if (S.fEstado && estadoDe(p).k !== S.fEstado) return false;
+    if (S.fFav && !S.fav.includes(p.id)) return false;
     if (needs.length && !needs.some(n=>p.match.objetivos.some(o=>n.objs.includes(o)))) return false;
     if (q) { const hay = sinAcento(p.nombre+" "+p.cliente.titular+" "+p.categoria+" "+p.interno.perfiles.join(" ")+" "+p.unidades.join(" ")+" "+ventajas(p).map(v=>v.join(" ")).join(" ")+" "+needsDe(p).map(n=>n.label).join(" ")+" "+p.match.objetivos.map(o=>OBJ[o]||"").join(" ")); if (!q.split(/\s+/).every(w=>hay.includes(w))) return false; }
     return true;
@@ -828,7 +830,7 @@ function vSoluciones(){
   const list = filtrar();
   const cats = CAT_ORDER.filter(c=>S.productos.some(p=>p.categoria===c)).concat([...new Set(S.productos.map(p=>p.categoria))].filter(c=>!CAT_ORDER.includes(c)));
   const groups = {}; list.forEach(p => (groups[p.categoria] = groups[p.categoria] || []).push(p));
-  const any = S.q || S.fUnidad || S.fCat || S.fEstado || S.fNeeds.length;
+  const any = S.q || S.fUnidad || S.fCat || S.fEstado || S.fNeeds.length || S.fFav;
   const nCount = n => S.productos.filter(p=>p.match.objetivos.some(o=>n.objs.includes(o))).length;
   return `
   <div class="page-head"><div><div class="eyebrow">Hub de Productos</div><h1>Productos Neix</h1>
@@ -839,12 +841,11 @@ function vSoluciones(){
   <p class="tiny muted" style="margin:14px 0 -4px">Podés elegir más de un objetivo.</p>
   <div class="needs" role="group" aria-label="Qué necesita tu cliente">${NEEDS.map(n=>`<button class="need" data-act="fNeed" data-v="${n.k}" aria-pressed="${S.fNeeds.includes(n.k)}"><span class="ic">${ico(n.icon)}</span><b>${n.label}</b><span class="n">${nCount(n)} productos</span></button>`).join("")}</div>
   <div class="filters">
-   <div class="frow"><span class="lbl">Unidad</span><div class="chips scroll">${[["","Todas"]].concat(Object.keys(UNI).map(u=>[u, u==="Mercado de Capitales"?"Mesa · Mercado de Capitales":u])).map(([u,t])=>`<button class="chip${u?" uchip":""}" style="--u:${UNI_COLOR[u]||"#999"}" data-act="fUnidad" data-v="${esc(u)}" aria-pressed="${S.fUnidad===u}">${esc(t)}</button>`).join("")}</div></div>
+   <div class="frow"><span class="lbl">Unidad</span><div class="chips scroll">${[["","Todas"]].concat(Object.keys(UNI).map(u=>[u, u==="Mercado de Capitales"?"Mesa · Mercado de Capitales":u])).map(([u,t])=>`<button class="chip${u?" uchip":""}" style="--u:${UNI_COLOR[u]||"#999"}" data-act="fUnidad" data-v="${esc(u)}" aria-pressed="${S.fUnidad===u}">${esc(t)}</button>`).join("")}<button class="chip favchip" data-act="fFav" aria-pressed="${!!S.fFav}" title="${S.fav.length ? "Ver solo tus favoritos" : "Marcá productos con la estrella para verlos acá"}">${ico("_star")}Favoritos${S.fav.length ? ` · ${S.fav.filter(id => S.byId[id]).length}` : ""}</button></div></div>
    <div class="rescount"><span>${list.length} ${list.length===1?"resultado":"resultados"}</span><span class="btn-row">
 
     ${any?`<button class="btn ghost" data-act="clearF">Limpiar</button>`:""}</span></div>
   </div>
-  ${!any && S.fav.some(id => S.byId[id]) ? `<section class="group"><div class="group-h"><span class="ic">${ico("_star")}</span><h2>Tus favoritos</h2><span>${S.fav.filter(id => S.byId[id]).length}</span></div><div class="grid">${S.fav.map(id => S.byId[id]).filter(Boolean).map(card).join("")}</div></section>` : ""}
   ${list.length ? cats.filter(c=>groups[c]).map(c => `<section class="group"><div class="group-h"><span class="ic">${ico(c)}</span><h2>${esc(c)}</h2><span>${groups[c].length}</span></div><div class="grid">${groups[c].map(card).join("")}</div></section>`).join("") : `<div class="empty" style="margin-top:20px">No hay productos con esos filtros. <button class="btn ghost" data-act="clearF">Limpiar filtros</button></div>`}`;
 }
 /* ── Favoritos (en el navegador de cada asesor) y etiqueta "Actualizado" (últimos 15 días) ── */
@@ -2306,7 +2307,8 @@ document.addEventListener("click", e => {
   if (a==="fUnidad"||a==="fCat") { S[a] = S[a]===v && v ? "" : v; render(); }
   else if (a==="fNeed") { const i = S.fNeeds.indexOf(v); i>=0 ? S.fNeeds.splice(i,1) : S.fNeeds.push(v); render(); }
   else if (a==="goCat") { S.fCat = v; S.fNeeds = []; S.q = ""; }
-  else if (a==="clearF") { S.q=""; S.fUnidad=""; S.fCat=""; S.fEstado=""; S.fNeeds=[]; render(); }
+  else if (a==="clearF") { S.q=""; S.fUnidad=""; S.fCat=""; S.fEstado=""; S.fNeeds=[]; S.fFav=false; render(); }
+  else if (a==="fFav") { if (!S.fav.length) { toast("Marcá productos con la estrella para verlos acá"); return; } S.fFav = !S.fFav; render(); }
   else if (a==="view") { S.view = v; render(); }
   else if (a==="persona") { S.persona = v; persist(); render(); }
   else if (a==="toggleProp") { const i = S.prop.items.findIndex(x=>x.id===id); if (i>=0) S.prop.items.splice(i,1); else { S.prop.items.push({id, nota:""}); uso(id, "p"); toast("Sumada a la propuesta"); } persist(); render(); }
