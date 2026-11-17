@@ -1,5 +1,6 @@
 [
  "acciones-argentinas",
+ "avales-bancarios",
  "avales-sgr",
  "bonos-cer-dl",
  "bonos-iliquidos",
@@ -10,6 +11,7 @@
  "cauciones",
  "cedears",
  "cheques",
+ "comercio-exterior-bancario",
  "cuentas-offshore",
  "estructuras-societarias",
  "facturas-fce",
@@ -22,7 +24,9 @@
  "futuros-dolar",
  "inversiones-alternativas",
  "inversoras",
+ "leasing",
  "licitaciones-primarias",
+ "mercado-de-capitales-bancario",
  "neix-connect",
  "notas-estructuradas",
  "obligaciones-negociables",
@@ -31,10 +35,12 @@
  "operaciones-bloque",
  "operatoria-internacional",
  "pagares",
+ "prestamos-bancarios",
  "pricing-fx",
  "research",
  "sinteticos",
  "swaps",
  "t-bills",
- "trade-ideas"
+ "trade-ideas",
+ "venta-de-cartera"
 ]
