@@ -81,7 +81,6 @@
   }
   window.neixBase = () => cargarRemoto().then((r) => !!r);
   window.neixCambios = () => cargarRemoto().then((r) => (r && r.cambios) || []);
-  window.neixActualizadas = () => cargarRemoto().then((r) => (r && r.actualizadas) || {});
 
   function createStaticDb() {
     const store = { productos: null, validaciones: null, notas: null, config: {} };

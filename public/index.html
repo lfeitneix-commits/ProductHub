@@ -195,7 +195,6 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .opimg{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .opimg .bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--ink-2);background:var(--surface)}
 .opimg img{display:block;width:100%;max-width:760px;margin:0 auto;height:auto;background:#fff}
-.newtag{font-size:11px;font-weight:600;color:#7A4A12;background:#F6E8D3;border-radius:4px;padding:2px 6px}
 .fav{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--ink-3);cursor:pointer;padding:2px;border-radius:6px}
 .fav .ico{width:17px;height:17px;fill:none}.fav[aria-pressed="true"]{color:#C9962B}.fav[aria-pressed="true"] .ico{fill:currentColor}
 .fav:hover{color:var(--ink)}.fav.fav-g{border:1px solid rgba(255,255,255,.25);color:#F3F0EB;padding:9px 16px;border-radius:999px;font-size:14px}.fav.fav-g[aria-pressed="true"]{color:#F1CC74}
@@ -848,17 +847,15 @@ function vSoluciones(){
   </div>
   ${list.length ? cats.filter(c=>groups[c]).map(c => `<section class="group"><div class="group-h"><span class="ic">${ico(c)}</span><h2>${esc(c)}</h2><span>${groups[c].length}</span></div><div class="grid">${groups[c].map(card).join("")}</div></section>`).join("") : `<div class="empty" style="margin-top:20px">No hay productos con esos filtros. <button class="btn ghost" data-act="clearF">Limpiar filtros</button></div>`}`;
 }
-/* ── Favoritos (en el navegador de cada asesor) y etiqueta "Actualizado" (últimos 15 días) ── */
+/* ── Favoritos (en el navegador de cada asesor) ── */
 const FAV_KEY = "neix-hub-fav";
 S.fav = (() => { try { const v = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch(_) { return []; } })();
 const esFav = id => S.fav.includes(id);
 function favToggle(id){ const i = S.fav.indexOf(id); if (i >= 0) S.fav.splice(i, 1); else S.fav.unshift(id); try { localStorage.setItem(FAV_KEY, JSON.stringify(S.fav)); } catch(_) {} toast(i >= 0 ? "Sacado de favoritos" : "Agregado a favoritos"); render(); }
 const favBtn = (id, grande) => `<button class="fav${grande ? " fav-g" : ""}" type="button" data-act="fav" data-id="${id}" aria-pressed="${esFav(id)}" aria-label="${esFav(id) ? "Sacar de favoritos" : "Agregar a favoritos"}" title="${esFav(id) ? "Sacar de favoritos" : "Agregar a favoritos"}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>${grande ? (esFav(id) ? "En favoritos" : "Favorito") : ""}</button>`;
-S.actualizadas = {};
-const actualizadoEl = p => { const f = S.actualizadas[p.id]; if (!f) return ""; const d = (Date.now() - Date.parse(f)) / 864e5; return d >= 0 && d <= 15 ? f : ""; };
 function card(p){
   const e = estadoDe(p);
-  return `<a class="card" href="#p-${p.id}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="units">${units(p)}</span><span class="btn-row" style="gap:6px">${actualizadoEl(p) ? `<span class="newtag">Actualizado</span>` : ""}${favBtn(p.id)}</span></div>
+  return `<a class="card" href="#p-${p.id}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="units">${units(p)}</span><span class="btn-row" style="gap:6px">${favBtn(p.id)}</span></div>
   <h3>${esc(p.nombre)}</h3><p class="tit">${esc(p.cliente.titular)}</p>
   <div class="foot"><span class="btn-row" style="gap:6px">${p.onePager?`<span class="optag">One pager</span>`:""}<span class="tiny muted">${p.simulador?"Con simulador":""}</span></span>${risk(p.riesgoNivel)}</div></a>`;
 }
@@ -871,7 +868,7 @@ function vProducto(id){
   return `<div class="p-hero"><div style="min-width:0"><button class="back" data-act="back" aria-label="Volver"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Volver</button><div class="crumb"><a href="#soluciones">Productos</a><span>/</span><a href="#soluciones" data-act="goCat" data-v="${esc(p.categoria)}">${esc(p.categoria)}</a></div>
    <span class="kicker">${esc(p.categoria)}</span><h1>${esc(p.nombre)}</h1></div>
    <div style="min-width:0"><div class="units" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px">${units(p)}</div><p class="lead">${esc(p.cliente.titular)}<span>${esc(p.cliente.bajada)}</span></p>
-   <div class="btn-row"><button class="btn" data-act="toggleProp" data-id="${p.id}">${ico(inProp?"_check":"_plus")}${inProp?"En la propuesta":"Agregar a propuesta"}</button>${favBtn(p.id, true)}</div>${actualizadoEl(p) ? `<p class="tiny" style="margin-top:12px;color:#CFC6B8">Actualizado el ${fdate(actualizadoEl(p).slice(0,10))}</p>` : ""}</div></div>
+   <div class="btn-row"><button class="btn" data-act="toggleProp" data-id="${p.id}">${ico(inProp?"_check":"_plus")}${inProp?"En la propuesta":"Agregar a propuesta"}</button>${favBtn(p.id, true)}</div></div></div>
   <div class="p-bar"><div class="seg" role="tablist">${tabs.map(([k,t])=>`<button role="tab" data-act="view" data-v="${k}" aria-pressed="${S.view===k}">${t}</button>`).join("")}</div>
    <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="op" data-id="${p.id}">${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="op" data-id="${p.id}">${ico("_mail")}Mail</button>${p.simulador?`<a class="btn" href="#simuladores" data-act="openSim" data-v="${p.simulador}">${ico("_calc")}Simular</a>`:""}</div></div>
   ${(() => { const cuerpo = S.view==="cliente" ? clienteView(p) : S.view==="interno" ? playbook(p) : operativa(p), lado = aside(p, e, S.view==="cliente");
@@ -2472,7 +2469,6 @@ async function boot(){
   render(true);
   // Quién está usando el Hub (ingreso con Microsoft en Vercel). En local no existe y se ignora.
   if (window.neixBase) window.neixBase().then(b => { S.base = b; if (route() === "gestion") softRender(); });
-  if (window.neixActualizadas) window.neixActualizadas().then(a => { S.actualizadas = a || {}; if (route() === "soluciones" || route().startsWith("p-")) softRender(); });
   if (window.neixCambios) window.neixCambios().then(c => { S.cambios = (c || []).concat(S.cambios.filter(x => !(c || []).some(y => y.fecha === x.fecha && y.id === x.id))).sort((a,b) => String(b.fecha).localeCompare(String(a.fecha))); if (route() === "gestion") softRender(); });
   fetch("api/datos?me=1", {cache:"no-store", credentials:"same-origin"}).then(r => r.ok ? r.json() : null).then(me => { if (me && me.email) { S.me = me; render(); } }).catch(()=>{});
   setTimeout(usoEnviar, 4000);

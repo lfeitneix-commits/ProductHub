@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     }
     if (req.method === "GET") {
       const t = await leerTodo(u.editor);
-      return res.status(200).json({ base: true, fichas: t.fichas, validaciones: t.validaciones, config: t.config || {}, notas: u.editor ? t.notas : [], cambios: u.editor ? t.cambios : [], actualizadas: t.actualizadas || {}, editor: u.editor });
+      return res.status(200).json({ base: true, fichas: t.fichas, validaciones: t.validaciones, config: t.config || {}, notas: u.editor ? t.notas : [], cambios: u.editor ? t.cambios : [], editor: u.editor });
     }
     if (req.method === "POST") {
       const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
