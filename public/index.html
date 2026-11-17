@@ -288,6 +288,11 @@ a.inst-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-hi)}.inst-c
 
 /* Simuladores */
 .sim{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}
+/* Formulario de los simuladores: todo entra en el ancho del recuadro, con el mismo margen a los dos lados. */
+#simForm>*,#simForm .q>*,#simForm label.f,#simForm .input{min-width:0}
+#simForm .input{width:100%;box-sizing:border-box}
+#simForm .seg{display:flex;width:100%;box-sizing:border-box}
+#simForm .seg button{flex:1 1 0;min-width:0;white-space:normal;line-height:1.25;text-align:center}
 .out{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
 .stat .v{font-family:var(--f-display);font-size:clamp(20px,2.4vw,25px);line-height:1.2;margin-top:4px}
