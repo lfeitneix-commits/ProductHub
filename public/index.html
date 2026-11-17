@@ -887,7 +887,7 @@ function facts(f){ return `<dl class="facts">${[["Moneda",f.moneda],["Plazo",f.p
 function clienteView(p){
   const o = p.onePager;
   if (!o) return `<div class="opstrip"><div><b>One pager</b><span>Armado con el contenido de esta ficha</span></div><span class="btn-row"><button class="btn ghost" data-act="opVer" data-id="${p.id}">Ver one pager</button><button class="btn" data-act="dlOnePager" data-id="${p.id}">${ico("_dl")}Descargar PDF</button></span></div>${onePager(p)}`;
-  return `<div class="opstrip"><div><b>One pager oficial</b><span>Actualizado ${fdate(o.fecha)}</span></div><span class="btn-row"><button class="btn ghost" data-act="opVer" data-id="${p.id}">Ver one pager</button><button class="btn" data-act="dlPdf" data-id="${p.id}">${ico("_dl")}Descargar PDF</button></span></div>${onePager(p)}`;
+  return `<div class="opstrip"><div><b>One pager oficial</b></div><span class="btn-row"><button class="btn ghost" data-act="opVer" data-id="${p.id}">Ver one pager</button><button class="btn" data-act="dlPdf" data-id="${p.id}">${ico("_dl")}Descargar PDF</button></span></div>${onePager(p)}`;
 }
 function onePager(p){
   const c = p.cliente, f = c.ficha;
