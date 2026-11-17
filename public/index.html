@@ -2059,21 +2059,38 @@ S.instructivos = [];
 const esArchivoHub = u => /^api\/archivo/.test(String(u || ""));
 const esVideo = u => /\.(mp4|webm|mov)(\?|#|$)/i.test(String(u || ""));
 /* Videos del repo (public/instructivos). Si en Gestión el instructivo quedó sin link, se usa el video. */
-const INST_VIDEO = {"apertura de cuenta comitente":"instructivos/apertura-de-cuenta.mp4", "como operar en home banking y app":"instructivos/como-operar.mp4", "alta de empresas en epyme":"instructivos/alta-epyme.mp4"};
-const INST_META = {"instructivos/apertura-de-cuenta.mp4":{poster:"instructivos/apertura-de-cuenta.jpg", dur:"0:40"}, "instructivos/como-operar.mp4":{poster:"instructivos/como-operar.jpg", dur:"0:46"}, "instructivos/alta-epyme.mp4":{poster:"instructivos/alta-epyme.jpg", dur:"1:05"}};
+/* Videos del repo (public/instructivos). Siempre se suman a la lista, aunque los instructivos se hayan guardado desde Gestión;
+   si alguien elimina uno en Gestión, queda marcado como oculto para que no vuelva a aparecer. */
+const INST_BASE = [
+  {titulo:"Apertura de cuenta comitente", url:"instructivos/apertura-de-cuenta.mp4", dur:"0:40"},
+  {titulo:"Cómo operar en home banking y app", url:"instructivos/como-operar.mp4", dur:"0:46"},
+  {titulo:"Alta de empresas en EPYME", url:"instructivos/alta-epyme.mp4", dur:"1:05"},
+  {titulo:"Resumen de cuenta", url:"instructivos/resumen-de-cuenta.mp4", dur:"0:30"},
+  {titulo:"Detalle de movimientos", url:"instructivos/detalle-de-movimientos.mp4", dur:"0:40"},
+  {titulo:"Recuperar contraseña", url:"instructivos/recuperar-contrasena.mp4", dur:"0:36"},
+];
+const claveInst = t => sinAcento(String(t || "").trim());
+const INST_VIDEO = Object.fromEntries(INST_BASE.map(x => [claveInst(x.titulo), x.url]));
+const esVideoHub = u => /^instructivos\/[\w.-]+\.(mp4|webm|mov)$/.test(String(u || ""));
+function instMezcla(lista){
+  const l = (lista || []).slice(), ya = new Set(l.map(x => claveInst(x.titulo)));
+  INST_BASE.forEach(b => { if (!ya.has(claveInst(b.titulo))) l.push({titulo: b.titulo, url: b.url}); });
+  return l;
+}
+const INST_META = Object.fromEntries(INST_BASE.map(x => [x.url, {poster: x.url.replace(/\.mp4$/, ".jpg"), dur: x.dur}]));
 function vInstructivos(){
-  const l = (S.instructivos || []).map((x, i) => ({x, i, u: instUrl(x)}));
+  const l = (S.instructivos || []).map((x, i) => ({x, i, u: instUrl(x)})).filter(o => !o.x.oculto);
   const tarjeta = ({x, i, u}) => { const vid = esVideo(u), m = INST_META[u] || {}, tipo = vid ? "Video" + (m.dur ? " · " + m.dur : "") : esArchivoHub(u) ? "PDF" : u ? "Link" : "Próximamente";
     const img = m.poster ? `<img src="${esc(m.poster)}" alt="" loading="lazy">` : `<span class="inst-ph">${ico(vid ? "_inst" : esArchivoHub(u) ? "_doc" : "_link")}</span>`;
     const cuerpo = `<span class="inst-img">${img}${vid ? `<span class="inst-play" aria-hidden="true"></span>` : ""}</span><span class="inst-tx"><b>${esc(x.titulo || "Instructivo")}</b><span class="tiny muted">${tipo}</span></span>`;
     if (!u) return `<div class="inst-card off">${cuerpo}</div>`;
     return vid || esArchivoHub(u) ? `<a class="inst-card" href="${esc(u)}" data-act="instVer" data-v="${i}">${cuerpo}</a>` : `<a class="inst-card" href="${esc(u)}" target="_blank" rel="noopener">${cuerpo}</a>`; };
   return `<div class="page-head"><div><div class="eyebrow">Instructivos</div><h1>Instructivos generales</h1>
-   <p class="muted">Videos y guías para acompañar al cliente: abrir la cuenta, operar y dar de alta su empresa.</p></div></div>
+   <p class="muted">Videos y guías para acompañar al cliente: abrir la cuenta, operar, ver su resumen y sus movimientos, recuperar la contraseña y dar de alta su empresa.</p></div></div>
    ${l.length ? `<div class="inst-grid">${l.map(tarjeta).join("")}</div>` : `<div class="empty">Todavía no hay instructivos cargados.${puedeGestionar() ? ` Cargalos desde <a href="#gestion">Gestión</a>.` : ""}</div>`}
    ${puedeGestionar() ? `<p class="tiny muted" style="margin-top:14px">Los títulos, links y PDF se editan en <a href="#gestion">Gestión</a>.</p>` : ""}`;
 }
-const instUrl = x => (x && x.url) || INST_VIDEO[sinAcento(String((x && x.titulo) || "").trim())] || "";
+const instUrl = x => x && x.oculto ? "" : (x && x.url) || INST_VIDEO[claveInst(x && x.titulo)] || "";
 function instructivosHTML(){
   const l = S.instructivos || [];
   if (!l.length) return `<p class="small muted">Todavía no hay instructivos cargados.${puedeGestionar() ? ` Cargalos desde <a href="#gestion">Gestión</a>.` : ""}</p>`;
@@ -2095,19 +2112,19 @@ function instEditorHTML(){
   if (!S.instEd) S.instEd = JSON.parse(JSON.stringify(S.instructivos || []));
   const l = S.instEd;
   return `<div class="panel" style="margin-bottom:18px"><h3>Instructivos generales</h3><p class="small muted" style="margin:-4px 0 12px">Se muestran en la sección Instructivos del menú. Cada uno puede tener un link o un PDF. Los videos los suma quien mantiene el Hub.</p>
-   <div class="stack" style="gap:10px">${l.map((x, i) => `<div class="inst-row">
+   <div class="stack" style="gap:10px">${l.map((x, i) => x.oculto ? "" : esVideoHub(instUrl(x)) ? `<div class="inst-row"><input class="input" data-inst="${i}" data-f="titulo" value="${esc(x.titulo || "")}" placeholder="Título del instructivo" aria-label="Título"><input class="input" value="" placeholder="Video del Hub" aria-label="Video" disabled><span class="btn-row"><button class="btn ghost" type="button" data-act="instVer" data-v="${i}" data-ed="1">Ver video</button><button class="btn ghost" type="button" data-act="instDel" data-v="${i}" aria-label="Eliminar">Eliminar</button></span></div>` : `<div class="inst-row">
      <input class="input" data-inst="${i}" data-f="titulo" value="${esc(x.titulo || "")}" placeholder="Título del instructivo" aria-label="Título">
      <input class="input" data-inst="${i}" data-f="url" value="${esc(esArchivoHub(x.url) ? "" : (x.url || ""))}" placeholder="${esArchivoHub(x.url) ? "PDF cargado" : "https://… (link al instructivo)"}" aria-label="Link" ${esArchivoHub(x.url) ? "disabled" : ""}>
      <span class="btn-row">${esArchivoHub(x.url) ? `<button class="btn ghost" type="button" data-act="instVer" data-v="${i}" data-ed="1">Ver PDF</button><button class="btn ghost" type="button" data-act="instSinPdf" data-v="${i}">Quitar PDF</button>` : `<label class="btn ghost" style="cursor:pointer">Subir PDF<input type="file" accept="application/pdf" data-instpdf="${i}" hidden></label>`}<button class="btn ghost" type="button" data-act="instDel" data-v="${i}" aria-label="Eliminar">Eliminar</button></span></div>`).join("")}</div>
    <div class="btn-row" style="margin-top:12px"><button class="btn" type="button" data-act="instAdd">${ico("_plus")}Agregar instructivo</button><button class="btn primary" type="button" data-act="instSave">Guardar instructivos</button></div></div>`;
 }
 async function instGuardar(b){
-  const lista = (S.instEd || []).map(x => ({titulo: String(x.titulo || "").trim(), url: String(x.url || "").trim()})).filter(x => x.titulo || x.url);
-  const mala = lista.find(x => x.url && !esArchivoHub(x.url) && !/^https?:\/\//i.test(x.url));
+  const lista = (S.instEd || []).map(x => x.oculto ? {titulo: String(x.titulo || "").trim(), url: "", oculto: true} : {titulo: String(x.titulo || "").trim(), url: String(x.url || "").trim()}).filter(x => x.titulo || x.url);
+  const mala = lista.find(x => x.url && !esArchivoHub(x.url) && !esVideoHub(x.url) && !/^https?:\/\//i.test(x.url));
   if (mala) { toast(`El link de "${mala.titulo || "un instructivo"}" tiene que empezar con https://`); return; }
   if (!S.db) return;
   b.disabled = true; b.textContent = "Guardando…";
-  try { window.neixQue = "editó los instructivos"; await S.db.doc("config/instructivos").set({lista}); S.instructivos = lista; S.instEd = null; toast("Instructivos guardados"); render(); }
+  try { window.neixQue = "editó los instructivos"; await S.db.doc("config/instructivos").set({lista}); S.instructivos = instMezcla(lista); S.instEd = null; toast("Instructivos guardados"); render(); }
   catch(e) { toast("No se pudieron guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); b.disabled = false; b.textContent = "Guardar instructivos"; }
 }
 async function instSubirPdf(i, file){
@@ -2199,7 +2216,7 @@ document.addEventListener("click", e => {
   else if (a==="opVer") { uso(id, "o"); opVer(id); }
   else if (a==="instVer") { e.preventDefault(); const l = b.dataset.ed ? S.instEd : S.instructivos, x = l && l[+v]; const u = instUrl(x); if (u) verArchivo(u, x.titulo || "Instructivo"); }
   else if (a==="instAdd") { S.instEd.push({titulo:"", url:""}); render(); }
-  else if (a==="instDel") { S.instEd.splice(+v, 1); render(); }
+  else if (a==="instDel") { const x = S.instEd[+v]; if (x && INST_VIDEO[claveInst(x.titulo)]) { x.oculto = true; x.url = ""; } else S.instEd.splice(+v, 1); render(); }
   else if (a==="instSinPdf") { S.instEd[+v].url = ""; render(); }
   else if (a==="instSave") instGuardar(b);
   else if (a==="prodNuevo") prodNuevo();
@@ -2367,7 +2384,7 @@ async function boot(){
   }, () => { if (src === db && usarRespaldo()) return; clearTimeout(timer); S.loading = false; if (!S.productos.length) S.dbMissing = true; render(); });
   src.collection("validaciones").onSnapshot(snap => { const v = {}; snap.docs.forEach(d=>v[d.id]=d.data()); S.vals = v; if (S.productos.length) softRender(); }, ()=>{});
   src.doc("config/asesores").onSnapshot(d => { S.asesores = d.exists ? (d.data().lista||[]) : []; const r = route(); if (r==="propuesta"||r==="presentaciones") softRender(); }, ()=>{});
-  src.doc("config/instructivos").onSnapshot(d => { S.instructivos = d.exists ? (d.data().lista || []) : []; S.instEd = null; softRender(); }, ()=>{});
+  src.doc("config/instructivos").onSnapshot(d => { S.instructivos = instMezcla(d.exists ? (d.data().lista || []) : []); S.instEd = null; softRender(); }, ()=>{});
   src.doc("config/impuestos").onSnapshot(d => { S.imp = d.exists ? d.data() : null; if (S.productos.length) softRender(); }, ()=>{});
   src.doc("config/onepagers").onSnapshot(d => { S.onepagers = d.exists ? (d.data().map||{}) : {}; if (S.raw) { setProductos(S.raw); softRender(); } }, ()=>{});
   };

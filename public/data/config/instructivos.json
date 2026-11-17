@@ -1,7 +1,28 @@
 {
  "lista": [
-  {"titulo": "Apertura de cuenta comitente", "url": "instructivos/apertura-de-cuenta.mp4"},
-  {"titulo": "Cómo operar en home banking y app", "url": "instructivos/como-operar.mp4"},
-  {"titulo": "Alta de empresas en EPYME", "url": "instructivos/alta-epyme.mp4"}
+  {
+   "titulo": "Apertura de cuenta comitente",
+   "url": "instructivos/apertura-de-cuenta.mp4"
+  },
+  {
+   "titulo": "Cómo operar en home banking y app",
+   "url": "instructivos/como-operar.mp4"
+  },
+  {
+   "titulo": "Alta de empresas en EPYME",
+   "url": "instructivos/alta-epyme.mp4"
+  },
+  {
+   "titulo": "Resumen de cuenta",
+   "url": "instructivos/resumen-de-cuenta.mp4"
+  },
+  {
+   "titulo": "Detalle de movimientos",
+   "url": "instructivos/detalle-de-movimientos.mp4"
+  },
+  {
+   "titulo": "Recuperar contraseña",
+   "url": "instructivos/recuperar-contrasena.mp4"
+  }
  ]
 }
