@@ -2153,29 +2153,41 @@ function instMezcla(lista){
 const INST_META = Object.fromEntries(INST_BASE.map(x => [x.url, {poster: x.url.replace(/\.mp4$/, ".jpg"), dur: x.dur}]));
 /* Mandar un instructivo al cliente: en el celular (y en Chrome o Edge) se abre el menú de compartir con el video o el PDF adjunto;
    si el navegador no puede adjuntar, se descarga para arrastrarlo al mensaje. Los links se comparten como link. */
-async function instEnviar(i, b){
+function instEnviar(i){
   const x = (S.instructivos || [])[i], u = instUrl(x); if (!u) return;
-  const titulo = x.titulo || "Instructivo", texto = `Hola, te comparto el instructivo "${titulo}" de Neix.`;
+  const titulo = x.titulo || "Instructivo", archivo = esVideo(u) || esArchivoHub(u);
+  const E = S.envio = {inst: true, titulo, u, archivo: null};
+  if (archivo) fetch(u, {credentials: "same-origin"}).then(r => { if (!r.ok) throw 0; return r.blob(); }).then(blob => {
+    const ext = esVideo(u) ? (u.match(/\.(mp4|webm|mov)/i) || [, "mp4"])[1].toLowerCase() : "pdf";
+    E.archivo = new File([blob], `${titulo} - Neix.${ext}`, {type: blob.type || (ext === "pdf" ? "application/pdf" : "video/" + ext)});
+    if (S.envio === E) { const n = $("#shAtt"); if (n) n.textContent = (esVideo(u) ? "Video listo: " : "PDF listo: ") + E.archivo.name; const bt = $("#shInstGo"); if (bt) bt.disabled = false; }
+  }).catch(() => { if (S.envio === E) { const n = $("#shAtt"); if (n) n.textContent = "No pudimos preparar el archivo. Probá de nuevo."; } });
+  const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
+  div.innerHTML = `<div class="box" role="dialog" aria-modal="true" aria-labelledby="shT"><h3 id="shT">Enviar al cliente</h3>
+    <label class="f" for="shMsg">Mensaje<textarea class="input" id="shMsg">${esc(`Hola, te comparto el instructivo "${titulo}" de Neix.`)}</textarea></label>
+    ${archivo ? `<div class="att" id="shAtt">Preparando el ${esVideo(u) ? "video" : "PDF"}…</div>` : `<div class="att">Se comparte el link: ${esc(u)}</div>`}
+    <p class="tiny muted" style="margin:0">${archivo ? "Al tocar Enviar se abre el menú para compartir con el archivo adjunto: elegí WhatsApp o tu mail y el contacto. El mensaje queda copiado; si no aparece, pegalo. Si el navegador no puede adjuntar, el archivo se descarga para que lo arrastres al mensaje." : "Al tocar Enviar se abre el menú para compartir. Si no está disponible, el mensaje con el link queda copiado."}</p>
+    <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button><button class="btn primary" id="shInstGo" data-act="instEnviarGo" ${archivo ? "disabled" : ""}>${ico("_send")}Enviar</button></div></div>`;
+  document.body.appendChild(div);
+  const t = $("#shMsg"); if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); }
+}
+async function instEnviarGo(){
+  const E = S.envio; if (!E || !E.inst) return;
+  const texto = (($("#shMsg") || {}).value || "").trim();
   const copiar = t => navigator.clipboard ? navigator.clipboard.writeText(t).then(() => true, () => false) : Promise.resolve(false);
-  if (!esVideo(u) && !esArchivoHub(u)) {
-    if (navigator.share) { try { await navigator.share({title: titulo, text: texto, url: u}); } catch(_) {} return; }
-    if (await copiar(texto + " " + u)) toast("Link copiado: pegalo en WhatsApp o en el mail"); return;
+  if (!E.archivo) {   // link externo
+    if (navigator.share) { try { await navigator.share({title: E.titulo, text: texto, url: E.u}); cerrarEnvio(); } catch(e) { if (!(e && e.name === "AbortError")) toast("No se pudo abrir el menú para compartir"); } return; }
+    if (await copiar((texto + " " + E.u).trim())) { cerrarEnvio(); toast("Mensaje y link copiados: pegalos en WhatsApp o en el mail"); } return;
   }
-  const txt = b.innerHTML; b.disabled = true; b.textContent = "Preparando…";
-  try {
-    const r = await fetch(u, {credentials: "same-origin"}); if (!r.ok) throw new Error("archivo");
-    const blob = await r.blob(), ext = esVideo(u) ? (u.match(/\.(mp4|webm|mov)/i) || [, "mp4"])[1].toLowerCase() : "pdf";
-    const file = new File([blob], `${titulo} - Neix.${ext}`, {type: blob.type || (ext === "pdf" ? "application/pdf" : "video/" + ext)});
-    if (navigator.canShare && navigator.canShare({files: [file]})) {
-      const copiado = copiar(texto);
-      try { await navigator.share({files: [file], text: texto, title: titulo}); if (await copiado) toast("Si el mensaje no aparece, pegalo: ya está copiado"); }
-      catch(e) { if (!(e && e.name === "AbortError")) toast("No se pudo abrir el menú para compartir"); }
-    } else if (S.dl) {
-      await S.dl.save({filename: file.name, data: file}); copiar(texto);
-      toast("Se descargó el archivo: adjuntalo en WhatsApp o en el mail. El mensaje quedó copiado.");
-    }
-  } catch(e) { toast("No pudimos preparar el archivo. Probá de nuevo."); }
-  b.disabled = false; b.innerHTML = txt;
+  if (navigator.canShare && navigator.canShare({files: [E.archivo]})) {
+    const copiado = copiar(texto);
+    try { await navigator.share({files: [E.archivo], text: texto, title: E.titulo}); cerrarEnvio(); if (await copiado) toast("Si el mensaje no aparece, pegalo: ya está copiado"); }
+    catch(e) { if (!(e && e.name === "AbortError")) toast("No se pudo abrir el menú para compartir"); }
+    return;
+  }
+  if (S.dl) { try { await S.dl.save({filename: E.archivo.name, data: E.archivo}); } catch(_) {} }
+  await copiar(texto); cerrarEnvio();
+  toast("Se descargó el archivo: adjuntalo en WhatsApp o en el mail. El mensaje quedó copiado.");
 }
 function vInstructivos(){
   const l = (S.instructivos || []).map((x, i) => ({x, i, u: instUrl(x)})).filter(o => !o.x.oculto);
@@ -2348,7 +2360,8 @@ document.addEventListener("click", e => {
   else if (a==="pzPDF") pzPDF();
   else if (a==="openSim") { S.sim = v; }
   else if (a==="fav") { e.preventDefault(); e.stopPropagation(); favToggle(id); }
-  else if (a==="instEnviar") instEnviar(+v, b);
+  else if (a==="instEnviar") instEnviar(+v);
+  else if (a==="instEnviarGo") instEnviarGo();
   else if (a==="simmon") { const sv = S.simv[S.sim]; if (sv.mon !== v) { sv.mon = v; Object.assign(sv, (SIM_MON[S.sim]||{})[v] || {}); } $("#simForm").innerHTML = simForm(); calcSim(); }
   else if (a==="simset") { S.simv[S.sim][b.dataset.k] = v; $("#simForm").innerHTML = simForm(); calcSim(); }
 });
