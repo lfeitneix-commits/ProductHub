@@ -954,13 +954,43 @@ async function opQuitar(id){
   try { window.neixQue = "eliminó el one pager"; await S.db.doc("productos/"+id).update({onePager: null, onePagerQuitado: true}); toast("One pager eliminado. Ya podés subir otro."); render(); }
   catch(e) { toast("No se pudo eliminar. Probá de nuevo."); }
 }
+/* Antes de subir un PDF desde Gestión, se le agregan links a los mails, webs y teléfonos que tenga escritos
+   (pdf.js encuentra dónde está cada texto y pdf-lib agrega el link). Si algo falla, se sube el original. */
+async function enlazarPDF(file){
+  try {
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js");
+    const pdfjs = window.pdfjsLib; pdfjs.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const src = await pdfjs.getDocument({data: bytes.slice()}).promise;
+    const { PDFDocument, PDFName, PDFString } = window.PDFLib, doc = await PDFDocument.load(bytes);
+    const re = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+|(?:https?:\/\/|www\.)[^\s,;)]+|\+54\s?9\s?\d{2,4}\s?\d{3,4}[\s-]?\d{4}|\(0?\d{2,4}\)\s?\d{3,4}[\s-]?\d{4}/g;
+    const destino = m => m.includes("@") ? "mailto:" + m : /^(https?:|www\.)/.test(m) ? (/^http/.test(m) ? m : "https://" + m.replace(/\.$/, "")) : /^\+54/.test(m) ? "https://wa.me/" + m.replace(/\D/g, "") : "tel:+54" + m.replace(/\D/g, "").replace(/^0/, "");
+    let n = 0;
+    for (let i = 0; i < src.numPages; i++) {
+      const pg = await src.getPage(i + 1), tc = await pg.getTextContent(), page = doc.getPage(i);
+      for (const it of tc.items) {
+        const str = it.str || ""; if (!str) continue; re.lastIndex = 0; let m;
+        while ((m = re.exec(str))) {
+          const [a, b, , d, e, f] = it.transform, ancho = it.width / Math.max(1, str.length), alto = Math.hypot(b, d) || Math.abs(d) || 10;
+          const x1 = e + ancho * m.index, x2 = x1 + ancho * m[0].length;
+          const link = doc.context.register(doc.context.obj({Type:"Annot", Subtype:"Link", Rect:[x1, f - alto * 0.25, x2, f + alto * 0.95], Border:[0, 0, 0],
+            A: {Type:"Action", S:"URI", URI: PDFString.of(destino(m[0].replace(/\.$/, "")))}}));
+          page.node.addAnnot(link); n++;
+        }
+      }
+    }
+    if (!n) return file;
+    return new File([await doc.save()], file.name, {type: "application/pdf"});
+  } catch (e) { console.warn("No se pudieron agregar los links al PDF", e); return file; }
+}
 async function upOP(id){
   const pdf = ($("#up_pdf")||{}).files?.[0];
   if (!pdf) { toast("Elegí el PDF del one pager"); return; }
   if (!S.assets || !S.db) { toast("No tenés permiso para subir archivos"); return; }
   const b = document.querySelector('[data-act="upOP"]'); if (b) { b.disabled = true; b.textContent = "Subiendo"; }
   try {
-    const a = await S.assets.upload(pdf, id), p = S.byId[id];
+    const a = await S.assets.upload(await enlazarPDF(pdf), id), p = S.byId[id];
     const op = {pdf:a.id, archivo: p.nombre+" - Neix.pdf", fecha: todayISO()};
     window.neixQue = "subió un one pager"; await S.db.doc("productos/"+id).update({onePager: op, onePagerQuitado: false}); toast("One pager cargado"); go("editar-"+id);
   } catch(e) { toast(e && e.message && e.message !== "subir" ? e.message : "No se pudo subir. Revisá el archivo y probá de nuevo."); if (b) { b.disabled = false; b.textContent = "Subir one pager"; } }
@@ -1430,7 +1460,7 @@ function cpdDoc(v){
    <div class="opx-why"><h2>Por qué Neix</h2><div class="opx-four"><div>Asesoramiento personalizado con especialistas.</div><div>Soluciones integradas en tipo de cambio y commodities.</div><div>Top 5 en ByMA y top 10 en A3.</div><div>Seguridad operativa y altos estándares normativos.</div></div></div>
   </div>
   <div class="opx-foot">
-   <div class="opx-foot-top"><div>${hayAsesor ? `<b>Asesor · ${esc(v.asesor)}</b><span>${[v.tel ? telLink(v.tel) : "", v.mail ? mailLink(v.mail) : ""].filter(Boolean).join(" · ")}</span>` : `<b>Contacto · Banca Corporativa</b><span>(011) 4859-1552 · bancacorporativa@neix.com.ar</span>`}<span>Don Francisco 3345, piso 5, San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></span></div>
+   <div class="opx-foot-top"><div>${hayAsesor ? `<b>Asesor · ${esc(v.asesor)}</b><span>${[v.tel ? telLink(v.tel) : "", v.mail ? mailLink(v.mail) : ""].filter(Boolean).join(" · ")}</span>` : `<b>Contacto · Banca Corporativa</b><span>${FIJO} · ${mailLink("bancacorporativa@neix.com.ar")}</span>`}<span>Don Francisco 3345, piso 5, San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></span></div>
     <em>Neix. Inteligencia Financiera.</em></div>
    <p>${esc(LEGAL_CPD(fLarga(v.fNeg)))}</p></div></div>`;
 }
@@ -1622,7 +1652,7 @@ function propDoc(){
     <div class="pp-facts"><span><b>Moneda</b> ${esc(p.cliente.ficha.moneda)}</span><span><b>Plazo</b> ${esc(p.cliente.ficha.plazo)}</span><span><b>Monto</b> ${esc(p.cliente.ficha.minimo)}</span><span><b>Liquidez</b> ${esc(p.cliente.ficha.liquidez)}</span></div>
     <p class="pp-note">${esc(p.cliente.aTener.join(" "))}</p></div></div>`).join("")}
    <div class="pp-sec"><div class="ey">Próximos pasos</div><div class="pp-steps"><div><b>Lo revisamos juntos</b>Repasamos cada idea con tus números y resolvemos tus dudas.</div><div><b>Definimos el plan</b>Montos, plazos y el orden de implementación.</div><div><b>Lo implementamos</b>Nos ocupamos de la operatoria y te acompañamos en el seguimiento.</div></div>
-    <div class="pp-contact"><div><div class="ey">Tu asesor en Neix</div><div style="font-family:Inter,Arial,sans-serif;font-weight:300;font-size:18px;margin-top:2px">${esc(P.asesor||"Tu asesor")}</div></div><div style="font-size:13px">${[P.mail ? mailLink(P.mail) : "", P.tel ? telLink(P.tel) : ""].filter(Boolean).join(" · ") || esc(P.contacto || "(011) 4859-1552")} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div>
+    <div class="pp-contact"><div><div class="ey">Tu asesor en Neix</div><div style="font-family:Inter,Arial,sans-serif;font-weight:300;font-size:18px;margin-top:2px">${esc(P.asesor||"Tu asesor")}</div></div><div style="font-size:13px">${[P.mail ? mailLink(P.mail) : "", P.tel ? telLink(P.tel) : ""].filter(Boolean).join(" · ") || (P.contacto ? enlazarTexto(P.contacto) : FIJO)} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div>
     <p class="pp-legal">${esc(LEYENDA)}</p></div>
   </div></div>`;
 }
@@ -1800,7 +1830,17 @@ window.addEventListener("resize", scaleDeck);
 /* Celular y mail del asesor como links en los documentos: el celular abre WhatsApp y el mail, un correo nuevo. */
 const telLink = t => { const n = telWA(t); return n ? `<a class="web" href="https://wa.me/${n}" target="_blank" rel="noopener">${esc(t)}</a>` : esc(t); };
 const mailLink = m => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(m||"").trim()) ? `<a class="web" href="mailto:${esc(String(m).trim())}">${esc(m)}</a>` : esc(m);
-function linksDe(root){ const b = root.getBoundingClientRect(); return [...root.querySelectorAll("a[href^='http'],a[href^='mailto:']")].map(a => { const r = a.getBoundingClientRect(); return {x:r.left-b.left, y:r.top-b.top, w:r.width, h:r.height, url:a.href}; }); }
+/* Teléfono fijo de Neix (llama) y cualquier texto con mails, webs o teléfonos convertido en links. */
+const FIJO = `<a class="web" href="tel:+541148591552">(011) 4859-1552</a>`;
+function enlazarTexto(t){
+  return esc(t).replace(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+|(?:https?:\/\/|www\.)[^\s,;<)]+|\+54\s?9\s?\d{2,4}\s?\d{3,4}[\s-]?\d{4}|\(0?\d{2,4}\)\s?\d{3,4}[\s-]?\d{4}/g, m => {
+    if (m.includes("@")) return mailLink(m);
+    if (/^(https?:|www\.)/.test(m)) return `<a class="web" href="${/^http/.test(m) ? m : "https://" + m}" target="_blank" rel="noopener">${m}</a>`;
+    if (/^\+54/.test(m)) return telLink(m);
+    return `<a class="web" href="tel:+54${m.replace(/\D/g, "").replace(/^0/, "")}">${m}</a>`;
+  });
+}
+function linksDe(root){ const b = root.getBoundingClientRect(); return [...root.querySelectorAll("a[href^='http'],a[href^='mailto:'],a[href^='tel:']")].map(a => { const r = a.getBoundingClientRect(); return {x:r.left-b.left, y:r.top-b.top, w:r.width, h:r.height, url:a.href}; }); }
 async function propPDFBlob(){ return docPDFBlob(propDoc()); }
 /* One pager sin PDF oficial: se arma en PDF con el mismo formato que la descarga. */
 function onePagerPDFBlob(p){ const head = EXPORT_HEAD(p.nombre+" · Neix"); return docPDFBlob(onePagerDoc(p).slice(head.length).replace("</body></html>","")); }
@@ -1961,7 +2001,7 @@ function onePagerDoc(p){
   <div class="pp-sec" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px"><div><div class="ey">Para quién es</div><p style="margin-top:8px">${esc(c.paraQuien)}</p></div>
    <div><div class="ey">Cómo funciona</div><ol style="margin:8px 0 0;padding-left:18px">${c.comoFunciona.map(s=>`<li style="margin-bottom:4px">${esc(s)}</li>`).join("")}</ol></div></div>
   ${tax}<div class="pp-sec"><div class="ey">Lo que tenés que saber</div><ul style="margin:8px 0 0;padding-left:18px">${c.aTener.map(a=>`<li style="margin-bottom:4px">${esc(a)}</li>`).join("")}</ul>
-   <div class="pp-contact"><div><div class="ey">En Neix</div><p style="margin-top:4px;max-width:52ch">${esc(c.enNeix)}</p></div><div style="font-size:13px">${p.unidades[0]} · ${contacto}<br>(011) 4859-1552 · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div>
+   <div class="pp-contact"><div><div class="ey">En Neix</div><p style="margin-top:4px;max-width:52ch">${esc(c.enNeix)}</p></div><div style="font-size:13px">${p.unidades[0]} · ${mailLink(contacto)}<br>${FIJO} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div>
    <p class="pp-legal">${esc(LEYENDA)}</p></div></div></div></body></html>`;
 }
 async function download(filename, html){
@@ -2131,7 +2171,7 @@ async function instSubirPdf(i, file){
   if (!file || !S.assets) return;
   if (!(file.type === "application/pdf" || /\.pdf$/i.test(file.name))) { toast("Tiene que ser un PDF"); return; }
   toast("Subiendo PDF…");
-  try { const a = await S.assets.upload(file, "instructivo"); S.instEd[i].url = a.id; if (!S.instEd[i].titulo) S.instEd[i].titulo = file.name.replace(/\.pdf$/i, ""); toast("PDF cargado. Tocá Guardar instructivos."); render(); }
+  try { const a = await S.assets.upload(await enlazarPDF(file), "instructivo"); S.instEd[i].url = a.id; if (!S.instEd[i].titulo) S.instEd[i].titulo = file.name.replace(/\.pdf$/i, ""); toast("PDF cargado. Tocá Guardar instructivos."); render(); }
   catch(e) { toast(e && e.message && e.message !== "subir" ? e.message : "No se pudo subir el PDF"); }
 }
 

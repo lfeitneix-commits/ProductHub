@@ -159,3 +159,10 @@ para no gastar las escrituras del plan gratis de Vercel Blob. Por eso los númer
 
 Ojo: el plan Hobby de Vercel permite hasta 12 funciones y el middleware cuenta como una. Hoy hay 10 en `api/` más el middleware (11).
 Para sumar otra (por ejemplo, la tenencia de NEIX Connect), unir antes las de `api/auth/` en una sola.
+
+## Links en los one pagers
+Todos los mails (correo nuevo), webs, celulares (WhatsApp) y el fijo de Neix (llamada) son clickeables:
+- One pagers que arma el Hub y propuestas: se generan con los links.
+- PDF oficiales del repo: `python3 scripts/enlazar-pdfs.py public/onepagers/*.pdf` (requiere `pip install pymupdf`). Correrlo cada vez que se suma un PDF al repo y subir la versión `?v=` en `public/data/config/onepagers.local.json`.
+- PDF subidos desde Gestión: el navegador les agrega los links antes de subirlos (`enlazarPDF`).
+Los PDF escaneados (imagen, sin texto) no se pueden enlazar.
