@@ -560,6 +560,14 @@ td:first-child{color:var(--ink)}
 .sl .ben b{display:block;font-size:14px;font-weight:600;color:#2A2927;margin-bottom:6px}
 .sl .ben span{display:block;font-size:12.5px;line-height:1.6;color:#4A4640}
 .sl .pnum{font-family:"Playfair Display",Georgia,serif;font-size:20px;color:#9A8E7D;margin-right:14px}
+/* contenido (propuesta) */
+.sl .toc{position:absolute;left:80px;right:80px;top:268px;border-bottom:1px solid #DCD6CD}
+.sl .toc>div{display:grid;grid-template-columns:90px 1fr auto;align-items:baseline;padding:28px 0;border-top:1px solid #DCD6CD}
+.sl .toc i{font-style:normal;font-family:"Playfair Display",Georgia,serif;font-size:26px;color:#8C7F6B}
+.sl .toc b{display:block;font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:30px;color:#2A2927;margin-bottom:8px}
+.sl .toc span{font-size:14px;line-height:1.6;color:#4A4640}
+.sl .toc em{font-style:normal;font-size:12.5px;letter-spacing:.2em;color:#8C7F6B}
+.sl .toc-nota{position:absolute;left:80px;right:80px;bottom:96px;padding:18px 24px}.sl .toc-nota span{font-size:13px;color:#D6CFC5}
 /* cierre */
 .sl .fin{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .sl .fin img{height:62px}
@@ -1679,7 +1687,7 @@ function vPropuesta(){
   P.items.forEach(it => { const p = S.byId[it.id]; if (!p) return; p.interno.relacionados.forEach(r => { if (!P.items.some(i=>i.id===r) && S.byId[r]) (sug[r] = sug[r] || []).push(p.nombre); }); });
   return `<div class="page-head"><div><div class="eyebrow">Propuesta</div><h1>Armá la propuesta</h1>
   <p class="muted">Sumá productos, contá por qué tienen sentido para este cliente y exportala lista para enviar.</p></div>
-  <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
+  <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn" data-act="dlPropPres" ${P.items.length?"":"disabled"} title="La propuesta como diapositivas, con la parte institucional">${ico("_inst")}Presentación</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
   <div class="pr-grid"><div class="stack">
    ${P.analisis ? `<div class="panel ia-prop" style="margin:0"><div><b>Incluye el análisis de cartera</b><span>Hecho el ${fdate(P.analisis.fecha)} desde Cliente. Va antes de los productos.</span></div><button class="btn ghost" data-act="iaPropQuitar">Quitar</button></div>` : ""}
    <div class="panel stack"><h3 style="margin:0">Para quién</h3>
@@ -1814,16 +1822,20 @@ function haloSlide(W = 1280, H = 720, tipo = "dk"){
 }
 /* Título en dos líneas parejas (sin itálica, como en la institucional). */
 function tituloPF(t){
-  const w = String(t||"").trim().split(/\s+/).filter(Boolean); if (w.length < 2) return esc(t||"");
+  const w = String(t||"").trim().split(/\s+/).filter(Boolean); if (w.length < 2 || w.join(" ").length <= 16) return esc(t||"");
   let best = 1, dif = 1e9; const tot = w.join(" ").length;
   for (let i = 1; i < w.length; i++) { const a = w.slice(0,i).join(" ").length, d = Math.abs(a - (tot - a)); if (d < dif) { dif = d; best = i; } }
   return `${esc(w.slice(0,best).join(" "))}<br>${esc(w.slice(best).join(" "))}`;
 }
 const recortar = (t, max) => { t = String(t || ""); if (t.length <= max) return t; const c = t.slice(0, max), p = c.lastIndexOf(". "); return p > max * 0.6 ? c.slice(0, p + 1) : c.slice(0, c.lastIndexOf(" ")) + "…"; };
-function deckSlides(){
-  const P = S.pz, items = P.items.map(id=>S.byId[id]).filter(Boolean), out = [];
+/* La misma función arma la presentación de Presentaciones (S.pz) y la de Propuesta en formato presentación (propCfg):
+   esta última suma, como la presentación de Holcim, el contenido, las partes I y II, lo conversado y el porqué de cada producto. */
+function deckSlides(cfg){
+  const P = cfg || S.pz, prop = P.modo === "propuesta", out = [];
+  const lista = P.prods || P.items.map(id => ({id})), items = lista.map(x => S.byId[x.id]).filter(Boolean), notaDe = Object.fromEntries(lista.map(x => [x.id, (x.nota || "").trim()]));
+  const cli = (P.cliente || "").trim().replace(/\.+$/, ""), marcas = {};
   const area = P.area && P.area !== "Estrategia" ? P.area.replace("Mesa · ","") : "";
-  const label = P.cliente ? `Presentación para ${P.cliente.trim()}` : "Presentación institucional";
+  const label = P.cliente ? `${prop ? "Propuesta" : "Presentación"} para ${cli}` : (prop ? "Propuesta" : "Presentación institucional");
   const halo = (W, H, t) => `background-image:url(${haloSlide(W, H, t)})`;
   const fondo = (W, H, t, pos) => `<div class="bg" style="${pos};${halo(W, H, t)}"></div>`;
   const pie = lt => `<img class="ftl" src="${lt ? LOGO_DARK : LOGO_LIGHT}" alt="NEIX"><span class="ftr">${esc(label)}</span>`;
@@ -1837,6 +1849,10 @@ function deckSlides(){
   out.push(`<div class="sl">${fondo(1280, 720, "dk", "inset:0")}<img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><span class="lbl">${esc(label)}</span>
     <div class="cov"><div class="ey">${esc(area ? "Neix · " + area : "Neix · 2008 – 2026")}</div><h1 class="pf" style="font-size:${String(P.titulo||"").length > 26 ? 74 : 88}px">${tituloPF(P.titulo)}</h1><div class="rule"></div>${P.bajada ? `<p>${esc(P.bajada)}</p>` : ""}</div>
     <p class="legal">NEIX S.A. ALyC Propio registrado bajo el N° 145 de la CNV y Agente de Colocación y Distribución Integral de FCI registrado bajo el N° 14 de la CNV.</p></div>`);
+  const parte = (n, titulo, texto) => `<div class="sl">${fondo(1280, 720, "dk", "inset:0")}<img class="lg" src="${LOGO_LIGHT}" alt="NEIX"><span class="lbl">${esc(label)}</span>
+    <div class="cov" style="top:230px"><div class="ey">Parte ${n}</div><h1 class="pf" style="font-size:80px">${titulo}</h1><div class="rule"></div><p>${esc(texto)}</p></div></div>`;
+  if (prop) out.push("%%CONTENIDO%%");
+  if (prop && P.inst) { marcas.i1 = out.length + 1; out.push(parte("I", "NEIX<br>Inteligencia Financiera", "Una ALyC con perfil bancario, foco en empresas, familias e inversores, y estándares de compliance de primera línea.")); }
 
   if (P.inst) {
     // 3. Quiénes somos
@@ -1855,16 +1871,26 @@ function deckSlides(){
     const dirs = [["goyheneix","Esteban Goyheneix","Chairman & Founder","Licenciado en Administración de Empresas (Universidad de Belgrano), con posgrados en Harvard y en la Universidad Torcuato Di Tella. Más de 30 años en el mercado financiero, con cargos directivos en Banco Galicia y Finansur. Fundó Neix en 2008."],
       ["mieres","Lucas Mieres","Presidente","Licenciado en Administración de Empresas (UCA), con especialización en Finanzas en la Universidad de San Andrés. Más de 20 años en el mercado financiero, carrera que comenzó en Banco Finansur."],
       ["olid","Silvia Olid","Directora","Licenciada en Administración de Empresas (UBA). Más de 30 años en el mercado de capitales desde sus inicios en HSBC, 15 de ellos en Prevención de Lavado de Activos. Es Oficial de Cumplimiento PLD de Neix."]];
-    out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(330, "Quiénes conducen Neix", "Accionistas y Directores")}
+    if (!P.instCorta) out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(330, "Quiénes conducen Neix", "Accionistas y Directores")}
       <div class="dirs" style="top:285px">${dirs.map(([f, n, c, b]) => `<div><img src="img/inst/${f}.jpg" alt="${esc(n)}"><b>${n}</b><i>${c}</i><span>${b}</span></div>`).join("")}</div>${pie(true)}</div>`);
     // 7. Valores
-    out.push(`<div class="sl lt">${fondo(820, 720, "lt", "left:460px;top:0;width:820px;height:720px")}<div class="pan" style="${halo(460, 720, "dk")}"><div class="in"><div class="ey">Cultura</div><h2 class="pf">Nuestros<br>valores</h2><div class="rule"></div><p>Los principios que guían cómo trabajamos con cada cliente y entre nosotros.</p></div><img class="ftl" src="${LOGO_LIGHT}" alt="NEIX"></div>
+    if (!P.instCorta) out.push(`<div class="sl lt">${fondo(820, 720, "lt", "left:460px;top:0;width:820px;height:720px")}<div class="pan" style="${halo(460, 720, "dk")}"><div class="in"><div class="ey">Cultura</div><h2 class="pf">Nuestros<br>valores</h2><div class="rule"></div><p>Los principios que guían cómo trabajamos con cada cliente y entre nosotros.</p></div><img class="ftl" src="${LOGO_LIGHT}" alt="NEIX"></div>
       <div class="lst">${[["Excelencia","Un servicio de excelencia en cada interacción: entender qué necesita cada cliente y anticiparnos, con curiosidad, iniciativa y criterio propio."],["Equipo","Nuestro principal activo. Los logros son compartidos y los errores se convierten en aprendizaje colectivo para desarrollar, cada día, nuestra mejor versión."],["Integridad","Integridad, honestidad y confidencialidad en el centro del negocio: cumplimos la letra y el espíritu de las normas que nos rigen."],["Prioridad del cliente","Buscamos las mejores alternativas para cada cliente según sus objetivos, y construimos relaciones de largo plazo en un mercado que no se detiene."]].map(([t, d], i) => `<div><i>${pad2(i+1)}</i><div><b>${t}</b><span>${d}</span></div></div>`).join("")}</div><span class="ftr" style="color:#8C7F6B">${esc(label)}</span></div>`);
     // 8. Productos y servicios
     out.push(`<div class="sl">${fondo(1280, 720, "dk", "inset:0")}${enc("Unidades de negocio", "Productos y servicios")}
       <div class="uns">${[["Banca<br>Privada","Individuos y familias de alto patrimonio","Administración patrimonial orientada a preservar y hacer crecer el capital en el largo plazo: wealth management, estructuras societarias y eficiencia impositiva."],["Banca<br>Corporativa","Empresas y PyMEs","Financiamiento en el mercado de capitales, administración de tesorería, inversiones y cobertura de riesgo, con estrategias diseñadas para cada compañía."],["Mercado<br>de Capitales","Institucionales, aseguradoras, fondos y brokers","Sales & Trading y ejecución en bloque con tecnología propia. Hacedor de Mercado en A3 Mercados y market maker de CEDEARs en ByMA."],["Financial<br>Advisors","Asesores financieros independientes","Una red de más de 100 asesores que operan con el respaldo, las herramientas y el research de Neix, con libertad para gestionar a sus clientes."]].map(([n, p, d], i) => `<div><em>${pad2(i+1)}</em><b>${n}</b><i>Para</i><strong>${p}</strong><span>${d}</span></div>`).join("")}</div>${pie(false)}</div>`);
   }
 
+  if (prop) {
+    marcas.i2 = out.length; marcas.p1 = out.length + 1;
+    out.push(parte("II", cli ? `Propuesta<br>para ${esc(cli)}` : "La<br>propuesta", items.length ? `${items.length === 1 ? "Una línea" : items.length + " líneas"} de trabajo a partir de lo que conversamos.` : "A partir de lo que conversamos."));
+    if ((P.mensaje || "").trim()) out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(250, "Propuesta", "Lo que conversamos")}
+      <div class="pr"><div class="pr-top"><div class="quote" style="font-size:19px;white-space:pre-line">${esc(recortar(P.mensaje.trim(), 650))}</div>
+      <div class="box" style="${halo(360, 150, "dk")}"><b>${esc(P.asesor || "Tu asesor en Neix")}</b><span>${[P.area ? esc(P.area) + " · Neix" : "Neix", P.mail ? mailLink(P.mail) : "", P.tel ? telLink(P.tel) : ""].filter(Boolean).join("<br>")}</span></div></div></div>${pie(true)}</div>`);
+    if (P.analisis && P.analisis.resumen) out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(250, "Propuesta", "Análisis de tu cartera")}
+      <div class="pr"><div class="quote" style="margin-top:0;font-size:17.5px">${esc(recortar(P.analisis.resumen, 420))}</div>
+      <div class="ben" style="grid-template-columns:repeat(2,1fr);row-gap:22px;margin-top:30px">${(P.analisis.diagnostico || []).slice(0, 4).map(d => `<div><b>${esc(d.titulo)}</b><span>${esc(recortar(d.detalle, 170))}</span></div>`).join("")}</div></div>${pie(true)}</div>`);
+  }
   // La propuesta: lista con el formato de "Nuestros valores" (hasta 5 por diapositiva)
   const porLamina = Math.ceil(items.length / Math.ceil(items.length / 5));   // repartidos parejo, hasta 5 por diapositiva
   if (items.length > 1) for (let k = 0; k < items.length; k += porLamina) {
@@ -1875,11 +1901,19 @@ function deckSlides(){
   // Un producto por diapositiva: franja oscura con el nombre y, abajo, el contenido de la ficha
   items.forEach((p, i) => { const c = p.cliente, f = c.ficha || {};
     out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(250, `Propuesta ${pad2(i+1)} · ${p.categoria}`, esc(p.nombre))}
-      <div class="pr"><div class="pr-top"><div class="quote">${esc(recortar(c.queEs || c.bajada || "", 380))}</div>${c.enNeix ? `<div class="box" style="${halo(360, 150, "dk")}"><b>En Neix</b><span>${esc(recortar(c.enNeix, 200))}</span></div>` : "<div></div>"}</div>
+      <div class="pr"><div class="pr-top"><div class="quote">${esc(recortar(c.queEs || c.bajada || "", 380))}</div>${notaDe[p.id] ? `<div class="box" style="${halo(360, 150, "dk")}"><b>${esc(cli ? "Por qué para " + cli : "Por qué para vos")}</b><span>${esc(recortar(notaDe[p.id], 220))}</span></div>` : c.enNeix ? `<div class="box" style="${halo(360, 150, "dk")}"><b>En Neix</b><span>${esc(recortar(c.enNeix, 200))}</span></div>` : "<div></div>"}</div>
       <dl class="fx">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Dónde opera",f.mercado]].filter(x=>x[1]).map(([k2,v])=>`<div><dt>${k2}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
       <div class="ben">${(c.beneficios||[]).slice(0,3).map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div></div>${pie(true)}</div>`);
   });
 
+  if (prop) {   // Contenido, como en la presentación de Holcim, con las páginas de cada parte
+    const fin = out.length, pg = n => String(n).padStart(2, "0"), filas = [];
+    if (marcas.i1) filas.push(["I", "Neix", "Quiénes somos, trayectoria, cifras relevantes y unidades de negocio.", marcas.i1, marcas.i2]);
+    filas.push([marcas.i1 ? "II" : "I", cli ? `Propuesta para ${cli}` : "La propuesta", [P.mensaje && P.mensaje.trim() ? "Lo que conversamos" : "", P.analisis ? "el análisis de la cartera" : "", items.length ? (items.length === 1 ? "la línea de trabajo que proponemos" : `las ${items.length} líneas de trabajo que proponemos`) : ""].filter(Boolean).join(", ").replace(/^./, m => m.toUpperCase()) + ".", marcas.p1, fin]);
+    out[out.indexOf("%%CONTENIDO%%")] = `<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}<div class="hd"><div class="ey">Índice</div><h2 class="pf">Contenido</h2><div class="rule"></div></div>
+      <div class="toc">${filas.map(f => `<div><i>${f[0]}</i><div><b>${esc(f[1])}</b><span>${esc(f[2])}</span></div><em>${pg(f[3])} — ${pg(f[4])}</em></div>`).join("")}</div>
+      ${cli || P.asesor ? `<div class="box toc-nota" style="${halo(1120, 70, "dk")}"><span>${esc(`Material preparado${cli ? " para " + cli : ""}${P.asesor ? " por " + P.asesor : ""}${P.area ? ", " + P.area + " de Neix" : ""}.`)}</span></div>` : ""}${pie(true)}</div>`;
+  }
   // Cierre
   const mail = P.mail || (P.area ? AREAS[P.area] : "info@neix.com.ar");
   out.push(`<div class="sl" style="background:#161616">${fondo(1280, 720, "dk0", "inset:0")}<div class="fin"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="pf">Inteligencia Financiera</div>
@@ -1947,6 +1981,21 @@ async function dlOnePagerPDF(b, p){
   b.disabled = false; b.innerHTML = txt;
 }
 const propNombre = () => `Propuesta Neix${S.prop.cliente?" - "+S.prop.cliente:""}.pdf`;
+/* Propuesta en formato presentación (como la de Holcim): datos de la propuesta + parte institucional corta. */
+function propCfg(){
+  const P = S.prop, a = findAsesor(P.asesor) || {}, cli = (P.cliente || "").trim();
+  const fecha = new Date().toLocaleDateString("es-AR", {day:"numeric", month:"long", year:"numeric"});
+  return {modo:"propuesta", titulo: cli || "Propuesta de inversión", bajada: `Propuesta de Neix · ${fecha}`, cliente: cli, inst: true, instCorta: true,
+    asesor: P.asesor, mail: P.mail || a.mail || "", tel: P.tel || a.tel || "", area: a.area && AREAS[a.area] ? a.area : "", prods: P.items, mensaje: P.mensaje, analisis: P.analisis};
+}
+const propPresNombre = () => `Propuesta Neix${S.prop.cliente ? " - " + S.prop.cliente.trim().replace(/\.+$/, "") : ""} (presentación).pdf`;
+async function dlPropPres(b){
+  if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
+  const txt = b.innerHTML; b.disabled = true; b.textContent = "Armando presentación";
+  try { await S.dl.save({filename: propPresNombre(), data: await laminasPDFBlob(deckSlides(propCfg()))}); toast("Presentación lista"); }
+  catch(e) { if (!(e && e.code === "declined")) toast("No pudimos armar la presentación. Probá de nuevo."); }
+  b.disabled = false; b.innerHTML = txt;
+}
 async function dlPropPDF(b){
   if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
   const txt = b.innerHTML; b.disabled = true; b.textContent = "Armando PDF";
@@ -2033,14 +2082,14 @@ document.addEventListener("keydown", e => {
 document.addEventListener("wheel", e => { const t = e.target; if (t.matches && t.matches('input[type="number"]') && document.activeElement === t) e.preventDefault(); }, {passive:false});
 function loadScript(src){ return new Promise((ok,ko)=>{ if (document.querySelector(`script[src="${src}"]`)) return ok(); const t = document.createElement("script"); t.src = src; t.onload = ok; t.onerror = ko; document.head.appendChild(t); }); }
 const pzNombre = () => `Presentación Neix${S.pz.cliente?" - "+S.pz.cliente.trim().replace(/\.+$/,""):""}.pdf`;
-async function pzPDFBlob(){
+async function pzPDFBlob(){ return laminasPDFBlob(deckSlides()); }
+async function laminasPDFBlob(sl){
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
   await cpdFuentes();
   const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0;width:1280px"; document.body.appendChild(host);
   try {
     const pdf = new window.jspdf.jsPDF({orientation:"landscape", unit:"px", format:[1280,720], hotfixes:["px_scaling"]});
-    const sl = deckSlides();
     for (let i=0;i<sl.length;i++){ host.innerHTML = sl[i]; const links = linksDe(host.firstElementChild); const cv = await window.html2canvas(host.firstElementChild, {scale:1.5, backgroundColor:null, useCORS:true, logging:false}); if (i) pdf.addPage([1280,720],"landscape"); pdf.addImage(cv.toDataURL("image/jpeg",.92),"JPEG",0,0,1280,720); links.forEach(l => pdf.link(l.x, l.y, l.w, l.h, {url: l.url})); }
     return pdf.output("blob");
   } finally { host.remove(); }
@@ -2358,6 +2407,7 @@ document.addEventListener("click", e => {
   else if (a==="dlOnePager") { uso(id, "o"); dlOnePagerPDF(b, S.byId[id]); }
   else if (a==="copyPropWA") copy(waProp());
   else if (a==="dlProp") dlPropPDF(b);
+  else if (a==="dlPropPres") dlPropPres(b);
   else if (a==="usoMes") { S.usoMes = v; S.usoAbierto = true; render(); }
   else if (a==="usoTodo") { S.usoTodo = !S.usoTodo; S.usoAbierto = true; render(); }
   else if (a==="notaRes") notaResolver(b.dataset.id, b.dataset.v==="1", b);
