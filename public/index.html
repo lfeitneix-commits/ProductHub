@@ -2044,7 +2044,7 @@ S.instructivos = [];
 const esArchivoHub = u => /^api\/archivo/.test(String(u || ""));
 const esVideo = u => /\.(mp4|webm|mov)(\?|#|$)/i.test(String(u || ""));
 /* Videos del repo (public/instructivos). Si en Gestión el instructivo quedó sin link, se usa el video. */
-const INST_VIDEO = {"apertura de cuenta comitente":"instructivos/apertura-de-cuenta.mp4", "como operar en home banking y app":"instructivos/como-operar.mp4"};
+const INST_VIDEO = {"apertura de cuenta comitente":"instructivos/apertura-de-cuenta.mp4", "como operar en home banking y app":"instructivos/como-operar.mp4", "alta de empresas en epyme":"instructivos/alta-epyme.mp4"};
 const instUrl = x => (x && x.url) || INST_VIDEO[sinAcento(String((x && x.titulo) || "").trim())] || "";
 function instructivosHTML(){
   const l = S.instructivos || [];
