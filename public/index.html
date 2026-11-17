@@ -888,8 +888,7 @@ function playbook(p){
 function operativa(p){
   const i = p.interno;
   return `<div class="pb"><div class="panel"><h3>Paso a paso operativo</h3><ol class="steps">${i.operativa.map(s=>`<li><span>${esc(s)}</span></li>`).join("")}</ol></div>
-  <div class="pb2"><div class="panel"><h3>Video o instructivo</h3>${i.video?`<a class="btn" href="${esc(i.video)}" target="_blank" rel="noopener">Abrir material ↗</a>`:`<p class="small muted">Este producto no tiene video propio. Si existe un instructivo, Marketing lo suma desde Editar.</p>`}</div>
-  <div class="panel"><h3>Instructivos generales</h3><p class="small muted" style="margin-bottom:12px">Apertura de cuenta, cómo operar, alta de empresas en EPYME y más.</p><a class="btn" href="#instructivos">${ico("_inst")}Ver instructivos</a></div></div></div>`;
+  <div class="panel"><h3>Video o instructivo</h3>${i.video?`<a class="btn" href="${esc(i.video)}" target="_blank" rel="noopener">Abrir material ↗</a>`:`<p class="small muted">Este producto no tiene video propio. Si existe un instructivo, Marketing lo suma desde Editar.</p>`}</div></div>`;
 }
 
 /* ── Editor ── */
