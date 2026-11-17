@@ -168,9 +168,9 @@
       ? { canEdit: async () => true, id: async () => "editor-local", me: async () => ({ name: "", email: "" }), search: async () => [], profiles: async (ids) => perfiles(ids) }
       : null;
     // Archivos: con base conectada se guardan en Vercel Blob (privados, /api/archivo); si no, URL temporal del navegador.
-    const assets = { async upload(file, producto, tipo) {
+    const assets = { async upload(file, producto) {
       if (await cargarRemoto()) {
-        const r = await fetch("api/subir", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/octet-stream", "x-producto": producto || "producto", "x-tipo": tipo || "pdf" }, body: file });
+        const r = await fetch("api/subir", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/octet-stream", "x-producto": producto || "producto" }, body: file });
         const j = await r.json().catch(() => ({}));
         if (!r.ok || !j.id) { const e = new Error(j.error || "subir"); e.code = "upload_failed"; throw e; }
         return { id: j.id };
