@@ -267,6 +267,8 @@ a.web{color:inherit;text-decoration:none}a.web:hover{text-decoration:underline}
 .pend-it{display:flex;justify-content:space-between;align-items:center;gap:14px;border-top:1px solid var(--line);padding:10px 0}.pend-tx{min-width:0}.pend-tx p{margin:4px 0 0;white-space:pre-line}
 .pend-it .btn-row{flex-shrink:0;flex-wrap:nowrap}
 @media (max-width:640px){.pend-it{flex-direction:column;align-items:flex-start}}
+.cv-row{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:10px}.cv-row .h{display:flex;justify-content:space-between;align-items:center}
+.fmt-seg{display:inline-flex}
 .ges-search{margin:0 0 12px}.ges-tabla tr[hidden]{display:none}
 .uso-tabla td.num,.uso-tabla th.num{text-align:right}
 @media (max-width:640px){
@@ -560,6 +562,11 @@ td:first-child{color:var(--ink)}
 .sl .ben b{display:block;font-size:14px;font-weight:600;color:#2A2927;margin-bottom:6px}
 .sl .ben span{display:block;font-size:12.5px;line-height:1.6;color:#4A4640}
 .sl .pnum{font-family:"Playfair Display",Georgia,serif;font-size:20px;color:#9A8E7D;margin-right:14px}
+/* lo que conversamos (propuesta) */
+.sl .cvg{position:absolute;left:80px;right:80px;top:292px;display:grid;grid-template-columns:repeat(3,1fr);column-gap:40px;row-gap:30px}
+.sl .cvg>div{border-top:1px solid #DCD6CD;padding-top:16px}
+.sl .cvg b{display:block;font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:21px;line-height:1.25;color:#2A2927;margin-bottom:10px}
+.sl .cvg span{display:block;font-size:13px;line-height:1.6;color:#4A4640}
 /* contenido (propuesta) */
 .sl .toc{position:absolute;left:80px;right:80px;top:268px;border-bottom:1px solid #DCD6CD}
 .sl .toc>div{display:grid;grid-template-columns:90px 1fr auto;align-items:baseline;padding:28px 0;border-top:1px solid #DCD6CD}
@@ -702,6 +709,7 @@ const S = {
 };
 const LS = "neix-hub-v2";
 try { const sv = JSON.parse(localStorage.getItem(LS) || "null"); if (sv) { if (sv.prop) S.prop = Object.assign(S.prop, sv.prop); if (sv.cliente) S.cliente = Object.assign(blankCliente(), sv.cliente, {consultando:false}); if (sv.persona) S.persona = sv.persona === "Persona humana" ? "Persona física" : sv.persona; } } catch(e) {}
+try { S.propFmt = localStorage.getItem("neix-hub-propfmt") === "pres" ? "pres" : "doc"; } catch(_) { S.propFmt = "doc"; }
 function persist(){ try { localStorage.setItem(LS, JSON.stringify({prop:S.prop, cliente:S.cliente, persona:S.persona})); } catch(e) {} }
 
 /* ── Utilidades ── */
@@ -1687,7 +1695,7 @@ function vPropuesta(){
   P.items.forEach(it => { const p = S.byId[it.id]; if (!p) return; p.interno.relacionados.forEach(r => { if (!P.items.some(i=>i.id===r) && S.byId[r]) (sug[r] = sug[r] || []).push(p.nombre); }); });
   return `<div class="page-head"><div><div class="eyebrow">Propuesta</div><h1>Armá la propuesta</h1>
   <p class="muted">Sumá productos, contá por qué tienen sentido para este cliente y exportala lista para enviar.</p></div>
-  <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn" data-act="dlPropPres" ${P.items.length?"":"disabled"} title="La propuesta como diapositivas, con la parte institucional">${ico("_inst")}Presentación</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
+  <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
   <div class="pr-grid"><div class="stack">
    ${P.analisis ? `<div class="panel ia-prop" style="margin:0"><div><b>Incluye el análisis de cartera</b><span>Hecho el ${fdate(P.analisis.fecha)} desde Cliente. Va antes de los productos.</span></div><button class="btn ghost" data-act="iaPropQuitar">Quitar</button></div>` : ""}
    <div class="panel stack"><h3 style="margin:0">Para quién</h3>
@@ -1695,14 +1703,15 @@ function vPropuesta(){
     <label class="f" for="pr_asesor">Asesor<input class="input" id="pr_asesor" data-pf="asesor" value="${esc(P.asesor)}" placeholder="Tu nombre" list="asesoresList" autocomplete="off"></label>${asesoresList()}
     <label class="f" for="pr_mail">Mail<input class="input" id="pr_mail" data-pf="mail" type="email" value="${esc(P.mail||"")}" placeholder="nombre@neix.com.ar"></label>
     <label class="f" for="pr_tel">Teléfono<input class="input" id="pr_tel" data-pf="tel" type="tel" value="${esc(P.tel||"")}" placeholder="+54 9 11 …"></label>
-    <label class="f" for="pr_msg">Tu mensaje<textarea class="input" id="pr_msg" data-pf="mensaje" placeholder="Retomá lo que conversaron: qué te contó, qué busca y por qué estas ideas tienen sentido para su momento.">${esc(P.mensaje)}</textarea></label></div>
+    ${S.propFmt==="pres" ? "" : `<label class="f" for="pr_msg">Tu mensaje<textarea class="input" id="pr_msg" data-pf="mensaje" placeholder="Retomá lo que conversaron: qué te contó, qué busca y por qué estas ideas tienen sentido para su momento.">${esc(P.mensaje)}</textarea></label>`}</div>
+   ${S.propFmt==="pres" ? conversamosHTML() : ""}
    <div class="panel stack"><h3 style="margin:0">Productos (${P.items.length})</h3>
     ${P.items.length ? P.items.map((it,i)=>{ const p = S.byId[it.id]; if (!p) return ""; return `<div class="pr-item"><div class="h"><b class="small">${esc(p.nombre)}</b><span class="btn-row" style="gap:2px">
      <button class="btn ghost icon" data-act="mv" data-i="${i}" data-d="-1" aria-label="Subir" ${i===0?"disabled":""}>↑</button><button class="btn ghost icon" data-act="mv" data-i="${i}" data-d="1" aria-label="Bajar" ${i===P.items.length-1?"disabled":""}>↓</button><button class="btn ghost" data-act="toggleProp" data-id="${p.id}">Quitar</button></span></div>
-     <textarea class="input" id="pn_${i}" data-pi="${i}" style="min-height:58px" aria-label="Por qué para este cliente" placeholder="Por qué para este cliente. Ej.: para que los dólares de la venta del campo rindan mientras definís la estructura.">${esc(it.nota||"")}</textarea></div>`; }).join("") : `<div class="empty small">Todavía no sumaste productos. <a href="#soluciones">Explorar</a>.</div>`}</div>
+     ${S.propFmt==="pres" ? "" : `<textarea class="input" id="pn_${i}" data-pi="${i}" style="min-height:58px" aria-label="Por qué para este cliente" placeholder="Por qué para este cliente. Ej.: para que los dólares de la venta del campo rindan mientras definís la estructura.">${esc(it.nota||"")}</textarea>`}</div>`; }).join("") : `<div class="empty small">Todavía no sumaste productos. <a href="#soluciones">Explorar</a>.</div>`}</div>
    ${Object.keys(sug).length?`<div class="panel"><h3>Suelen ir juntas</h3><div class="stack" style="gap:8px">${Object.entries(sug).slice(0,5).map(([id,from])=>`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div class="small"><b>${esc(S.byId[id].nombre)}</b><div class="tiny muted">Complementa ${esc(from.join(", "))}</div></div><button class="btn" data-act="toggleProp" data-id="${id}">${ico("_plus")}</button></div>`).join("")}</div></div>`:""}
   </div>
-  <div style="min-width:0"><div class="paper-label"><span>Así la recibe tu cliente</span><span class="tiny">Se descarga como página web y se guarda en PDF</span></div><div class="paper-wrap" id="preview"></div></div></div>`;
+  <div style="min-width:0"><div class="paper-label"><div class="seg fmt-seg">${[["doc","Documento"],["pres","Presentación"]].map(([k,t]) => `<button data-act="propFmt" data-v="${k}" aria-pressed="${(S.propFmt||"doc")===k}">${t}</button>`).join("")}</div><span class="tiny">${S.propFmt==="pres" ? "Diapositivas 16:9 · se descarga en PDF" : "Documento A4 · se descarga en PDF"}</span></div><div class="${S.propFmt==="pres" ? "" : "paper-wrap"}" id="preview"></div></div></div>`;
 }
 function propDoc(){
   const P = S.prop, items = P.items.map(i=>({it:i, p:S.byId[i.id]})).filter(x=>x.p);
@@ -1729,7 +1738,24 @@ function propDoc(){
     <p class="pp-legal">${esc(LEYENDA)}</p></div>
   </div></div>`;
 }
-function refreshPreview(){ const pv = $("#preview"); if (pv) pv.innerHTML = S.prop.items.length ? propDoc() : `<div class="empty" style="background:var(--surface)">La vista previa aparece cuando sumás productos.</div>`; }
+/* "Lo que conversamos" de la presentación (como "Lo que nos plantearon" en la de Holcim): lo único que se edita en ese formato. */
+function conversamosHTML(){
+  const l = S.prop.conversamos || [];
+  return `<div class="panel stack"><div><h3 style="margin:0">Lo que conversamos</h3><p class="tiny muted" style="margin:4px 0 0">Lo que te planteó el cliente, en puntos cortos. Es lo único que se edita en la presentación: la información de los productos sale de las fichas.</p></div>
+    ${l.map((x, i) => `<div class="cv-row"><div class="h"><span class="tiny muted">Punto ${i + 1}</span><button class="btn ghost" type="button" data-act="cvDel" data-v="${i}">Quitar</button></div>
+      <input class="input" data-cv="${i}" data-f="t" value="${esc(x.t || "")}" placeholder="Título. Ej.: Capital de trabajo de la cadena de valor" aria-label="Título del punto ${i + 1}">
+      <textarea class="input" data-cv="${i}" data-f="d" style="min-height:64px" placeholder="Qué te contó. Ej.: Buscan que sus proveedores cobren antes sin sumar deuda al balance." aria-label="Detalle del punto ${i + 1}">${esc(x.d || "")}</textarea></div>`).join("")}
+    ${l.length < 6 ? `<button class="btn" type="button" data-act="cvAdd" style="justify-self:start">${ico("_plus")}Agregar punto</button>` : `<span class="tiny muted">Hasta 6 puntos.</span>`}</div>`;
+}
+function refreshPreview(){
+  const pv = $("#preview"); if (!pv) return;
+  if (!S.prop.items.length) { pv.innerHTML = `<div class="empty" style="background:var(--surface)">La vista previa aparece cuando sumás productos.</div>`; return; }
+  if (S.propFmt === "pres") {
+    if (!S._pzFont) { S._pzFont = 1; cpdFuentes().then(() => refreshPreview()); }
+    pv.className = "slides"; pv.innerHTML = deckSlides(propCfg()).map(h => `<div class="slide-wrap">${h}</div>`).join(""); scaleDeck(); return;
+  }
+  pv.className = "paper-wrap"; pv.innerHTML = propDoc();
+}
 
 /* ── Análisis de cartera ── */
 const CLASE = {caucion:"Liquidez en pesos", fci:"Liquidez en pesos", soberanos:"Renta fija en dólares", on:"Renta fija en dólares", dl:"Cobertura (CER / DL)", cer:"Cobertura (CER / DL)", acciones:"Renta variable", cedears:"Renta variable", internacional:"Internacional", tbills:"Internacional"};
@@ -1884,9 +1910,8 @@ function deckSlides(cfg){
   if (prop) {
     marcas.i2 = out.length; marcas.p1 = out.length + 1;
     out.push(parte("II", cli ? `Propuesta<br>para ${esc(cli)}` : "La<br>propuesta", items.length ? `${items.length === 1 ? "Una línea" : items.length + " líneas"} de trabajo a partir de lo que conversamos.` : "A partir de lo que conversamos."));
-    if ((P.mensaje || "").trim()) out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(250, "Propuesta", "Lo que conversamos")}
-      <div class="pr"><div class="pr-top"><div class="quote" style="font-size:19px;white-space:pre-line">${esc(recortar(P.mensaje.trim(), 650))}</div>
-      <div class="box" style="${halo(360, 150, "dk")}"><b>${esc(P.asesor || "Tu asesor en Neix")}</b><span>${[P.area ? esc(P.area) + " · Neix" : "Neix", P.mail ? mailLink(P.mail) : "", P.tel ? telLink(P.tel) : ""].filter(Boolean).join("<br>")}</span></div></div></div>${pie(true)}</div>`);
+    if ((P.conversamos || []).length) out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(250, "Propuesta", "Lo que conversamos")}
+      <div class="cvg">${P.conversamos.slice(0, 6).map(x => `<div><b>${esc(x.t || "")}</b><span>${esc(recortar(x.d || "", 230))}</span></div>`).join("")}</div>${pie(true)}</div>`);
     if (P.analisis && P.analisis.resumen) out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(250, "Propuesta", "Análisis de tu cartera")}
       <div class="pr"><div class="quote" style="margin-top:0;font-size:17.5px">${esc(recortar(P.analisis.resumen, 420))}</div>
       <div class="ben" style="grid-template-columns:repeat(2,1fr);row-gap:22px;margin-top:30px">${(P.analisis.diagnostico || []).slice(0, 4).map(d => `<div><b>${esc(d.titulo)}</b><span>${esc(recortar(d.detalle, 170))}</span></div>`).join("")}</div></div>${pie(true)}</div>`);
@@ -1909,7 +1934,7 @@ function deckSlides(cfg){
   if (prop) {   // Contenido, como en la presentación de Holcim, con las páginas de cada parte
     const fin = out.length, pg = n => String(n).padStart(2, "0"), filas = [];
     if (marcas.i1) filas.push(["I", "Neix", "Quiénes somos, trayectoria, cifras relevantes y unidades de negocio.", marcas.i1, marcas.i2]);
-    filas.push([marcas.i1 ? "II" : "I", cli ? `Propuesta para ${cli}` : "La propuesta", [P.mensaje && P.mensaje.trim() ? "Lo que conversamos" : "", P.analisis ? "el análisis de la cartera" : "", items.length ? (items.length === 1 ? "la línea de trabajo que proponemos" : `las ${items.length} líneas de trabajo que proponemos`) : ""].filter(Boolean).join(", ").replace(/^./, m => m.toUpperCase()) + ".", marcas.p1, fin]);
+    filas.push([marcas.i1 ? "II" : "I", cli ? `Propuesta para ${cli}` : "La propuesta", [(P.conversamos || []).length ? "Lo que conversamos" : "", P.analisis ? "el análisis de la cartera" : "", items.length ? (items.length === 1 ? "la línea de trabajo que proponemos" : `las ${items.length} líneas de trabajo que proponemos`) : ""].filter(Boolean).join(", ").replace(/^./, m => m.toUpperCase()) + ".", marcas.p1, fin]);
     out[out.indexOf("%%CONTENIDO%%")] = `<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}<div class="hd"><div class="ey">Índice</div><h2 class="pf">Contenido</h2><div class="rule"></div></div>
       <div class="toc">${filas.map(f => `<div><i>${f[0]}</i><div><b>${esc(f[1])}</b><span>${esc(f[2])}</span></div><em>${pg(f[3])} — ${pg(f[4])}</em></div>`).join("")}</div>
       ${cli || P.asesor ? `<div class="box toc-nota" style="${halo(1120, 70, "dk")}"><span>${esc(`Material preparado${cli ? " para " + cli : ""}${P.asesor ? " por " + P.asesor : ""}${P.area ? ", " + P.area + " de Neix" : ""}.`)}</span></div>` : ""}${pie(true)}</div>`;
@@ -1986,7 +2011,8 @@ function propCfg(){
   const P = S.prop, a = findAsesor(P.asesor) || {}, cli = (P.cliente || "").trim();
   const fecha = new Date().toLocaleDateString("es-AR", {day:"numeric", month:"long", year:"numeric"});
   return {modo:"propuesta", titulo: cli || "Propuesta de inversión", bajada: `Propuesta de Neix · ${fecha}`, cliente: cli, inst: true, instCorta: true,
-    asesor: P.asesor, mail: P.mail || a.mail || "", tel: P.tel || a.tel || "", area: a.area && AREAS[a.area] ? a.area : "", prods: P.items, mensaje: P.mensaje, analisis: P.analisis};
+    asesor: P.asesor, mail: P.mail || a.mail || "", tel: P.tel || a.tel || "", area: a.area && AREAS[a.area] ? a.area : "", prods: P.items.map(x => ({id: x.id})),
+    conversamos: (P.conversamos || []).filter(x => (x.t || "").trim() || (x.d || "").trim()), analisis: P.analisis};
 }
 const propPresNombre = () => `Propuesta Neix${S.prop.cliente ? " - " + S.prop.cliente.trim().replace(/\.+$/, "") : ""} (presentación).pdf`;
 async function dlPropPres(b){
@@ -1997,6 +2023,7 @@ async function dlPropPres(b){
   b.disabled = false; b.innerHTML = txt;
 }
 async function dlPropPDF(b){
+  if (S.propFmt === "pres") return dlPropPres(b);
   if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
   const txt = b.innerHTML; b.disabled = true; b.textContent = "Armando PDF";
   try { await S.dl.save({filename: propNombre(), data: await propPDFBlob()}); toast("PDF listo"); }
@@ -2030,7 +2057,7 @@ function abrirEnvio(canal, tipo, id){
   const asunto = tipo === "op" ? `${p.nombre} · Neix` : `${tipo === "pz" ? "Presentación" : "Propuesta"} Neix${P.cliente?" para "+P.cliente:""}`;
   const E = S.envio = {canal, tipo, id, asunto, archivo: null};
   const listo = (txt) => { if (S.envio !== E) return; const n = $("#shAtt"); if (n) n.textContent = txt; ["#shSend","#shShare"].forEach(q => { const bt = $(q); if (bt) bt.disabled = false; }); };
-  (tipo === "op" ? archivoOP(p) : tipo === "pz" ? pzPDFBlob().then(b => new File([b], pzNombre(), {type:"application/pdf"})) : propPDFBlob().then(b => new File([b], propNombre(), {type:"application/pdf"})))
+  (tipo === "op" ? archivoOP(p) : tipo === "pz" ? pzPDFBlob().then(b => new File([b], pzNombre(), {type:"application/pdf"})) : (S.propFmt === "pres" ? laminasPDFBlob(deckSlides(propCfg())).then(b => new File([b], propPresNombre(), {type:"application/pdf"})) : propPDFBlob().then(b => new File([b], propNombre(), {type:"application/pdf"}))))
     .then(f => { E.archivo = f; listo("PDF listo: " + f.name); })
     .catch(() => listo("No pudimos preparar el archivo. Se envía solo el mensaje."));
   const cel = puedeCompartir(), wa = canal === "wa";
@@ -2408,6 +2435,9 @@ document.addEventListener("click", e => {
   else if (a==="copyPropWA") copy(waProp());
   else if (a==="dlProp") dlPropPDF(b);
   else if (a==="dlPropPres") dlPropPres(b);
+  else if (a==="propFmt") { S.propFmt = v; try { localStorage.setItem("neix-hub-propfmt", v); } catch(_) {} if (v === "pres" && !(S.prop.conversamos || []).length) { S.prop.conversamos = [{t:"",d:""},{t:"",d:""},{t:"",d:""}]; persist(); } render(); }
+  else if (a==="cvAdd") { (S.prop.conversamos = S.prop.conversamos || []).push({t:"", d:""}); persist(); render(); }
+  else if (a==="cvDel") { S.prop.conversamos.splice(+v, 1); persist(); render(); }
   else if (a==="usoMes") { S.usoMes = v; S.usoAbierto = true; render(); }
   else if (a==="usoTodo") { S.usoTodo = !S.usoTodo; S.usoAbierto = true; render(); }
   else if (a==="notaRes") notaResolver(b.dataset.id, b.dataset.v==="1", b);
@@ -2473,6 +2503,7 @@ document.addEventListener("input", e => {
     if (t.dataset.pf==="asesor") { const a = findAsesor(t.value); if (a) { if (t.value !== a.nombre) t.value = S.prop.asesor = a.nombre; S.prop.mail = a.mail || ""; S.prop.tel = a.tel || ""; delete S.prop.contacto; const m = $("#pr_mail"), te = $("#pr_tel"); if (m) m.value = S.prop.mail; if (te) te.value = S.prop.tel; } }
     persist(); refreshPreview(); }
   else if (t.dataset.pi) { S.prop.items[+t.dataset.pi].nota = t.value; persist(); refreshPreview(); }
+  else if (t.dataset.cv !== undefined && S.prop.conversamos) { S.prop.conversamos[+t.dataset.cv][t.dataset.f] = t.value; persist(); clearTimeout(S._cvT); S._cvT = setTimeout(refreshPreview, 250); }
 });
 /* Selector de PDF de Gestión: muestra el archivo elegido y acepta arrastrar y soltar. */
 function pdfElegido(f){
