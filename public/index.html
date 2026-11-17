@@ -569,6 +569,12 @@ td:first-child{color:var(--ink)}
 .sl .cvg>div{border-top:1px solid #DCD6CD;padding-top:16px}
 .sl .cvg b{display:block;font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:21px;line-height:1.25;color:#2A2927;margin-bottom:10px}
 .sl .cvg span{display:block;font-size:13px;line-height:1.6;color:#4A4640}
+/* líneas de trabajo (propuesta, como la de Holcim) */
+.sl .lin-baj{font-size:15px;line-height:1.6;color:#4A4640;margin:22px 0 0;max-width:720px}
+.sl .lin{position:absolute;left:80px;right:80px;top:252px;border-top:1px solid #DCD6CD}
+.sl .lin>div{display:grid;grid-template-columns:92px 1fr;align-items:baseline;padding:14px 0 15px;border-bottom:1px solid #DCD6CD}
+.sl .lin i{font-family:"Playfair Display",Georgia,serif;font-size:23px;line-height:1.2;color:#2A2927}
+.sl .lin b{font-family:"Playfair Display",Georgia,serif;font-weight:500;font-size:21px;line-height:1.2;color:#2A2927}
 /* contenido (propuesta) */
 .sl .toc{position:absolute;left:80px;right:80px;top:268px;border-bottom:1px solid #DCD6CD}
 .sl .toc>div{display:grid;grid-template-columns:90px 1fr auto;align-items:baseline;padding:28px 0;border-top:1px solid #DCD6CD}
@@ -1586,9 +1592,9 @@ function aplicarHalo(root){
   });
 }
 async function cpdFuentes(){
-  if (!document.getElementById("opxFont")) { const l = document.createElement("link"); l.id = "opxFont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap"; document.head.appendChild(l); }
+  if (!document.getElementById("opxFont")) { const l = document.createElement("link"); l.id = "opxFont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap"; document.head.appendChild(l); }
   if (!document.getElementById("opxCss")) { const st = document.createElement("style"); st.id = "opxCss"; st.textContent = OPX_CSS; document.head.appendChild(st); }
-  try { await Promise.all([document.fonts.load('400 40px "Playfair Display"'), document.fonts.load('400 12px Inter'), document.fonts.load('600 12px Inter')]); await document.fonts.ready; } catch(_) {}
+  try { await Promise.all([document.fonts.load('400 40px "Playfair Display"'), document.fonts.load('italic 400 40px "Playfair Display"'), document.fonts.load('500 40px "Playfair Display"'), document.fonts.load('400 12px Inter'), document.fonts.load('600 12px Inter')]); await document.fonts.ready; } catch(_) {}
 }
 async function cpdPDF(b){
   if (!S.dl) return;
@@ -1932,7 +1938,16 @@ function deckSlides(cfg){
   }
   // La propuesta: lista con el formato de "Nuestros valores" (hasta 5 por diapositiva)
   const porLamina = Math.ceil(items.length / Math.ceil(items.length / 5));   // repartidos parejo, hasta 5 por diapositiva
-  if (items.length > 1) for (let k = 0; k < items.length; k += porLamina) {
+  const NUM = ["Una","Dos","Tres","Cuatro","Cinco","Seis","Siete","Ocho","Nueve","Diez","Once","Doce"];
+  if (prop && items.length) {   // como "Seis líneas de trabajo" de la presentación de Holcim (hasta 6 por diapositiva, repartidas parejo)
+    const por = Math.ceil(items.length / Math.ceil(items.length / 6));
+    for (let k = 0; k < items.length; k += por) {
+      const n = items.length, tit = `${NUM[n - 1] || n} ${n === 1 ? "línea" : "líneas"} de trabajo`;
+      out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}<div class="hd"><div class="ey">Propuesta</div><h2 class="pf">${tit}</h2><div class="rule"></div>
+        <p class="lin-baj">${n === 1 ? "La línea de trabajo que proponemos a partir de lo que conversamos." : "Ordenadas según lo que conversamos. Cada una puede avanzarse de forma independiente."}</p></div>
+        <div class="lin">${items.slice(k, k + por).map((p, i) => `<div><i>${pad2(k + i + 1)}</i><b>${esc(p.nombre)}</b></div>`).join("")}</div>${pie(true)}</div>`);
+    }
+  } else if (items.length > 1) for (let k = 0; k < items.length; k += porLamina) {
     const grupo = items.slice(k, k + porLamina);
     out.push(`<div class="sl lt">${fondo(820, 720, "lt", "left:460px;top:0;width:820px;height:720px")}<div class="pan" style="${halo(460, 720, "dk")}"><div class="in"><div class="ey">Propuesta</div><h2 class="pf">${items.length} líneas<br>de trabajo</h2><div class="rule"></div><p>${esc(P.cliente ? `Las soluciones de Neix que proponemos para ${P.cliente.trim().replace(/\.+$/, "")}.` : "Las soluciones de Neix que proponemos.")}</p></div><img class="ftl" src="${LOGO_LIGHT}" alt="NEIX"></div>
       <div class="lst">${grupo.map((p, i) => `<div><i>${pad2(k + i + 1)}</i><div><b>${esc(p.nombre)}</b><span>${esc(p.cliente.titular || "")}</span></div></div>`).join("")}</div><span class="ftr" style="color:#8C7F6B">${esc(label)}</span></div>`);
