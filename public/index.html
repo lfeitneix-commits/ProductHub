@@ -2042,10 +2042,12 @@ function gesFiltrar(){
 /* ── Instructivos generales (se cargan desde Gestión; se ven en "Cómo se opera" de todas las fichas) ── */
 S.instructivos = [];
 const esArchivoHub = u => /^api\/archivo/.test(String(u || ""));
-const esVideo = u => /\.(mp4|webm|mov)(\?|#|$)/i.test(String(u || ""));
+const esVideo = u => /\.(mp4|webm|mov)(\?|#|$)/i.test(String(u || "")) || /^blob:.*#video$/.test(String(u || ""));
+/* Archivo del Hub (subido desde Gestión, o un video del repo en public/instructivos), no un link externo. */
+const esArchivoPropio = u => esArchivoHub(u) || /^instructivos\/[\w.-]+$/.test(String(u || "")) || /^blob:/.test(String(u || ""));
 /* Videos del repo (public/instructivos). Si en Gestión el instructivo quedó sin link, se usa el video. */
 const INST_VIDEO = {"apertura de cuenta comitente":"instructivos/apertura-de-cuenta.mp4", "como operar en home banking y app":"instructivos/como-operar.mp4"};
-const instUrl = x => (x && x.url) || INST_VIDEO[sinAcento(String((x && x.titulo) || "").trim())] || "";
+const instUrl = x => (x && x.url) || (x && x.quitado ? "" : INST_VIDEO[sinAcento(String((x && x.titulo) || "").trim())]) || "";
 function instructivosHTML(){
   const l = S.instructivos || [];
   if (!l.length) return `<p class="small muted">Todavía no hay instructivos cargados.${puedeGestionar() ? ` Cargalos desde <a href="#gestion">Gestión</a>.` : ""}</p>`;
@@ -2066,16 +2068,16 @@ function verArchivo(url, titulo){
 function instEditorHTML(){
   if (!S.instEd) S.instEd = JSON.parse(JSON.stringify(S.instructivos || []));
   const l = S.instEd;
-  return `<div class="panel" style="margin-bottom:18px"><h3>Instructivos generales</h3><p class="small muted" style="margin:-4px 0 12px">Se muestran en la pestaña "Cómo se opera" de todas las fichas. Cada uno puede tener un link o un PDF.</p>
+  return `<div class="panel" style="margin-bottom:18px"><h3>Instructivos generales</h3><p class="small muted" style="margin:-4px 0 12px">Se muestran en la pestaña "Cómo se opera" de todas las fichas. Cada uno puede tener un link, un PDF o un video (hasta 4 MB).</p>
    <div class="stack" style="gap:10px">${l.map((x, i) => `<div class="inst-row">
      <input class="input" data-inst="${i}" data-f="titulo" value="${esc(x.titulo || "")}" placeholder="Título del instructivo" aria-label="Título">
-     <input class="input" data-inst="${i}" data-f="url" value="${esc(esArchivoHub(x.url) ? "" : (x.url || ""))}" placeholder="${esArchivoHub(x.url) ? "PDF cargado" : "https://… (link al instructivo)"}" aria-label="Link" ${esArchivoHub(x.url) ? "disabled" : ""}>
-     <span class="btn-row">${esArchivoHub(x.url) ? `<button class="btn ghost" type="button" data-act="instVer" data-v="${i}" data-ed="1">Ver PDF</button><button class="btn ghost" type="button" data-act="instSinPdf" data-v="${i}">Quitar PDF</button>` : `<label class="btn ghost" style="cursor:pointer">Subir PDF<input type="file" accept="application/pdf" data-instpdf="${i}" hidden></label>`}<button class="btn ghost" type="button" data-act="instDel" data-v="${i}" aria-label="Eliminar">Eliminar</button></span></div>`).join("")}</div>
+     ${(() => { const u = instUrl(x), propio = esArchivoPropio(u), vid = esVideo(u); return `<input class="input" data-inst="${i}" data-f="url" value="${esc(propio ? "" : (x.url || ""))}" placeholder="${propio ? (vid ? "Video cargado" : "PDF cargado") : "https://… (link al instructivo)"}" aria-label="Link" ${propio ? "disabled" : ""}>
+     <span class="btn-row">${propio ? `<button class="btn ghost" type="button" data-act="instVer" data-v="${i}" data-ed="1">${vid ? "Ver video" : "Ver PDF"}</button><button class="btn ghost" type="button" data-act="instSinPdf" data-v="${i}">${vid ? "Quitar video" : "Quitar PDF"}</button>` : `<label class="btn ghost" style="cursor:pointer">Subir PDF o video<input type="file" accept="application/pdf,video/mp4,video/quicktime,video/webm" data-instpdf="${i}" hidden></label>`}`; })()}<button class="btn ghost" type="button" data-act="instDel" data-v="${i}" aria-label="Eliminar">Eliminar</button></span></div>`).join("")}</div>
    <div class="btn-row" style="margin-top:12px"><button class="btn" type="button" data-act="instAdd">${ico("_plus")}Agregar instructivo</button><button class="btn primary" type="button" data-act="instSave">Guardar instructivos</button></div></div>`;
 }
 async function instGuardar(b){
-  const lista = (S.instEd || []).map(x => ({titulo: String(x.titulo || "").trim(), url: String(x.url || "").trim()})).filter(x => x.titulo || x.url);
-  const mala = lista.find(x => x.url && !esArchivoHub(x.url) && !/^https?:\/\//i.test(x.url));
+  const lista = (S.instEd || []).map(x => { const o = {titulo: String(x.titulo || "").trim(), url: String(x.url || "").trim()}; if (!o.url && x.quitado) o.quitado = true; return o; }).filter(x => x.titulo || x.url);
+  const mala = lista.find(x => x.url && !esArchivoPropio(x.url) && !/^https?:\/\//i.test(x.url));
   if (mala) { toast(`El link de "${mala.titulo || "un instructivo"}" tiene que empezar con https://`); return; }
   if (!S.db) return;
   b.disabled = true; b.textContent = "Guardando…";
@@ -2084,10 +2086,17 @@ async function instGuardar(b){
 }
 async function instSubirPdf(i, file){
   if (!file || !S.assets) return;
-  if (!(file.type === "application/pdf" || /\.pdf$/i.test(file.name))) { toast("Tiene que ser un PDF"); return; }
-  toast("Subiendo PDF…");
-  try { const a = await S.assets.upload(file, "instructivo"); S.instEd[i].url = a.id; if (!S.instEd[i].titulo) S.instEd[i].titulo = file.name.replace(/\.pdf$/i, ""); toast("PDF cargado. Tocá Guardar instructivos."); render(); }
-  catch(e) { toast(e && e.message && e.message !== "subir" ? e.message : "No se pudo subir el PDF"); }
+  const video = /^video\//.test(file.type) || /\.(mp4|mov|webm)$/i.test(file.name), pdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+  if (!video && !pdf) { toast("Tiene que ser un PDF o un video MP4, MOV o WebM"); return; }
+  if (file.size > 4 * 1024 * 1024) { toast(video ? "El video pesa más de 4 MB. Subilo a SharePoint o YouTube y pegá el link, o pasáselo a quien mantiene el Hub." : "El PDF supera los 4 MB"); return; }
+  toast(video ? "Subiendo video…" : "Subiendo PDF…");
+  try {
+    const a = await S.assets.upload(file, "instructivo", video ? "video" : "pdf");
+    S.instEd[i].url = /^blob:/.test(a.id) && video ? a.id + "#video" : a.id;   // en local, la URL temporal se marca como video
+    if (!S.instEd[i].titulo) S.instEd[i].titulo = file.name.replace(/\.(pdf|mp4|mov|webm)$/i, "");
+    toast((video ? "Video" : "PDF") + " cargado. Tocá Guardar instructivos."); render();
+  }
+  catch(e) { toast(e && e.message && e.message !== "subir" ? e.message : "No se pudo subir el archivo"); }
 }
 
 /* ── Alta y baja de productos desde Gestión ── */
@@ -2172,7 +2181,7 @@ document.addEventListener("click", e => {
   else if (a==="instVer") { e.preventDefault(); const l = b.dataset.ed ? S.instEd : S.instructivos, x = l && l[+v]; const u = instUrl(x); if (u) verArchivo(u, x.titulo || "Instructivo"); }
   else if (a==="instAdd") { S.instEd.push({titulo:"", url:""}); render(); }
   else if (a==="instDel") { S.instEd.splice(+v, 1); render(); }
-  else if (a==="instSinPdf") { S.instEd[+v].url = ""; render(); }
+  else if (a==="instSinPdf") { S.instEd[+v].url = ""; S.instEd[+v].quitado = true; render(); }
   else if (a==="instSave") instGuardar(b);
   else if (a==="prodNuevo") prodNuevo();
   else if (a==="prodCrear") prodCrear(b);
