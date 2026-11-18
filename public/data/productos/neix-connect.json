@@ -110,5 +110,6 @@
     "Banca Privada"
   ],
   "validador": "lfeit@neix.com.ar",
-  "vence": "2027-02-14"
+  "vence": "2027-02-14",
+  "sinOnePager": true
 }
