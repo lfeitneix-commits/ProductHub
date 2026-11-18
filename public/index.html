@@ -553,9 +553,9 @@ td:first-child{color:var(--ink)}
 .sl .uns strong{display:block;font-size:13px;font-weight:600;line-height:1.45;margin-bottom:16px}
 .sl .uns span{display:block;font-size:12.5px;line-height:1.6;color:#D6CFC5}
 /* producto */
-.sl .pr{position:absolute;left:80px;right:80px;top:290px}
+.sl .pr{position:absolute;left:80px;right:80px;top:276px}
 .sl .pr-top{display:grid;grid-template-columns:1fr 360px;column-gap:44px;align-items:start}
-.sl .pr-top .quote{margin-top:0;font-size:17.5px;line-height:1.6}
+.sl .pr-top .quote{margin-top:0;font-size:16.5px;line-height:1.6}
 .sl .pr-top .box span{font-size:13px}
 .sl .fx{display:grid;grid-template-columns:repeat(4,1fr);margin-top:30px;border-top:1px solid #DCD6CD;padding-top:16px}
 .sl .fx div{padding-right:20px}
@@ -564,12 +564,13 @@ td:first-child{color:var(--ink)}
 .sl .ben{display:grid;grid-template-columns:repeat(3,1fr);column-gap:36px;margin-top:26px}
 .sl .ben b{display:block;font-size:14px;font-weight:600;color:#2A2927;margin-bottom:6px}
 .sl .ben span{display:block;font-size:12.5px;line-height:1.6;color:#4A4640}
-.sl .pnum{font-family:"Playfair Display",Georgia,serif;font-size:20px;color:#9A8E7D;margin-right:14px}
+.sl .pnum{font-family:"Playfair Display",Georgia,serif;font-size:66px;line-height:1;color:#9A8E7D;margin-right:26px;font-variant-numeric:lining-nums;vertical-align:-4px}
 /* lo que conversamos (propuesta) */
 .sl .cvg{position:absolute;left:80px;right:80px;top:292px;display:grid;grid-template-columns:repeat(3,1fr);column-gap:40px;row-gap:30px}
 .sl .cvg>div{border-top:1px solid #DCD6CD;padding-top:16px}
-.sl .cvg b{display:block;font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:21px;line-height:1.25;color:#2A2927;margin-bottom:10px}
-.sl .cvg span{display:block;font-size:13px;line-height:1.6;color:#4A4640}
+.sl .cvg b{display:block;font-family:"Playfair Display",Georgia,serif;font-weight:400;font-size:24px;line-height:1.25;color:#2A2927;margin-bottom:12px}
+.sl .cvg span{display:block;font-size:15px;line-height:1.6;color:#4A4640}
+.sl .cvg-g{column-gap:56px;row-gap:40px}.sl .cvg-g>div{padding-top:22px}.sl .cvg-g b{font-size:30px;margin-bottom:14px}.sl .cvg-g span{font-size:17.5px}
 /* líneas de trabajo (propuesta, como la de Holcim) */
 .sl .lin-baj{font-size:15px;line-height:1.6;color:#4A4640;margin:22px 0 0;max-width:720px}
 .sl .lin{position:absolute;left:80px;right:80px;top:252px;border-top:1px solid #DCD6CD}
@@ -1933,7 +1934,8 @@ function deckSlides(cfg){
     marcas.i2 = out.length; marcas.p1 = out.length + 1;
     out.push(parte("II", cli ? `Propuesta<br>para ${esc(cli)}` : "La<br>propuesta", items.length ? `${items.length === 1 ? "Una línea" : items.length + " líneas"} de trabajo a partir de lo que conversamos.` : "A partir de lo que conversamos."));
     if ((P.conversamos || []).length) out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(250, "Propuesta", "Lo que conversamos")}
-      <div class="cvg">${P.conversamos.slice(0, 6).map(x => `<div><b>${esc(x.t || "")}</b><span>${esc(recortar(x.d || "", 230))}</span></div>`).join("")}</div>${pie(true)}</div>`);
+      ${(() => { const l = P.conversamos.slice(0, 6), n = l.length, cols = n <= 3 ? n : n === 4 ? 2 : 3, chico = n > 3 && n !== 4;   // repartidos parejo en el ancho
+        return `<div class="cvg${chico ? "" : " cvg-g"}" style="grid-template-columns:repeat(${cols},1fr)">${l.map(x => `<div><b>${esc(x.t || "")}</b><span>${esc(recortar(x.d || "", chico ? 200 : 300))}</span></div>`).join("")}</div>`; })()}${pie(true)}</div>`);
     if (P.analisis && P.analisis.resumen) out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(250, "Propuesta", "Análisis de tu cartera")}
       <div class="pr"><div class="quote" style="margin-top:0;font-size:17.5px">${esc(recortar(P.analisis.resumen, 420))}</div>
       <div class="ben" style="grid-template-columns:repeat(2,1fr);row-gap:22px;margin-top:30px">${(P.analisis.diagnostico || []).slice(0, 4).map(d => `<div><b>${esc(d.titulo)}</b><span>${esc(recortar(d.detalle, 170))}</span></div>`).join("")}</div></div>${pie(true)}</div>`);
@@ -1956,7 +1958,7 @@ function deckSlides(cfg){
   }
   // Un producto por diapositiva: franja oscura con el nombre y, abajo, el contenido de la ficha
   items.forEach((p, i) => { const c = p.cliente, f = c.ficha || {};
-    out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(250, `Propuesta ${pad2(i+1)} · ${p.categoria}`, esc(p.nombre))}
+    out.push(`<div class="sl lt">${fondo(1280, 720, "lt", "inset:0")}${banda(250, `Propuesta · ${p.categoria}`, `<span class="pnum">${pad2(i+1)}</span>${esc(p.nombre)}`)}
       <div class="pr"><div class="pr-top"><div class="quote">${esc(recortar(c.queEs || c.bajada || "", 380))}</div>${notaDe[p.id] ? `<div class="box" style="${halo(360, 150, "dk")}"><b>${esc(cli ? "Por qué para " + cli : "Por qué para vos")}</b><span>${esc(recortar(notaDe[p.id], 220))}</span></div>` : c.enNeix ? `<div class="box" style="${halo(360, 150, "dk")}"><b>En Neix</b><span>${esc(recortar(c.enNeix, 200))}</span></div>` : "<div></div>"}</div>
       <dl class="fx">${[["Moneda",f.moneda],["Plazo",f.plazo],["Riesgo",f.riesgo],["Dónde opera",f.mercado]].filter(x=>x[1]).map(([k2,v])=>`<div><dt>${k2}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
       <div class="ben">${(c.beneficios||[]).slice(0,3).map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div></div>${pie(true)}</div>`);
