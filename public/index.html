@@ -199,6 +199,7 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .fav .ico{width:17px;height:17px;fill:none}.fav[aria-pressed="true"]{color:#C9962B}.fav[aria-pressed="true"] .ico{fill:currentColor}
 .fav:hover{color:var(--ink)}.fav.fav-g{border:1px solid rgba(255,255,255,.25);color:#F3F0EB;padding:9px 16px;border-radius:999px;font-size:14px}.fav.fav-g[aria-pressed="true"]{color:#F1CC74}
 .favchip{display:inline-flex;align-items:center;gap:6px}.favchip .ico{width:14px;height:14px;fill:none}.favchip[aria-pressed="true"] .ico{fill:currentColor}
+.qchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;margin-left:8px;font-size:12px;color:var(--ink-2);cursor:pointer}.qchip:hover{color:var(--ink)}
 .otros{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 0}.otros .chips{display:flex;flex-wrap:wrap;gap:6px}.otros .chip{display:inline-flex;align-items:center;gap:6px;text-decoration:none}.otros .chip .ico{width:15px;height:15px}
 .optag{font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:4px;padding:2px 6px}
 .upl{display:grid;gap:10px;border:1px dashed var(--line-2);border-radius:10px;padding:12px 14px}
@@ -901,7 +902,7 @@ function vSoluciones(){
   <div class="needs" role="group" aria-label="Qué necesita tu cliente">${NEEDS.map(n=>`<button class="need" data-act="fNeed" data-v="${n.k}" aria-pressed="${S.fNeeds.includes(n.k)}"><span class="ic">${ico(n.icon)}</span><b>${n.label}</b><span class="n">${nCount(n)} ${nCount(n) === 1 ? "producto" : "productos"}</span></button>`).join("")}</div>
   <div class="filters">
    <div class="frow"><span class="lbl">Unidad</span><div class="chips scroll">${[["","Todas"]].concat(Object.keys(UNI).map(u=>[u, u==="Mercado de Capitales"?"Mesa · Mercado de Capitales":u])).map(([u,t])=>`<button class="chip${u?" uchip":""}" style="--u:${UNI_COLOR[u]||"#999"}" data-act="fUnidad" data-v="${esc(u)}" aria-pressed="${S.fUnidad===u}">${esc(t)}</button>`).join("")}<button class="chip favchip" data-act="fFav" aria-pressed="${!!S.fFav}" title="${S.fav.length ? "Ver solo tus favoritos" : "Marcá productos con la estrella para verlos acá"}">${ico("_star")}Favoritos${S.fav.length ? ` · ${S.fav.filter(id => S.byId[id]).length}` : ""}</button></div></div>
-   <div class="rescount"><span>${list.length} ${list.length===1?"resultado":"resultados"}</span><span class="btn-row">
+   <div class="rescount"><span>${list.length} ${list.length===1?"resultado":"resultados"}${S.q.trim() ? ` para <b>“${esc(S.q.trim())}”</b> <button class="qchip" data-act="qClear" aria-label="Borrar la búsqueda">✕ Borrar búsqueda</button>` : ""}</span><span class="btn-row">
 
     ${any?`<button class="btn ghost" data-act="clearF">Limpiar</button>`:""}</span></div>
   </div>
@@ -2467,6 +2468,7 @@ document.addEventListener("click", e => {
   if (a==="fUnidad"||a==="fCat") { S[a] = S[a]===v && v ? "" : v; render(); }
   else if (a==="fNeed") { const i = S.fNeeds.indexOf(v); i>=0 ? S.fNeeds.splice(i,1) : S.fNeeds.push(v); render(); }
   else if (a==="goCat") { S.fCat = v; S.fNeeds = []; S.q = ""; }
+  else if (a==="qClear") { S.q = ""; render(); }
   else if (a==="clearF") { S.q=""; S.fUnidad=""; S.fCat=""; S.fEstado=""; S.fNeeds=[]; S.fFav=false; render(); }
   else if (a==="fFav") { if (!S.fav.length) { toast("Marcá productos con la estrella para verlos acá"); return; } S.fFav = !S.fFav; render(); }
   else if (a==="view") { S.view = v; render(); }
