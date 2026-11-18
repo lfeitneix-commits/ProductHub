@@ -858,8 +858,8 @@ function stateMsg(t, d){ return `<div class="page-head"><div><div class="eyebrow
 /* ── Productos ── */
 const sinAcento = t => String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 const needsDe = p => NEEDS.filter(n=>p.match.objetivos.some(o=>n.objs.includes(o)));
-function filtrar(){
-  const q = sinAcento(S.q.trim()), needs = NEEDS.filter(n=>S.fNeeds.includes(n.k));
+function filtrar(sinNecesidades){   // sinNecesidades: para contar cuántos hay en cada tarjeta de necesidad con los demás filtros aplicados
+  const q = sinAcento(S.q.trim()), needs = sinNecesidades ? [] : NEEDS.filter(n=>S.fNeeds.includes(n.k));
   return S.productos.filter(p => {
     if (S.fUnidad && !p.unidades.includes(S.fUnidad)) return false;
     if (S.fCat && p.categoria !== S.fCat) return false;
@@ -890,7 +890,7 @@ function vSoluciones(){
   const cats = CAT_ORDER.filter(c=>S.productos.some(p=>p.categoria===c)).concat([...new Set(S.productos.map(p=>p.categoria))].filter(c=>!CAT_ORDER.includes(c)));
   const groups = {}; list.forEach(p => (groups[p.categoria] = groups[p.categoria] || []).push(p));
   const any = S.q || S.fUnidad || S.fCat || S.fEstado || S.fNeeds.length || S.fFav;
-  const nCount = n => S.productos.filter(p=>p.match.objetivos.some(o=>n.objs.includes(o))).length;
+  const base = filtrar(true), nCount = n => base.filter(p=>p.match.objetivos.some(o=>n.objs.includes(o))).length;   // el número respeta la búsqueda y los otros filtros
   return `
   <div class="page-head"><div><div class="eyebrow">Hub de Productos</div><h1>Productos Neix</h1>
    <p class="muted">${S.productos.length} productos de Banca Corporativa, Banca Privada, FAs y la Mesa, con la versión para el cliente, el playbook interno y cómo se opera.</p></div>
@@ -898,7 +898,7 @@ function vSoluciones(){
   <div class="search">${ico("_search")}<input class="input" id="q" type="search" placeholder="Buscá productos, instructivos o simuladores" value="${esc(S.q)}" aria-label="Buscar productos, instructivos o simuladores" autocomplete="off"></div>
   ${otrosResultadosHTML()}
   <p class="tiny muted" style="margin:14px 0 -4px">Podés elegir más de un objetivo.</p>
-  <div class="needs" role="group" aria-label="Qué necesita tu cliente">${NEEDS.map(n=>`<button class="need" data-act="fNeed" data-v="${n.k}" aria-pressed="${S.fNeeds.includes(n.k)}"><span class="ic">${ico(n.icon)}</span><b>${n.label}</b><span class="n">${nCount(n)} productos</span></button>`).join("")}</div>
+  <div class="needs" role="group" aria-label="Qué necesita tu cliente">${NEEDS.map(n=>`<button class="need" data-act="fNeed" data-v="${n.k}" aria-pressed="${S.fNeeds.includes(n.k)}"><span class="ic">${ico(n.icon)}</span><b>${n.label}</b><span class="n">${nCount(n)} ${nCount(n) === 1 ? "producto" : "productos"}</span></button>`).join("")}</div>
   <div class="filters">
    <div class="frow"><span class="lbl">Unidad</span><div class="chips scroll">${[["","Todas"]].concat(Object.keys(UNI).map(u=>[u, u==="Mercado de Capitales"?"Mesa · Mercado de Capitales":u])).map(([u,t])=>`<button class="chip${u?" uchip":""}" style="--u:${UNI_COLOR[u]||"#999"}" data-act="fUnidad" data-v="${esc(u)}" aria-pressed="${S.fUnidad===u}">${esc(t)}</button>`).join("")}<button class="chip favchip" data-act="fFav" aria-pressed="${!!S.fFav}" title="${S.fav.length ? "Ver solo tus favoritos" : "Marcá productos con la estrella para verlos acá"}">${ico("_star")}Favoritos${S.fav.length ? ` · ${S.fav.filter(id => S.byId[id]).length}` : ""}</button></div></div>
    <div class="rescount"><span>${list.length} ${list.length===1?"resultado":"resultados"}</span><span class="btn-row">
