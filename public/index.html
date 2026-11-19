@@ -200,6 +200,9 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .fav:hover{color:var(--ink)}.fav.fav-g{border:1px solid rgba(255,255,255,.25);color:#F3F0EB;padding:9px 16px;border-radius:999px;font-size:14px}.fav.fav-g[aria-pressed="true"]{color:#F1CC74}
 .favchip{display:inline-flex;align-items:center;gap:6px}.favchip .ico{width:14px;height:14px;fill:none}.favchip[aria-pressed="true"] .ico{fill:currentColor}
 .qchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;margin-left:8px;font-size:12px;color:var(--ink-2);cursor:pointer}.qchip:hover{color:var(--ink)}
+.teo .teo-ej{background:var(--surface-2);border-radius:10px;padding:14px 16px;margin-bottom:14px}.teo .teo-ej>b{display:block;font-weight:600;margin-bottom:4px}.teo .teo-ej p{margin:0 0 10px;color:var(--ink-2)}
+.teo-t{width:100%;border-collapse:collapse;font-size:12.5px}.teo-t th{text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line-2)}.teo-t td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}.teo-t td.r{text-align:right;white-space:nowrap;font-weight:600}
+.teo-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.teo-g>div{border-top:1px solid var(--line-2);padding-top:10px}.teo-g b{display:block;font-weight:600;margin-bottom:4px}.teo-g span{font-size:13px;line-height:1.55;color:var(--ink-2)}
 .otros{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 0}.otros .chips{display:flex;flex-wrap:wrap;gap:6px}.otros .chip{display:inline-flex;align-items:center;gap:6px;text-decoration:none}.otros .chip .ico{width:15px;height:15px}
 .optag{font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:4px;padding:2px 6px}
 .upl{display:grid;gap:10px;border:1px dashed var(--line-2);border-radius:10px;padding:12px 14px}
@@ -971,12 +974,23 @@ function taxTable(k, persona, cliente){
   return `<div class="tname">${esc(t.nombre)}</div><div class="tw"><table><thead><tr>${cols.map(c=>`<th>${c[0]}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${r[c[1]]==="Gravado"?`<span class="gr">Gravado</span>`:esc(r[c[1]])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
 }
 const ventajas = p => (p.interno.ventajas && p.interno.ventajas.length) ? p.interno.ventajas : p.cliente.beneficios;
+/* Teoría y ejemplo (opcional, por ficha): un caso con tabla de escenarios y conceptos explicados en criollo. */
+function teoriaHTML(i){
+  const ej = i.ejemplo, te = i.teoria || [];
+  if (!ej && !te.length) return "";
+  return `<div class="panel teo"><h3>Teoría y ejemplo</h3>
+    ${ej ? `<div class="teo-ej"><b>${esc(ej.titulo || "Ejemplo")}</b>${ej.detalle ? `<p class="small">${esc(ej.detalle)}</p>` : ""}
+      ${ej.filas && ej.filas.length ? `<div class="tw"><table class="teo-t"><thead><tr>${(ej.cols || []).map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${ej.filas.map(f => `<tr>${f.map((c, k) => `<td${k === f.length - 1 ? ' class="r"' : ""}>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : ""}
+      ${ej.nota ? `<p class="tiny muted" style="margin-top:6px">${esc(ej.nota)}</p>` : ""}</div>` : ""}
+    ${te.length ? `<div class="teo-g">${te.map(t => `<div><b>${esc(t[0])}</b><span>${esc(t[1])}</span></div>`).join("")}</div>` : ""}</div>`;
+}
 function playbook(p){
   const i = p.interno, f = p.cliente.ficha, li = a => a && a.length ? `<ul class="clean small">${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : `<p class="small muted">Sin cargar.</p>`;
   return `<div class="pb">
    <div class="panel"><h3>Por qué ofrecerlo</h3><div class="vent">${ventajas(p).map(b=>`<div><b>${esc(b[0])}</b>${b[1]?`<span>${esc(b[1])}</span>`:""}</div>`).join("")}</div>
     <div class="keyfacts">${[["Moneda",f.moneda],["Plazo",f.plazo],["Monto",f.minimo],["Liquidez",f.liquidez],["Opera en",f.mercado]].map(([k,v])=>`<span><b>${k}</b> ${esc(v)}</span>`).join("")}<span><b>Riesgo</b> ${risk(p.riesgoNivel)} ${esc(RISK_TXT[p.riesgoNivel])}</span></div></div>
    ${i.ingreso?`<div class="cobro"><span class="eyebrow">Cómo cobramos</span><p style="margin-top:4px">${esc(i.ingreso)}</p></div>`:""}
+   ${teoriaHTML(i)}
    <div class="pb3"><div class="panel"><h3>A quién</h3>${li(i.perfiles)}</div><div class="panel"><h3>Cuándo aparece</h3>${li(i.senales)}</div><div class="panel"><h3>Qué preguntar</h3>${li(i.preguntas)}</div></div>
    <div class="pb2"><div class="panel"><h3>Se combina con</h3><div class="rel">${i.relacionados.map(id=>S.byId[id]?`<a class="chip" href="#p-${id}">${esc(S.byId[id].nombre)}</a>`:"").join("")}</div></div>
     <div class="panel"><h3>Encaje</h3><dl class="kv"><dt>Clientes</dt><dd>${p.match.tipos.map(t=>TIPO[t]).join(", ")}</dd><dt>Objetivos</dt><dd>${p.match.objetivos.map(o=>OBJ[o]).join(", ")}</dd><dt>Mínimo</dt><dd>${p.match.minimoUSD?usd(p.match.minimoUSD):"Sin mínimo relevante"}</dd></dl></div></div>
@@ -1020,7 +1034,7 @@ async function save(id){
     if (t==="pairs") v = raw.split("\n").map(s=>s.trim()).filter(Boolean).map(s=>{ const i = s.indexOf("|"); return i<0 ? [s,""] : [s.slice(0,i).trim(), s.slice(i+1).trim()]; });
     setP(p, el.dataset.k, v);
   });
-  p.ultimaRevision = todayISO();
+  p.ultimaRevision = todayISO(); p.editadoEl = new Date().toISOString();
   const b = document.querySelector('[data-act="save"]'); if (b) { b.disabled = true; b.textContent = "Guardando"; }
   try { window.neixQue = "editó la ficha"; await S.db.doc("productos/"+id).set(p); toast("Ficha guardada"); go("gestion"); }
   catch(e) { toast(e && e.code === "permission_denied" ? "No tenés permiso para editar fichas" : "No se pudo guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); if (b) { b.disabled = false; b.textContent = "Guardar cambios"; } }

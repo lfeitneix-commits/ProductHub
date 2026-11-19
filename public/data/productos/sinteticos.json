@@ -2,45 +2,47 @@
   "categoria": "Cobertura",
   "cliente": {
     "aTener": [
-      "Requiere integrar garantías y el resultado de los futuros se ajusta a diario.",
-      "El resultado depende de la ejecución de todas las patas de la estrategia."
+      "En el covered call, si el papel sube por encima de la base te ejercen: ganás la tasa, pero no la suba adicional.",
+      "Ante una baja fuerte la prima amortigua, pero no cubre toda la caída.",
+      "Lanzar opciones sin tener el activo o sin cobertura puede generar pérdidas muy superiores a la prima cobrada.",
+      "Los futuros y las opciones lanzadas requieren garantías y se ajustan todos los días."
     ],
-    "bajada": "Estrategias que combinan contado y derivados para replicar el resultado de otro instrumento.",
+    "bajada": "Estrategias con derivados para cobrar una tasa sobre tus acciones, cubrir una posición o fijar un precio, armadas y ejecutadas por la Mesa de Neix.",
     "beneficios": [
       [
-        "Resultado a medida",
-        "Tasa o cobertura diseñada para tu necesidad."
+        "Renta sobre tus acciones",
+        "Con el covered call cobrás la prima de las opciones lanzadas: una tasa sobre una posición que ya tenés."
       ],
       [
-        "Arbitraje de tasas",
-        "Aprovecha diferencias entre la tasa implícita de los futuros y otras alternativas."
+        "Colchón ante bajas",
+        "La prima cobrada amortigua caídas moderadas del papel y baja tu punto de equilibrio."
       ],
       [
         "Ejecución de la Mesa",
-        "Diseño, ejecución y seguimiento de la estrategia."
+        "La Mesa elige bases y vencimientos, ejecuta todas las patas y sigue la posición y las garantías."
       ]
     ],
     "comoFunciona": [
-      "Definimos el resultado buscado: tasa, cobertura o arbitraje.",
-      "La Mesa arma la combinación de contado y derivados.",
-      "Se integran las garantías en A3.",
-      "La Mesa monitorea la posición hasta el vencimiento."
+      "Definimos el objetivo: renta, cobertura o tasa.",
+      "La Mesa propone la estrategia, con la base y el vencimiento de las opciones o los futuros.",
+      "Se ejecutan todas las patas en el mismo momento y se integran las garantías.",
+      "Seguimos la posición hasta el vencimiento o el ejercicio."
     ],
-    "enNeix": "La Mesa diseña y ejecuta la estrategia y monitorea las garantías durante toda la operación.",
+    "enNeix": "La Mesa diseña la estrategia, elige bases y vencimientos según la volatilidad del momento y monitorea la posición y las garantías hasta el vencimiento.",
     "ficha": {
-      "liquidez": "Diaria, con mark to market",
-      "mercado": "A3 y ByMA",
+      "liquidez": "Diaria, con ajuste por mercado",
+      "mercado": "ByMA (opciones) y A3 (futuros)",
       "minimo": "A consultar",
       "moneda": "Pesos y dólares",
-      "plazo": "Según el vencimiento del derivado",
-      "riesgo": "Moderado a alto: requiere garantías"
+      "plazo": "Según el vencimiento de la opción o el futuro",
+      "riesgo": "Moderado a alto, según la estrategia"
     },
-    "paraQuien": "Inversores sofisticados, empresas e institucionales que buscan una tasa o una cobertura a medida.",
-    "queEs": "Un sintético combina una posición contado con futuros u opciones para obtener un resultado que no se consigue con un instrumento directo. Por ejemplo, una tasa fija en pesos (compra de dólares y venta de futuro) o una cobertura cambiaria (posición en pesos y compra de futuro).",
-    "titular": "La tasa o la cobertura exacta que necesitás"
+    "paraQuien": "Inversores con experiencia en renta variable, empresas e institucionales que buscan renta sobre su cartera de acciones, una cobertura o una tasa a medida.",
+    "queEs": "Los derivados son contratos cuyo valor depende de otro activo: una acción como GGAL, el dólar o un índice. Con opciones y futuros se arman estrategias que no se consiguen con un instrumento directo: cobrar una tasa sobre acciones que ya tenés, cubrirte de una baja o fijar hoy un precio futuro. La más usada es el covered call: comprás la acción y lanzás calls, y la prima que cobrás funciona como renta y como colchón ante bajas.",
+    "titular": "Renta, cobertura y tasa con opciones y futuros"
   },
   "estado": "a_validar",
-  "fuente": "Relevamiento Banca Corporativa",
+  "fuente": "Ficha técnica de mercado de la Mesa · Derivados Financieros: Guía de Ejecución y Riesgo (GGAL)",
   "impuestos": [
     "opc_fut"
   ],
@@ -48,30 +50,84 @@
     "competencia": [],
     "objeciones": [],
     "operativa": [
-      "Coordinar la estrategia con la Mesa.",
-      "Integración de garantías en A3."
+      "Definir con la Mesa la estrategia, la base y el vencimiento.",
+      "Ejecutar todas las patas en el mismo momento (contado y opciones o futuros).",
+      "Integrar las garantías en ByMA o A3.",
+      "Seguir la posición y avisar al cliente antes del vencimiento o ante un ejercicio."
     ],
     "perfiles": [
+      "Inversores con cartera de acciones",
       "Tesorerías corporativas",
-      "Inversores sofisticados",
       "Institucionales"
     ],
-    "pitch": "Con un sintético armamos la tasa o la cobertura exacta que necesitás, combinando contado y futuros.",
+    "pitch": "Si ya tenés acciones, con un covered call les sacás una tasa y armás un colchón ante bajas. Y si necesitás cubrirte o fijar un precio, lo armamos con opciones o futuros.",
     "preguntas": [
-      "¿Buscás una tasa o una cobertura?",
-      "¿A qué plazo?"
+      "¿Tenés acciones en cartera que querés rentabilizar?",
+      "¿Buscás renta, cobertura o fijar una tasa?"
     ],
     "relacionados": [
-      "futuros-dolar",
       "opciones",
-      "cauciones",
-      "bonos-cer-dl"
+      "futuros-dolar",
+      "acciones-argentinas",
+      "cedears"
     ],
     "senales": [
-      "Busca tasa fija en pesos",
-      "Necesita cobertura a un plazo puntual"
+      "Tiene acciones y espera un mercado lateral o una baja moderada",
+      "Se acercan balances o eventos que inflan la volatilidad",
+      "Necesita cubrir una posición a un plazo puntual"
     ],
-    "video": ""
+    "video": "",
+    "ejemplo": {
+      "titulo": "Covered call con opciones ITM sobre GGAL (10 lotes)",
+      "detalle": "Compra de 1.000 GGAL a $6.000 ($6.000.000) y venta de 10 lotes de la base C5600 a $650 ($650.000 cobrados: $400 de valor intrínseco y $250 de tasa). Capital neto: $5.350.000. Punto de equilibrio: $5.350 (−10,83%).",
+      "cols": [
+        "Escenario al vencimiento",
+        "GGAL",
+        "Qué pasa",
+        "Resultado"
+      ],
+      "filas": [
+        [
+          "Alcista o lateral (ejercido)",
+          "≥ $5.600",
+          "Te ejercen a $5.600 ($5.600.000) y capturás toda la tasa.",
+          "+$250.000 (+4,67%)"
+        ],
+        [
+          "Baja moderada (amortiguada)",
+          "$5.450",
+          "Sin ejercicio: acciones ($5.450.000) + prima cobrada ($650.000).",
+          "+$100.000 (+1,87%)"
+        ],
+        [
+          "Punto de equilibrio",
+          "$5.350",
+          "El valor del papel iguala la inversión neta inicial.",
+          "$0 (0,00%)"
+        ],
+        [
+          "Baja fuerte",
+          "$4.800",
+          "Conservás las acciones ($4.800.000); la prima amortigua $650.000 de la caída.",
+          "−$550.000 (−10,28%)"
+        ]
+      ],
+      "nota": "Ejemplo ilustrativo con precios de referencia. Las bases, primas y vencimientos los define la Mesa en cada momento."
+    },
+    "teoria": [
+      [
+        "Delta (Δ): el velocímetro del precio",
+        "Cuánto sube o baja la prima por cada $1 que se mueve el papel. También aproxima la probabilidad de que la base termine ejercida. Por zona: OTM 0,10–0,20 (lenta) · ATM ~0,50 · ITM 0,70–0,90 (copia casi 1 a 1 al papel). Con un call de delta 0,80 lanzado, la exposición neta baja a +0,20 (1,00 − 0,80) y frena el impacto de las caídas diarias."
+      ],
+      [
+        "Vega (ν): el termómetro de la incertidumbre",
+        "Cuánto cambia la prima por cada 1% que sube o baja la volatilidad implícita. Es máxima en bases ATM y plazos largos. Quien compra opciones gana si sube la volatilidad; quien lanza, si baja. Antes de balances o eventos macro la volatilidad infla las primas: lanzar caro y aprovechar la caída posterior (volatility crush) acelera la ganancia."
+      ],
+      [
+        "La lección de Barings (1995)",
+        "Nick Leeson, operador del banco británico Barings en Singapur, vendió miles de straddles sin cobertura sobre el Nikkei 225 apostando a un mercado estable. El terremoto de Kobe hundió la bolsa más de 7%: con la volatilidad disparada (Vega en contra) y el Delta acelerando las pérdidas, el agujero superó los USD 1.300 millones y quebró un banco de 233 años. Lanzar opciones sin respaldo convierte una prima chica en un riesgo ilimitado."
+      ]
+    ]
   },
   "match": {
     "eventos": [
@@ -83,9 +139,9 @@
     ],
     "minimoUSD": null,
     "objetivos": [
-      "cobertura_devaluacion",
       "renta",
-      "cobertura_precios"
+      "cobertura_precios",
+      "cobertura_devaluacion"
     ],
     "perfiles": [
       "moderado",
@@ -100,8 +156,8 @@
   },
   "nombre": "Derivados",
   "observaciones": [
-    "Producto sumado en el relevamiento de Banca Corporativa: falta one pager.",
-    "Validar descripción y estrategias habituales con la Mesa."
+    "Ficha basada en la ficha técnica de la Mesa (Derivados Financieros, GGAL): validar con la Mesa.",
+    "Los precios del ejemplo son ilustrativos."
   ],
   "riesgoNivel": 4,
   "simulador": null,
@@ -112,5 +168,6 @@
     "Banca Corporativa"
   ],
   "validador": "",
-  "vence": "2027-02-11"
+  "vence": "2027-02-11",
+  "revisionRepo": "2026-11-19T15:00:00Z"
 }

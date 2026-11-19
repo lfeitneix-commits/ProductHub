@@ -97,7 +97,15 @@
         const ids = await getJSON("data/productos/index.json");
         const docs = await Promise.all(ids.map((id) => getJSON("data/productos/" + id + ".json").then((d) => [id, d])));
         store.productos = Object.fromEntries(docs);
-        if (remoto && remoto.fichas) Object.entries(dec(remoto.fichas)).forEach(([id, d]) => { store.productos[id] = d; }); // lo editado en Gestión manda
+        // Lo editado en Gestión manda, salvo que la ficha del repo se haya actualizado después (revisionRepo más nueva que editadoEl):
+        // en ese caso se muestra la del repo y se conserva lo que solo se maneja en Gestión (eliminado y one pager subido).
+        if (remoto && remoto.fichas) Object.entries(dec(remoto.fichas)).forEach(([id, d]) => {
+          const repo = store.productos[id];
+          if (repo && repo.revisionRepo && !(d && d.editadoEl && d.editadoEl > repo.revisionRepo)) {
+            const propio = {}; ["oculto", "onePager", "onePagerQuitado"].forEach((k) => { if (d && k in d) propio[k] = d[k]; });
+            store.productos[id] = Object.assign({}, repo, propio);
+          } else store.productos[id] = d;
+        });
       }
       return store.productos;
     }
