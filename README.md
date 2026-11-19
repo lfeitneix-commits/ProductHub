@@ -166,3 +166,10 @@ Todos los mails (correo nuevo), webs, celulares (WhatsApp) y el fijo de Neix (ll
 - PDF oficiales del repo: `python3 scripts/enlazar-pdfs.py public/onepagers/*.pdf` (requiere `pip install pymupdf`). Correrlo cada vez que se suma un PDF al repo y subir la versión `?v=` en `public/data/config/onepagers.local.json`.
 - PDF subidos desde Gestión: el navegador les agrega los links antes de subirlos (`enlazarPDF`).
 Los PDF escaneados (imagen, sin texto) no se pueden enlazar.
+
+## Fondos que ofrecemos (ficha de FCI)
+Lista de fondos locales por tipo en `public/data/config/fondos.json` (sale de FONDOS_LOCALES_BYMA.xlsx). El campo `cafci` es el nombre exacto
+del fondo en la Cámara Argentina de FCI. El rendimiento (en el año y últimos 12 meses) lo calcula el navegador con el valor de cuotaparte de la
+API pública de ArgentinaDatos (`api.argentinadatos.com/v1/finanzas/fci/...`, sin clave, permite pedidos desde el navegador) y lo guarda un día.
+No usa funciones de Vercel. La fuente tiene días incompletos desde 2026: solo se usa un día si trae la mayoría de los fondos,
+por eso no hay rendimiento del último mes.

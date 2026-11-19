@@ -204,7 +204,9 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .teo-t{width:100%;border-collapse:collapse;font-size:12.5px}.teo-t th{text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line-2)}.teo-t td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}.teo-t td.r{text-align:right;white-space:nowrap;font-weight:600}
 .teo-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.teo-g>div{border-top:1px solid var(--line-2);padding-top:10px}.teo-g b{display:block;font-weight:600;margin-bottom:4px}.teo-g span{font-size:13px;line-height:1.55;color:var(--ink-2)}
 .fds-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}.fds-q{margin-bottom:10px}.fds-t{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
-.fds-g{margin-top:8px}.fds-g[hidden]{display:none}.fds-tab{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}.fds-tab th:nth-child(1){width:56%}.fds-tab th:nth-child(2){width:26%}.fds-tab .esp .muted{font-family:inherit;font-size:12.5px}.fds-tab th{text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line-2)}.fds-tab td{padding:7px 8px;border-bottom:1px solid var(--line)}.fds-tab tr[hidden]{display:none}.fds-tab .esp{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;white-space:nowrap}
+.fds-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.fds-bar .fds-t{margin-bottom:0}.fds-o{display:inline-flex;align-items:center}.fds-o .tiny{padding:0 8px}
+.fds-tab td.r,.fds-tab th.r{text-align:right;white-space:nowrap}.fds-tab .neg{color:#B23A3A}
+.fds-g{margin-top:8px}.fds-g[hidden]{display:none}.fds-tab{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}.fds-tab th:nth-child(1){width:44%}.fds-tab th:nth-child(2){width:18%}.fds-tab th:nth-child(3){width:12%}.fds-tab .esp .muted{font-family:inherit;font-size:12.5px}.fds-tab th{text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line-2)}.fds-tab td{padding:7px 8px;border-bottom:1px solid var(--line)}.fds-tab tr[hidden]{display:none}.fds-tab .esp{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;white-space:nowrap}
 .otros{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 0}.otros .chips{display:flex;flex-wrap:wrap;gap:6px}.otros .chip{display:inline-flex;align-items:center;gap:6px;text-decoration:none}.otros .chip .ico{width:15px;height:15px}
 .optag{font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:4px;padding:2px 6px}
 .upl{display:grid;gap:10px;border:1px dashed var(--line-2);border-radius:10px;padding:12px 14px}
@@ -846,6 +848,7 @@ function render(anim){
   if (r === "presentaciones") { refreshDeck(); pzFiltrar(); }
   if (r === "gestion") gesFiltrar();
   if (!r.startsWith("p-")) S._vista = "";
+  if ($("#fd_q")) { fondosFiltrar(); if (S.fdAbiertos) document.querySelectorAll(".fds-g").forEach(g => { if (S.fdAbiertos.includes(g.dataset.tipo)) g.open = true; }); }
 }
 /* Pie interno: solo la sesión (quién entró y Salir). El "Hablemos" con datos de contacto no hace falta en una herramienta interna. */
 function footer(r){
@@ -978,16 +981,64 @@ function taxTable(k, persona, cliente){
 const ventajas = p => (p.interno.ventajas && p.interno.ventajas.length) ? p.interno.ventajas : p.cliente.beneficios;
 /* Fondos que ofrecemos (ficha de FCI): lista de fondos locales por tipo, con buscador. Datos: public/data/config/fondos.json. */
 const MON_FD = {ARS:"Pesos", "USD EXT":"USD cable", USD:"USD MEP"};
+/* Rendimientos: valor de cuotaparte que los fondos informan a la Cámara Argentina de FCI (API pública de ArgentinaDatos, sin clave).
+   Se compara el último dato con el cierre del año anterior y con el de hace un año. La fuente tiene días incompletos
+   (desde 2026 guarda pocos fondos por día), así que solo se usa un día si trae la mayoría de los fondos. Se guarda en el navegador por un día. */
+const RD_KEY = "neix-hub-rend-v2", RD_API = "https://api.argentinadatos.com/v1/finanzas/fci/", RD_CATS = ["mercadoDinero","rentaFija","rentaVariable","rentaMixta","otros"];
+async function rdCargar(nombres){
+  try { const c = JSON.parse(localStorage.getItem(RD_KEY) || "null"); if (c && c.dia === todayISO() && c.r) return c; } catch(_) {}
+  const get = async (cat, f, intento = 0) => {
+    const r = await fetch(RD_API + cat + "/" + f).catch(() => null);
+    if (r && r.ok) return r.json();
+    if (r && r.status === 404) { const e = new Error("http"); e.status = 404; throw e; }
+    if (intento < 2) { await new Promise(ok => setTimeout(ok, 800 * (intento + 1))); return get(cat, f, intento + 1); }   // error pasajero: reintenta
+    const e = new Error("http"); e.status = r ? r.status : 0; throw e;
+  };
+  const lista = (await Promise.all(RD_CATS.map(c => get(c, "ultimo").catch(() => [])))).flat();
+  const ult = {}; let fecha = "";
+  lista.forEach(x => { if (x && x.fondo && nombres.has(x.fondo)) { ult[x.fondo] = [x.vcp, x.fecha]; if (x.fecha > fecha) fecha = x.fecha; } });
+  if (!fecha) throw new Error("sin datos");
+  const minimo = Math.max(20, Object.keys(ult).length * 0.6);
+  const enFecha = async desde => {   // día hábil completo más cercano, hacia atrás
+    const d = new Date(desde + "T12:00:00Z");
+    for (let k = 0; k < 12; k++) {
+      const f = d.toISOString().slice(0, 10), ruta = f.replace(/-/g, "/");
+      try {
+        const prim = await get(RD_CATS[0], ruta), rest = await Promise.all(RD_CATS.slice(1).map(c => get(c, ruta).catch(() => [])));
+        const m = {}; [prim, ...rest].flat().forEach(x => { if (x && x.fondo && nombres.has(x.fondo)) m[x.fondo] = x.vcp; });
+        if (Object.keys(m).length >= minimo) return {f, m};
+        d.setUTCDate(d.getUTCDate() - 1);
+      } catch(e) { d.setUTCDate(d.getUTCDate() - 1); }
+    }
+    return {f: "", m: {}};
+  };
+  const haceUnAnio = new Date(fecha + "T12:00:00Z"); haceUnAnio.setUTCFullYear(haceUnAnio.getUTCFullYear() - 1);
+  const [ytd, anio] = await Promise.all([enFecha((+fecha.slice(0, 4) - 1) + "-12-31"), enFecha(haceUnAnio.toISOString().slice(0, 10))]);
+  const out = {dia: todayISO(), fecha, fYtd: ytd.f, f365: anio.f, anio: fecha.slice(0, 4), r: {}};
+  Object.entries(ult).forEach(([n, [v, f]]) => {
+    if (!v || (Date.parse(fecha) - Date.parse(f)) / 864e5 > 7) return;   // sin dato reciente
+    const r = {}; if (ytd.m[n]) r.m = +((v / ytd.m[n] - 1) * 100).toFixed(2); if (anio.m[n]) r.a = +((v / anio.m[n] - 1) * 100).toFixed(2);
+    if ("m" in r || "a" in r) out.r[n] = r;
+  });
+  try { localStorage.setItem(RD_KEY, JSON.stringify(out)); } catch(_) {}
+  return out;
+}
+const pctFd = v => v === undefined ? `<span class="muted">—</span>` : `<span class="${v < 0 ? "neg" : ""}">${v > 0 ? "+" : ""}${fmt(v, 2)}%</span>`;
 function fondosHTML(){
   if (S.fondos === undefined) { S.fondos = null; fetch("data/config/fondos.json", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { S.fondos = j || {lista:[], tipos:[]}; if (route().startsWith("p-fci")) softRender(); }); }
   if (!S.fondos) return `<div class="panel"><h3>Fondos que ofrecemos</h3><p class="small muted">Cargando…</p></div>`;
   const F = S.fondos, ed = puedeGestionar(), tipos = (F.tipos || []).filter(t => F.lista.some(f => f.tipo === t));
-  const fila = f => `<tr data-q="${esc(sinAcento([f.n, f.esp || "", f.tipo].join(" ")))}"><td>${esc(f.n)}${ed && f.conf ? ` <span class="tiny muted">· a confirmar</span>` : ""}</td><td class="esp">${f.esp ? esc(f.esp) : `<span class="muted">No cotiza en BYMA</span>`}</td><td>${esc(MON_FD[f.mon] || "—")}</td></tr>`;
-  return `<div class="panel fds"><div class="fds-h"><h3 style="margin:0">Fondos que ofrecemos <span class="tiny muted">${F.lista.length}</span></h3><span class="tiny muted">El rendimiento de cada fondo se suma cuando esté la fuente de datos.</span></div>
-    <div class="search fds-q">${ico("_search")}<input class="input" id="fd_q" type="search" placeholder="Buscá un fondo, una sociedad gerente o la especie" autocomplete="off" aria-label="Buscar fondos"></div>
-    <div class="chips fds-t">${[["", "Todos"]].concat(tipos.map(t => [t, t])).map(([t, l]) => `<button class="chip" data-act="fdTipo" data-v="${esc(t)}" aria-pressed="${(S.fdTipo || "") === t}">${esc(l)}${t ? ` · ${F.lista.filter(f => f.tipo === t).length}` : ""}</button>`).join("")}</div>
-    ${tipos.map(t => `<details class="fold fds-g" data-tipo="${esc(t)}"><summary>${esc(t)} <span class="tiny muted fds-n">${F.lista.filter(f => f.tipo === t).length}</span></summary><div class="in"><div class="tw"><table class="fds-tab"><thead><tr><th>Fondo</th><th>Especie BYMA</th><th>Moneda</th></tr></thead><tbody>${F.lista.filter(f => f.tipo === t).map(fila).join("")}</tbody></table></div></div></details>`).join("")}
-    <p class="small muted fds-nada" hidden>No hay fondos con esa búsqueda.</p></div>`;
+  if (S.rend === undefined) { S.rend = null; rdCargar(new Set(F.lista.map(f => f.cafci).filter(Boolean))).then(r => { S.rend = r; }).catch(() => { S.rend = {error: true, r: {}}; }).then(() => { if (route().startsWith("p-fci")) softRender(); }); }
+  const R = S.rend, rd = f => (R && R.r && f.cafci && R.r[f.cafci]) || {}, orden = S.fdOrden || "n";
+  const ordenar = l => orden === "n" ? l : l.slice().sort((a, b) => { const x = rd(a)[orden], y = rd(b)[orden]; return (y === undefined ? -1e9 : y) - (x === undefined ? -1e9 : x); });
+  const fila = f => `<tr data-q="${esc(sinAcento([f.n, f.esp || "", f.tipo].join(" ")))}"><td>${esc(f.n)}${ed && f.conf ? ` <span class="tiny muted">· a confirmar</span>` : ""}</td><td class="esp">${f.esp ? esc(f.esp) : `<span class="muted">No cotiza en BYMA</span>`}</td><td>${esc(MON_FD[f.mon] || "—")}</td><td class="r">${R ? pctFd(rd(f).m) : "…"}</td><td class="r">${R ? pctFd(rd(f).a) : "…"}</td></tr>`;
+  return `<div class="panel fds"><div class="fds-h"><h3 style="margin:0">Fondos que ofrecemos <span class="tiny muted">${F.lista.length}</span></h3><span class="tiny muted">${!R ? "Cargando rendimientos…" : R.error ? "No pudimos traer los rendimientos ahora. Probá más tarde." : `Rendimiento al ${fdate(R.fecha)}: en el año (desde el ${fdate(R.fYtd)}) y últimos 12 meses (desde el ${fdate(R.f365)}).`}</span></div>
+    <div class="search fds-q">${ico("_search")}<input class="input" id="fd_q" type="search" placeholder="Buscá un fondo, una sociedad gerente o la especie" autocomplete="off" aria-label="Buscar fondos" value="${esc(S.fdQ || "")}"></div>
+    <div class="fds-bar"><div class="chips fds-t">${[["", "Todos"]].concat(tipos.map(t => [t, t])).map(([t, l]) => `<button class="chip" data-act="fdTipo" data-v="${esc(t)}" aria-pressed="${(S.fdTipo || "") === t}">${esc(l)}${t ? ` · ${F.lista.filter(f => f.tipo === t).length}` : ""}</button>`).join("")}</div>
+      <div class="seg fds-o"><span class="tiny muted">Ordenar</span>${[["n","Nombre"],["m","En el año"],["a","12 meses"]].map(([k, l]) => `<button data-act="fdOrden" data-v="${k}" aria-pressed="${orden === k}">${l}</button>`).join("")}</div></div>
+    ${tipos.map(t => `<details class="fold fds-g" data-tipo="${esc(t)}"><summary>${esc(t)} <span class="tiny muted fds-n">${F.lista.filter(f => f.tipo === t).length}</span></summary><div class="in"><div class="tw"><table class="fds-tab"><thead><tr><th>Fondo</th><th>Especie BYMA</th><th>Moneda</th><th class="r">En el año</th><th class="r">12 meses</th></tr></thead><tbody>${ordenar(F.lista.filter(f => f.tipo === t)).map(fila).join("")}</tbody></table></div></div></details>`).join("")}
+    <p class="small muted fds-nada" hidden>No hay fondos con esa búsqueda.</p>
+    <p class="tiny muted" style="margin:12px 0 0">Fuente: valor de cuotaparte informado a la Cámara Argentina de FCI (vía ArgentinaDatos). Los fondos sin dato no informan a la Cámara o tienen otro nombre. Rendimientos pasados no aseguran rendimientos futuros.</p></div>`;
 }
 function fondosFiltrar(){
   const box = $(".fds"); if (!box) return;
@@ -2509,6 +2560,7 @@ document.addEventListener("click", e => {
   else if (a==="fNeed") { const i = S.fNeeds.indexOf(v); i>=0 ? S.fNeeds.splice(i,1) : S.fNeeds.push(v); render(); }
   else if (a==="goCat") { S.fCat = v; S.fNeeds = []; S.q = ""; }
   else if (a==="qClear") { S.q = ""; render(); }
+  else if (a==="fdOrden") { S.fdOrden = v; S.fdAbiertos = [...document.querySelectorAll(".fds-g[open]")].map(g => g.dataset.tipo); render(); }
   else if (a==="fdTipo") { S.fdTipo = v; document.querySelectorAll('[data-act="fdTipo"]').forEach(x => x.setAttribute("aria-pressed", String((x.dataset.v || "") === v))); fondosFiltrar(); }
   else if (a==="clearF") { S.q=""; S.fUnidad=""; S.fCat=""; S.fEstado=""; S.fNeeds=[]; S.fFav=false; render(); }
   else if (a==="fFav") { if (!S.fav.length) { toast("Marcá productos con la estrella para verlos acá"); return; } S.fFav = !S.fFav; render(); }
@@ -2592,7 +2644,7 @@ document.addEventListener("input", e => {
     if (t.dataset.pf==="asesor") { const a = findAsesor(t.value); if (a) { if (t.value !== a.nombre) t.value = S.prop.asesor = a.nombre; S.prop.mail = a.mail || ""; S.prop.tel = a.tel || ""; delete S.prop.contacto; const m = $("#pr_mail"), te = $("#pr_tel"); if (m) m.value = S.prop.mail; if (te) te.value = S.prop.tel; } }
     persist(); refreshPreview(); }
   else if (t.dataset.pi) { S.prop.items[+t.dataset.pi].nota = t.value; persist(); refreshPreview(); }
-  else if (t.id === "fd_q") fondosFiltrar();
+  else if (t.id === "fd_q") { S.fdQ = t.value; fondosFiltrar(); }
   else if (t.dataset.cv !== undefined && S.prop.conversamos) { S.prop.conversamos[+t.dataset.cv][t.dataset.f] = t.value; persist(); clearTimeout(S._cvT); S._cvT = setTimeout(refreshPreview, 250); }
 });
 /* Selector de PDF de Gestión: muestra el archivo elegido y acepta arrastrar y soltar. */
