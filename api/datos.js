@@ -92,17 +92,24 @@ async function enviarMail(req, res, u) {
 
   // 2) Armar el mail: el texto y la firma de Neix (datos del asesor + logo como imagen incrustada)
   const f = body.firma && typeof body.firma === "object" ? body.firma : {};
-  const nombre = String(f.nombre || u.nombre || "").slice(0, 80), area = String(f.area || "").slice(0, 60), tel = String(f.tel || "").slice(0, 30);
-  const d = tel.replace(/\D/g, "").replace(/^0/, ""), wa = d ? (d.length === 10 ? "549" + d : d.length === 11 && d[0] === "9" ? "54" + d : d) : "";
+  const nombre = String(f.nombre || u.nombre || "").slice(0, 80), cargo = String(f.cargo || "").slice(0, 80), cel = String(f.cel || "").slice(0, 30);
+  const d = cel.replace(/\D/g, "").replace(/^0/, ""), wa = d ? (d.length === 10 ? "549" + d : d.length === 11 && d[0] === "9" ? "54" + d : d) : "";
   const logo = /^data:image\/png;base64,[A-Za-z0-9+/=]{100,60000}$/.test(String(body.logo || "")) ? String(body.logo).split(",")[1] : "";
-  const a = 'style="color:#3D3D3D;text-decoration:none"', sep = '<span style="color:#B5AC9F">&nbsp;·&nbsp;</span>';
+  const a = 'style="color:#3D3D3D;text-decoration:none"';
+  // Firma oficial de Neix: nombre, cargo en bordó, teléfono, dirección y el bloque con barra bordó, logo y leyenda.
   const html = `<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.5;color:#222">${escHTML(texto).replace(/\r?\n/g, "<br>")}</div>
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:22px;border-top:1px solid #E4E0DA;font-family:Calibri,Arial,sans-serif;color:#3D3D3D"><tr><td style="padding-top:14px">
-${nombre ? `<div style="font-size:12pt;font-weight:bold;color:#232323">${escHTML(nombre)}</div>` : ""}
-<div style="font-size:10pt;color:#8C7F6B;margin-bottom:6px">${escHTML(area ? area + " · Neix" : "Neix · Inteligencia Financiera")}</div>
-<div style="font-size:10pt">${[tel ? (wa ? `<a href="https://wa.me/${wa}" ${a}>${escHTML(tel)}</a>` : escHTML(tel)) : "", `<a href="mailto:${escHTML(u.email)}" ${a}>${escHTML(u.email)}</a>`, `<a href="https://www.neix.com.ar" ${a}>www.neix.com.ar</a>`].filter(Boolean).join(sep)}</div>
-${logo ? `<div style="margin-top:12px"><img src="cid:logo-neix" alt="NEIX" width="86" style="display:block;width:86px;height:auto;border:0"></div>` : ""}
-<div style="font-size:7.5pt;line-height:1.4;color:#A39B90;margin-top:12px;max-width:560px">NEIX S.A. ALyC Propio registrado bajo el N° 145 de la CNV y Agente de Colocación y Distribución Integral de FCI registrado bajo el N° 14 de la CNV.</div>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:20px;font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;color:#3D3D3D"><tr><td>
+${nombre ? `<div style="font-weight:bold;color:#3D3D3D">${escHTML(nombre)}</div>` : ""}
+${cargo ? `<div style="font-weight:bold;color:#AB1930">${escHTML(cargo)}</div>` : ""}
+<div>Tel. <a href="tel:+541148591552" ${a}>4859-1552</a></div>
+${cel ? `<div>Cel. ${wa ? `<a href="https://wa.me/${wa}" ${a}>${escHTML(cel)}</a>` : escHTML(cel)}</div>` : ""}
+<div>P8 Buenavista - Don Francisco 3345, Piso 5, San Fernando</div>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:10px"><tr><td style="border-left:3px solid #AB1930;padding:6px 0 4px 16px">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+${logo ? `<td style="vertical-align:middle"><img src="cid:logo-neix" alt="NEIX" width="150" style="display:block;width:150px;height:auto;border:0"></td>` : `<td style="vertical-align:middle;font-size:24pt;font-weight:bold;letter-spacing:6px;color:#3D3D3D">NEIX</td>`}
+<td style="vertical-align:middle;padding-left:10px;font-family:Georgia,'Times New Roman',serif;font-size:9pt;line-height:1.15;color:#6B6B6B">Inteligencia<br>&nbsp;&nbsp;&nbsp;&nbsp;Financiera</td></tr></table>
+<div style="font-size:7pt;font-style:italic;line-height:1.4;color:#444;margin-top:10px;max-width:340px">NEIX S.A. Agente de Liquidación y Compensación y Agente de Negociación Propio, Registrado bajo el N° 145 de la CNV y Agente de Colocación y Distribución Integral de Fondos Comunes de Inversión Registrado bajo el N° 14 de la CNV.</div>
+</td></tr></table>
 </td></tr></table>`;
   const g = await fetch("https://graph.microsoft.com/v1.0/me/sendMail", {
     method: "POST", headers: { Authorization: "Bearer " + tok.access_token, "Content-Type": "application/json" },

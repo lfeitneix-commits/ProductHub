@@ -2226,7 +2226,7 @@ const aBase64 = f => new Promise((ok, ko) => { const r = new FileReader(); r.onl
 function firmaMail(){
   const me = S.me || {}, a = findAsesor(me.nombre) || (S.asesores || []).find(x => String(x.mail || "").toLowerCase() === String(me.email || "").toLowerCase()) || {};
   const P = S.envio && S.envio.tipo === "pz" ? S.pz : S.prop;
-  return {nombre: a.nombre || me.nombre || "", area: a.area || "", tel: a.tel || (P && normNom(P.asesor) === normNom(a.nombre || me.nombre) ? P.tel : "") || ""};
+  return {nombre: a.nombre || me.nombre || "", cargo: a.cargo || a.area || "", cel: a.tel || (P && normNom(P.asesor) === normNom(a.nombre || me.nombre) ? P.tel : "") || ""};
 }
 async function enviarDirecto(b){
   const E = S.envio, para = (($("#shTo") || {}).value || "").split(/[,;\s]+/).map(x => x.trim()).filter(Boolean);

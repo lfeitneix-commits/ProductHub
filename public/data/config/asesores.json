@@ -89,6 +89,13 @@
       "area": "Banca Privada",
       "mail": "lmalaccorto@neix.com.ar",
       "tel": "+54 9 11 6958-7199"
+    },
+    {
+      "nombre": "Luna Feit",
+      "area": "Marketing",
+      "cargo": "Analista de Proyectos",
+      "mail": "lfeit@neix.com.ar",
+      "tel": ""
     }
   ]
 }
