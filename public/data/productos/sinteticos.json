@@ -122,10 +122,6 @@
       [
         "Vega (ν): el termómetro de la incertidumbre",
         "Cuánto cambia la prima por cada 1% que sube o baja la volatilidad implícita. Es máxima en bases ATM y plazos largos. Quien compra opciones gana si sube la volatilidad; quien lanza, si baja. Antes de balances o eventos macro la volatilidad infla las primas: lanzar caro y aprovechar la caída posterior (volatility crush) acelera la ganancia."
-      ],
-      [
-        "La lección de Barings (1995)",
-        "Nick Leeson, operador del banco británico Barings en Singapur, vendió miles de straddles sin cobertura sobre el Nikkei 225 apostando a un mercado estable. El terremoto de Kobe hundió la bolsa más de 7%: con la volatilidad disparada (Vega en contra) y el Delta acelerando las pérdidas, el agujero superó los USD 1.300 millones y quebró un banco de 233 años. Lanzar opciones sin respaldo convierte una prima chica en un riesgo ilimitado."
       ]
     ]
   },
@@ -169,5 +165,5 @@
   ],
   "validador": "",
   "vence": "2027-02-11",
-  "revisionRepo": "2026-11-19T15:00:00Z"
+  "revisionRepo": "2026-11-19T18:00:00Z"
 }
