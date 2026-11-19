@@ -203,6 +203,8 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .teo .teo-ej{background:var(--surface-2);border-radius:10px;padding:14px 16px;margin-bottom:14px}.teo .teo-ej>b{display:block;font-weight:600;margin-bottom:4px}.teo .teo-ej p{margin:0 0 10px;color:var(--ink-2)}
 .teo-t{width:100%;border-collapse:collapse;font-size:12.5px}.teo-t th{text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line-2)}.teo-t td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}.teo-t td.r{text-align:right;white-space:nowrap;font-weight:600}
 .teo-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.teo-g>div{border-top:1px solid var(--line-2);padding-top:10px}.teo-g b{display:block;font-weight:600;margin-bottom:4px}.teo-g span{font-size:13px;line-height:1.55;color:var(--ink-2)}
+.fds-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}.fds-q{margin-bottom:10px}.fds-t{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.fds-g{margin-top:8px}.fds-g[hidden]{display:none}.fds-tab{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}.fds-tab th:nth-child(1){width:56%}.fds-tab th:nth-child(2){width:26%}.fds-tab .esp .muted{font-family:inherit;font-size:12.5px}.fds-tab th{text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line-2)}.fds-tab td{padding:7px 8px;border-bottom:1px solid var(--line)}.fds-tab tr[hidden]{display:none}.fds-tab .esp{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;white-space:nowrap}
 .otros{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 0}.otros .chips{display:flex;flex-wrap:wrap;gap:6px}.otros .chip{display:inline-flex;align-items:center;gap:6px;text-decoration:none}.otros .chip .ico{width:15px;height:15px}
 .optag{font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:4px;padding:2px 6px}
 .upl{display:grid;gap:10px;border:1px dashed var(--line-2);border-radius:10px;padding:12px 14px}
@@ -974,6 +976,30 @@ function taxTable(k, persona, cliente){
   return `<div class="tname">${esc(t.nombre)}</div><div class="tw"><table><thead><tr>${cols.map(c=>`<th>${c[0]}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${r[c[1]]==="Gravado"?`<span class="gr">Gravado</span>`:esc(r[c[1]])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
 }
 const ventajas = p => (p.interno.ventajas && p.interno.ventajas.length) ? p.interno.ventajas : p.cliente.beneficios;
+/* Fondos que ofrecemos (ficha de FCI): lista de fondos locales por tipo, con buscador. Datos: public/data/config/fondos.json. */
+const MON_FD = {ARS:"Pesos", "USD EXT":"USD cable", USD:"USD MEP"};
+function fondosHTML(){
+  if (S.fondos === undefined) { S.fondos = null; fetch("data/config/fondos.json", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { S.fondos = j || {lista:[], tipos:[]}; if (route().startsWith("p-fci")) softRender(); }); }
+  if (!S.fondos) return `<div class="panel"><h3>Fondos que ofrecemos</h3><p class="small muted">Cargando…</p></div>`;
+  const F = S.fondos, ed = puedeGestionar(), tipos = (F.tipos || []).filter(t => F.lista.some(f => f.tipo === t));
+  const fila = f => `<tr data-q="${esc(sinAcento([f.n, f.esp || "", f.tipo].join(" ")))}"><td>${esc(f.n)}${ed && f.conf ? ` <span class="tiny muted">· a confirmar</span>` : ""}</td><td class="esp">${f.esp ? esc(f.esp) : `<span class="muted">No cotiza en BYMA</span>`}</td><td>${esc(MON_FD[f.mon] || "—")}</td></tr>`;
+  return `<div class="panel fds"><div class="fds-h"><h3 style="margin:0">Fondos que ofrecemos <span class="tiny muted">${F.lista.length}</span></h3><span class="tiny muted">El rendimiento de cada fondo se suma cuando esté la fuente de datos.</span></div>
+    <div class="search fds-q">${ico("_search")}<input class="input" id="fd_q" type="search" placeholder="Buscá un fondo, una sociedad gerente o la especie" autocomplete="off" aria-label="Buscar fondos"></div>
+    <div class="chips fds-t">${[["", "Todos"]].concat(tipos.map(t => [t, t])).map(([t, l]) => `<button class="chip" data-act="fdTipo" data-v="${esc(t)}" aria-pressed="${(S.fdTipo || "") === t}">${esc(l)}${t ? ` · ${F.lista.filter(f => f.tipo === t).length}` : ""}</button>`).join("")}</div>
+    ${tipos.map(t => `<details class="fold fds-g" data-tipo="${esc(t)}"><summary>${esc(t)} <span class="tiny muted fds-n">${F.lista.filter(f => f.tipo === t).length}</span></summary><div class="in"><div class="tw"><table class="fds-tab"><thead><tr><th>Fondo</th><th>Especie BYMA</th><th>Moneda</th></tr></thead><tbody>${F.lista.filter(f => f.tipo === t).map(fila).join("")}</tbody></table></div></div></details>`).join("")}
+    <p class="small muted fds-nada" hidden>No hay fondos con esa búsqueda.</p></div>`;
+}
+function fondosFiltrar(){
+  const box = $(".fds"); if (!box) return;
+  const q = sinAcento(($("#fd_q") || {}).value || "").trim(), pal = q ? q.split(/\s+/) : [], tipo = S.fdTipo || ""; let total = 0;
+  box.querySelectorAll(".fds-g").forEach(g => {
+    let n = 0; const okTipo = !tipo || g.dataset.tipo === tipo;
+    g.querySelectorAll("tbody tr").forEach(tr => { const ok = okTipo && pal.every(w => tr.dataset.q.includes(w)); tr.hidden = !ok; if (ok) n++; });
+    g.hidden = !n; g.querySelector(".fds-n").textContent = n; total += n;
+    if (q || tipo) g.open = n > 0 && (!!q || n <= 40); 
+  });
+  box.querySelector(".fds-nada").hidden = total > 0;
+}
 /* Teoría y ejemplo (opcional, por ficha): un caso con tabla de escenarios y conceptos explicados en criollo. */
 function teoriaHTML(i){
   const ej = i.ejemplo, te = i.teoria || [];
@@ -990,7 +1016,7 @@ function playbook(p){
    <div class="panel"><h3>Por qué ofrecerlo</h3><div class="vent">${ventajas(p).map(b=>`<div><b>${esc(b[0])}</b>${b[1]?`<span>${esc(b[1])}</span>`:""}</div>`).join("")}</div>
     <div class="keyfacts">${[["Moneda",f.moneda],["Plazo",f.plazo],["Monto",f.minimo],["Liquidez",f.liquidez],["Opera en",f.mercado]].map(([k,v])=>`<span><b>${k}</b> ${esc(v)}</span>`).join("")}<span><b>Riesgo</b> ${risk(p.riesgoNivel)} ${esc(RISK_TXT[p.riesgoNivel])}</span></div></div>
    ${i.ingreso?`<div class="cobro"><span class="eyebrow">Cómo cobramos</span><p style="margin-top:4px">${esc(i.ingreso)}</p></div>`:""}
-   ${teoriaHTML(i)}
+   ${teoriaHTML(i)}${p.id === "fci" ? fondosHTML() : ""}
    <div class="pb3"><div class="panel"><h3>A quién</h3>${li(i.perfiles)}</div><div class="panel"><h3>Cuándo aparece</h3>${li(i.senales)}</div><div class="panel"><h3>Qué preguntar</h3>${li(i.preguntas)}</div></div>
    <div class="pb2"><div class="panel"><h3>Se combina con</h3><div class="rel">${i.relacionados.map(id=>S.byId[id]?`<a class="chip" href="#p-${id}">${esc(S.byId[id].nombre)}</a>`:"").join("")}</div></div>
     <div class="panel"><h3>Encaje</h3><dl class="kv"><dt>Clientes</dt><dd>${p.match.tipos.map(t=>TIPO[t]).join(", ")}</dd><dt>Objetivos</dt><dd>${p.match.objetivos.map(o=>OBJ[o]).join(", ")}</dd><dt>Mínimo</dt><dd>${p.match.minimoUSD?usd(p.match.minimoUSD):"Sin mínimo relevante"}</dd></dl></div></div>
@@ -2483,6 +2509,7 @@ document.addEventListener("click", e => {
   else if (a==="fNeed") { const i = S.fNeeds.indexOf(v); i>=0 ? S.fNeeds.splice(i,1) : S.fNeeds.push(v); render(); }
   else if (a==="goCat") { S.fCat = v; S.fNeeds = []; S.q = ""; }
   else if (a==="qClear") { S.q = ""; render(); }
+  else if (a==="fdTipo") { S.fdTipo = v; document.querySelectorAll('[data-act="fdTipo"]').forEach(x => x.setAttribute("aria-pressed", String((x.dataset.v || "") === v))); fondosFiltrar(); }
   else if (a==="clearF") { S.q=""; S.fUnidad=""; S.fCat=""; S.fEstado=""; S.fNeeds=[]; S.fFav=false; render(); }
   else if (a==="fFav") { if (!S.fav.length) { toast("Marcá productos con la estrella para verlos acá"); return; } S.fFav = !S.fFav; render(); }
   else if (a==="view") { S.view = v; render(); }
@@ -2565,6 +2592,7 @@ document.addEventListener("input", e => {
     if (t.dataset.pf==="asesor") { const a = findAsesor(t.value); if (a) { if (t.value !== a.nombre) t.value = S.prop.asesor = a.nombre; S.prop.mail = a.mail || ""; S.prop.tel = a.tel || ""; delete S.prop.contacto; const m = $("#pr_mail"), te = $("#pr_tel"); if (m) m.value = S.prop.mail; if (te) te.value = S.prop.tel; } }
     persist(); refreshPreview(); }
   else if (t.dataset.pi) { S.prop.items[+t.dataset.pi].nota = t.value; persist(); refreshPreview(); }
+  else if (t.id === "fd_q") fondosFiltrar();
   else if (t.dataset.cv !== undefined && S.prop.conversamos) { S.prop.conversamos[+t.dataset.cv][t.dataset.f] = t.value; persist(); clearTimeout(S._cvT); S._cvT = setTimeout(refreshPreview, 250); }
 });
 /* Selector de PDF de Gestión: muestra el archivo elegido y acepta arrastrar y soltar. */

@@ -1,0 +1,1406 @@
+{
+"fuente": "FONDOS_LOCALES_BYMA.xlsx (hoja Todos los fondos locales)",
+"actualizado": "2026-11-19",
+"tipos": [
+"Money Market",
+"Renta Fija en $",
+"Renta Fija en USD",
+"Fondos Mixtos en $",
+"Fondos Mixtos en USD",
+"Renta Variable en $",
+"Renta Variable USD"
+],
+"lista": [
+{
+"n": "BAVSA Ahorro - Clase A",
+"tipo": "Money Market",
+"esp": "BVSA AHO A",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Fondo Inmediato - Clase A",
+"tipo": "Money Market",
+"esp": "CHMP INM A",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Fondo Inmediato - Clase B",
+"tipo": "Money Market",
+"esp": "CHMP INM B",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Fondo Inmediato Plus - Clase A",
+"tipo": "Money Market",
+"esp": "CHMP INP A",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Fondo Inmediato Plus - Clase B",
+"tipo": "Money Market",
+"esp": "CHMP INP B",
+"mon": "ARS"
+},
+{
+"n": "Compass Liquidez Cl.B",
+"tipo": "Money Market"
+},
+{
+"n": "ConoSur Liquidez - Clase A",
+"tipo": "Money Market",
+"esp": "CONO LIQ A",
+"mon": "ARS"
+},
+{
+"n": "ConoSur Liquidez - Clase B",
+"tipo": "Money Market",
+"esp": "CONO LIQ B",
+"mon": "ARS"
+},
+{
+"n": "Delta Performance - Clase A",
+"tipo": "Money Market",
+"esp": "DELT PER A",
+"mon": "ARS"
+},
+{
+"n": "Delta Performance Cl.B",
+"tipo": "Money Market"
+},
+{
+"n": "Delta Pesos - Clase A",
+"tipo": "Money Market",
+"esp": "DELT PES A",
+"mon": "ARS"
+},
+{
+"n": "Delta Pesos - Clase B",
+"tipo": "Money Market",
+"esp": "DELT PES B",
+"mon": "ARS"
+},
+{
+"n": "Delta Pesos - Clase K",
+"tipo": "Money Market",
+"esp": "DELT PES K",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Fima Premium - Clase A",
+"tipo": "Money Market",
+"esp": "FIMA PRE A",
+"mon": "ARS"
+},
+{
+"n": "Fima Premium - Clase B",
+"tipo": "Money Market",
+"esp": "FIMA PRE B",
+"mon": "ARS"
+},
+{
+"n": "Fima Premium - Clase C",
+"tipo": "Money Market",
+"esp": "FIMA PRE C",
+"mon": "ARS"
+},
+{
+"n": "GAINVEST Pesos CL. B",
+"tipo": "Money Market"
+},
+{
+"n": "IAM Ahorro Pesos - Clase A",
+"tipo": "Money Market",
+"esp": "IAM AHO A",
+"mon": "ARS"
+},
+{
+"n": "IAM Ahorro Pesos Cl.B",
+"tipo": "Money Market"
+},
+{
+"n": "IAM Renta (sin identificar) - Clase B",
+"tipo": "Money Market",
+"esp": "IAM RENT B",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Megainver Liquidez Pesos - Clase A",
+"tipo": "Money Market",
+"esp": "MEG LIQ A",
+"mon": "ARS"
+},
+{
+"n": "Megainver Liquidez Pesos - Clase B",
+"tipo": "Money Market",
+"esp": "MEG LIQ B",
+"mon": "ARS"
+},
+{
+"n": "MEGAQM Pesos - Clase A",
+"tipo": "Money Market",
+"esp": "MEGA PES A",
+"mon": "ARS"
+},
+{
+"n": "MEGAQM Pesos - Clase B",
+"tipo": "Money Market",
+"esp": "MEGA PES B",
+"mon": "ARS"
+},
+{
+"n": "Schroder Liquidez - Clase A",
+"tipo": "Money Market",
+"esp": "SCHO LIQ A",
+"mon": "ARS"
+},
+{
+"n": "Ualintec Ahorro Pesos - Clase A",
+"tipo": "Money Market",
+"esp": "UAL AHO A",
+"mon": "ARS"
+},
+{
+"n": "Vinci Compass Liquidez - Clase A",
+"tipo": "Money Market",
+"esp": "COMP LIQ A",
+"mon": "ARS"
+},
+{
+"n": "Allaria Estructurado Cl.B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Allaria Patrimonio V - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "ALLA P V B",
+"mon": "ARS"
+},
+{
+"n": "BAVSA Pesos Plus - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "BVSA PLU A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Champaquí Ahorro Pesos - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CHMP AHP A",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Ahorro Pesos - Clase C",
+"tipo": "Renta Fija en $",
+"esp": "CHMP AHP C",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Cobertura - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CHMP COB A",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Cobertura - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "CHMP COB B",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Estratégico - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CHMP EST A",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Estratégico - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "CHMP EST B",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Pymes - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CHMP PYM A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Champaquí Renta Pesos - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CHMP RP A",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Renta Pesos - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "CHMP RP B",
+"mon": "ARS"
+},
+{
+"n": "Compass Ahorro - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "COMP AH A",
+"mon": "ARS"
+},
+{
+"n": "Compass Arg.Pymes Cl. A",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Compass Opportunity - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "COMP OPP A",
+"mon": "ARS"
+},
+{
+"n": "Compass Renta Fija - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "COMP R.F A",
+"mon": "ARS"
+},
+{
+"n": "Compass Renta Fija - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "COMP R.F B",
+"mon": "ARS"
+},
+{
+"n": "Compass Renta Fija IV - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "COMP IV A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Compass Renta Fija S.3 Cl. A",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Compass Renta Fija S.3 Cl. B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Compass Renta Fija S.4 Cl.B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "ConoSur Ahorro - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CONO AHO A",
+"mon": "ARS"
+},
+{
+"n": "ConoSur Ahorro - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "CONO AHO B",
+"mon": "ARS"
+},
+{
+"n": "Consultatio (Ley 27.260/27.743) - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CONS LEY A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Consultatio Ahorro Plus Arg. B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Consultatio Ahorro Plus Argentina - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CONS PLS A",
+"mon": "ARS"
+},
+{
+"n": "Consultatio Deuda Arg. Cl. B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Consultatio Deuda Argentina - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CONS DEU A",
+"mon": "ARS"
+},
+{
+"n": "Consultatio Estrategia - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CONS EST A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Consultatio Renta Balanceada - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CONS BAL A",
+"mon": "ARS"
+},
+{
+"n": "Consultatio Renta Fija Arg. B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Consultatio Renta Fija Argentina - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CONS FIJ A",
+"mon": "ARS"
+},
+{
+"n": "Consultatio Renta Local - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CONS REN A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Consultatio Renta Local - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "CONS REN B",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Consultatio Renta Nacional - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CONS NAC A",
+"mon": "ARS"
+},
+{
+"n": "Consultatio Tactico - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "CONS TAC A",
+"mon": "ARS"
+},
+{
+"n": "Delta Ahorro - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "DELT AHO A",
+"mon": "ARS"
+},
+{
+"n": "Delta Ahorro Plus - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "DELT PLS A",
+"mon": "ARS"
+},
+{
+"n": "Delta Ahorro Plus C.B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Delta Federal I - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "DELT FED A",
+"mon": "ARS"
+},
+{
+"n": "Delta Gestion IX - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "DELT GES A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Delta Gestion IX - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "DEL GES B",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Delta Infraestructura - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "DELT INF A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Delta Moneda - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "DELT MON A",
+"mon": "ARS"
+},
+{
+"n": "Delta Moneda Cl.B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Delta Patrimonio I - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "DELT PAT A",
+"mon": "ARS"
+},
+{
+"n": "Delta Pymes - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "DELT PYM A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Delta Renta - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "DELT REN A",
+"mon": "ARS"
+},
+{
+"n": "Delta Renta Cl.B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Delta Retorno Real - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "DELTA RET",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Fima Ahorro Pesos - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "FIMA AHO A",
+"mon": "ARS"
+},
+{
+"n": "Fima Ahorro Pesos - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "FIMA AHO B",
+"mon": "ARS"
+},
+{
+"n": "Fima Ahorro Pesos - Clase C",
+"tipo": "Renta Fija en $",
+"esp": "FIMA AHO C",
+"mon": "ARS"
+},
+{
+"n": "Fima Ahorro Plus - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "FIMA AHP A",
+"mon": "ARS"
+},
+{
+"n": "Fima Ahorro Plus - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "FIMA AHP B",
+"mon": "ARS"
+},
+{
+"n": "Fima Ahorro Plus - Clase C",
+"tipo": "Renta Fija en $",
+"esp": "FIMA AHP C",
+"mon": "ARS"
+},
+{
+"n": "Fima Capital Plus - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "FIMA CAP A",
+"mon": "ARS"
+},
+{
+"n": "Fima Capital Plus - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "FIMA CAP B",
+"mon": "ARS"
+},
+{
+"n": "FIMA Capital Plus Cl.C",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Fima Letras - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "FIMA LET A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Fima Letras - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "FIMA LET B",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Fima Renta Pesos - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "FIMA REN A",
+"mon": "ARS"
+},
+{
+"n": "Fima Renta Pesos - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "FIMA REN B",
+"mon": "ARS"
+},
+{
+"n": "Fima Renta Plus - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "FIMA PLS A",
+"mon": "ARS"
+},
+{
+"n": "Fima Renta Plus - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "FIMA PLS B",
+"mon": "ARS"
+},
+{
+"n": "Gainvest Abierto Pymes - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GAIN ABP A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Gainvest Capital - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GAIN CAP A",
+"mon": "ARS"
+},
+{
+"n": "Gainvest Estrategia III - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GAI EST3 A",
+"mon": "ARS"
+},
+{
+"n": "Gainvest FF - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GAINV FF A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Gainvest Infraestructura - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GAIN INF A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Gainvest Renta Fija - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GAIN RF A",
+"mon": "ARS"
+},
+{
+"n": "Gainvest Renta Fija Protección Plus - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GAI RFPP A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Galileo (D.596) - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GALI 596 A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Galileo Ahorro - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GALI AHO A",
+"mon": "ARS"
+},
+{
+"n": "Galileo Ahorro Plus - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GALI PLS A",
+"mon": "ARS"
+},
+{
+"n": "Galileo Ahorro Plus - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "GALI PLS B",
+"mon": "ARS"
+},
+{
+"n": "Galileo Argentina - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GALI ARG A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Galileo Argentina - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "GALI ARG B",
+"mon": "ARS"
+},
+{
+"n": "Galileo Estrategia - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GALI EST A",
+"mon": "ARS"
+},
+{
+"n": "Galileo Multimercado II - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GALI MUL A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Galileo Multimercado II - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "GALI MUL B",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Galileo Premium - Clase B",
+"tipo": "Renta Fija en $",
+"esp": "GALI PRE B",
+"mon": "ARS"
+},
+{
+"n": "Galileo Renta - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "GALI R.F A",
+"mon": "ARS"
+},
+{
+"n": "IAM Renta Capital - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "IAM R.C. A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "IAM Renta Crecimiento - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "IAM CREC A",
+"mon": "ARS"
+},
+{
+"n": "IAM Renta Plus - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "IAM R.P. A",
+"mon": "ARS"
+},
+{
+"n": "IAM Renta Plus Cl.B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "IAM Rta. Crecimiento Cl.B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Megainver Retorno Absoluto - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "MEG R.A. A",
+"mon": "ARS"
+},
+{
+"n": "Megainver Rta.Fija Cob.Cl.B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "MEGAQM Cobertura - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "MEG COB A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "MegaQM Retorno Absoluto Cl. B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Novus Capital - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "NOV CAP A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Novus Estrategia - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "NOV EST A",
+"mon": "ARS"
+},
+{
+"n": "Novus Income - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "NOV INCO A",
+"mon": "ARS"
+},
+{
+"n": "Novus Pymes - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "NOV PYM A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Novus Renta Fija - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "NOV RTF A",
+"mon": "ARS"
+},
+{
+"n": "Novus Valor - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "NOV VALO A",
+"mon": "ARS"
+},
+{
+"n": "Schroder Argentina - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "SCHO ARG A",
+"mon": "ARS"
+},
+{
+"n": "Schroder Infraestructura - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "SCHO INF A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Schroder Renta Performance - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "SCH PERF A",
+"mon": "ARS"
+},
+{
+"n": "Schroder Renta Plus - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "SCHO R.P A",
+"mon": "ARS"
+},
+{
+"n": "Schroder Rta.Plus Cl.B",
+"tipo": "Renta Fija en $"
+},
+{
+"n": "Ualintec Cobertura - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "UAL COB A",
+"mon": "ARS"
+},
+{
+"n": "Ualintec Pesos Plus - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "UAL PPLU A",
+"mon": "ARS"
+},
+{
+"n": "Ualintec Renta Fija Pesos - Clase A",
+"tipo": "Renta Fija en $",
+"esp": "UAL RFP A",
+"mon": "ARS"
+},
+{
+"n": "BAVSA Ahorro Dólar - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "BVSA AHD A",
+"mon": "USD EXT"
+},
+{
+"n": "BAVSA Renta Dólares - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "BVSA RD A",
+"mon": "USD EXT"
+},
+{
+"n": "BAVSA Renta Dólares - Clase C",
+"tipo": "Renta Fija en USD",
+"esp": "BVSA RD C",
+"mon": "USD EXT"
+},
+{
+"n": "Champaquí Fondo Liquidez Dólar - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "CHMP USD A",
+"mon": "USD EXT"
+},
+{
+"n": "Champaquí Fondo Liquidez Dólar - Clase B",
+"tipo": "Renta Fija en USD",
+"esp": "CHMP USD B",
+"mon": "USD EXT"
+},
+{
+"n": "Champaquí Renta Dólar - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "CHMP RD A",
+"mon": "USD EXT"
+},
+{
+"n": "Champaquí Renta Dólar - Clase B",
+"tipo": "Renta Fija en USD",
+"esp": "CHMP RD B",
+"mon": "USD EXT"
+},
+{
+"n": "Compass Ahorro Dolar Cl.A",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "Compass Best Ideas - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "COMP BI A",
+"mon": "USD EXT"
+},
+{
+"n": "Compass Best Ideas - Clase B",
+"tipo": "Renta Fija en USD",
+"esp": "COMP BI B",
+"mon": "USD EXT"
+},
+{
+"n": "Compass Best Ideas - Clase H",
+"tipo": "Renta Fija en USD",
+"esp": "COMP BES H",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Compass Renta Fija (USD) - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "COMP RF A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "ConoSur Renta Fija Corporativa - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "CONO RFC A",
+"mon": "USD EXT"
+},
+{
+"n": "ConoSur Renta Fija Corporativa - Clase B",
+"tipo": "Renta Fija en USD",
+"esp": "CONO RFC B",
+"mon": "USD EXT"
+},
+{
+"n": "Consultatio Liquidez Cl.B",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "Consultatio Liquidez Cl.C",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "Consultatio Multimercado III - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "CONS MUL A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Delta Dolares Clase A",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "Delta Dolares Clase B",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "Delta Renta Dolares",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "Fima Premium Dólares - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "FIMA DOL A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Fima Premium Dólares - Clase B",
+"tipo": "Renta Fija en USD",
+"esp": "FIMA DOL B",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Fima Renta Dolares I - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "FIMA R.D A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Fima Renta Dolares I - Clase B",
+"tipo": "Renta Fija en USD",
+"esp": "FIMA R.D B",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Fima Renta Fija Dólares - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "FIMA RFD A",
+"mon": "USD EXT"
+},
+{
+"n": "Gainvest Performance - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "GAI PERF A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Gainvest Premium (USD) - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "GAIN PRE A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Gainvest Renta Fija Dólares - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "GAIN RFD A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Galileo Event Driven - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "GALI EVE A",
+"mon": "USD EXT"
+},
+{
+"n": "Galileo Income - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "GALI INC A",
+"mon": "USD EXT"
+},
+{
+"n": "Galileo Multi-Strategy CLA",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "IAM Estrategia - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "IAM EST A",
+"mon": "USD EXT"
+},
+{
+"n": "IAM Renta Dólares - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "IAM DOL A",
+"mon": "USD"
+},
+{
+"n": "MEGAQM Corporativo Dólares - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "MEG CD A",
+"mon": "USD EXT"
+},
+{
+"n": "MegaQM LATAM Corporativo C.B",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "MegaQM Liquidez Dolar Cl.B",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "MEGAQM Liquidez Dólar - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "MEG USD A",
+"mon": "USD EXT"
+},
+{
+"n": "MEGAQM Renta Fija LATAM - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "MEG LAT A",
+"mon": "USD EXT"
+},
+{
+"n": "Novus Ahorro Dólares - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "NOV AHD A",
+"mon": "USD EXT"
+},
+{
+"n": "Novus Renta Dólar - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "NOV RTD A",
+"mon": "USD EXT"
+},
+{
+"n": "Schroder Income - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "SCHO INC A",
+"mon": "USD EXT"
+},
+{
+"n": "Schroder Retorno Total - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "SCHO R.T A",
+"mon": "USD"
+},
+{
+"n": "Schroder Retorno Total 3 A",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "Schroder Retorno Total Cl.B",
+"tipo": "Renta Fija en USD"
+},
+{
+"n": "Schroder Retorno Total Cuatro - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "SCH RT4 A",
+"mon": "USD EXT"
+},
+{
+"n": "Toronto Trust - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "TORO TRU A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Toronto Trust - Clase B",
+"tipo": "Renta Fija en USD",
+"esp": "TORO TRU B",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Ualintec Renta Dólares - Clase A",
+"tipo": "Renta Fija en USD",
+"esp": "UAL RD A",
+"mon": "USD EXT"
+},
+{
+"n": "Allaria Estructurado - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "ALLA EST A",
+"mon": "ARS"
+},
+{
+"n": "Allaria Patrimonio V - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "ALLA P V A",
+"mon": "ARS"
+},
+{
+"n": "BAVSA Retorno Total - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "BVSA TOT A",
+"mon": "ARS"
+},
+{
+"n": "BAVSA Retorno Total - Clase D",
+"tipo": "Fondos Mixtos en $",
+"esp": "BVSA TOT D",
+"mon": "ARS"
+},
+{
+"n": "Delta Multimercado I - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "DELT MUL A",
+"mon": "ARS"
+},
+{
+"n": "Fima Mix I - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "FIMA MIX A",
+"mon": "ARS"
+},
+{
+"n": "Fima Mix I - Clase B",
+"tipo": "Fondos Mixtos en $",
+"esp": "FIMA MIX B",
+"mon": "ARS"
+},
+{
+"n": "Gainvest Balanceado - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "GAIN BAL A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Gainvest Balanceado VI - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "GAI BAL6 A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Gainvest Balanceado VIII - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "GAI BAL8 A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Gainvest Global V - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "GAI GLOV A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Gainvest Global VIII - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "GAI GLO8 A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Megainver Retorno Total - Clase B",
+"tipo": "Fondos Mixtos en $",
+"esp": "MEG RET B",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "MegaQM Balanceado Cl. B",
+"tipo": "Fondos Mixtos en $"
+},
+{
+"n": "Novus Balanceado - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "NOV BAL A",
+"mon": "ARS"
+},
+{
+"n": "Novus Gestion II - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "NOV GS2 A",
+"mon": "ARS"
+},
+{
+"n": "Novus Performance - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "NOV PERF A",
+"mon": "ARS"
+},
+{
+"n": "Novus Renta Capital - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "NOV RCAP A",
+"mon": "ARS"
+},
+{
+"n": "Novus Renta Mixta - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "NOV MIX A",
+"mon": "ARS"
+},
+{
+"n": "Quinquela Renta Mixta - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "QUIN BAL A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Schroder Crecimiento 3 - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "SCH CRE3 A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Schroder Crecimiento 3 CL.B",
+"tipo": "Fondos Mixtos en $"
+},
+{
+"n": "Ualintec Retorno Total - Clase A",
+"tipo": "Fondos Mixtos en $",
+"esp": "UAL TOT A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Compass Renta Mixta Dólares III - Clase A",
+"tipo": "Fondos Mixtos en USD",
+"esp": "COMP USD A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Compass Renta Mixta Dólares III - Clase H",
+"tipo": "Fondos Mixtos en USD",
+"esp": "COMP DOL H",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Gainvest Estrategia I - Clase A",
+"tipo": "Fondos Mixtos en USD",
+"esp": "GAI ES I A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Gainvest Global - Clase A",
+"tipo": "Fondos Mixtos en USD",
+"esp": "GAIN GLO A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Gainvest Global IV - Clase A",
+"tipo": "Fondos Mixtos en USD",
+"esp": "GAI GLIV A",
+"mon": "USD EXT",
+"conf": true
+},
+{
+"n": "Champaquí Renta Variable - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "CHMP RV A",
+"mon": "ARS"
+},
+{
+"n": "Champaquí Renta Variable - Clase B",
+"tipo": "Renta Variable en $",
+"esp": "CHMP RV B",
+"mon": "ARS"
+},
+{
+"n": "Compass Crecimiento Cl.A",
+"tipo": "Renta Variable en $"
+},
+{
+"n": "Compass Renta Mixta II - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "COM MX2 A",
+"mon": "ARS"
+},
+{
+"n": "Compass Renta Mixta II - Clase B",
+"tipo": "Renta Variable en $",
+"esp": "COM MX2 B",
+"mon": "ARS"
+},
+{
+"n": "Consultatio Acciones Arg. B",
+"tipo": "Renta Variable en $"
+},
+{
+"n": "Consultatio Acciones Argentina - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "CONS ACC A",
+"mon": "ARS"
+},
+{
+"n": "Consultatio Renta Variable - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "CONS VAR A",
+"mon": "ARS"
+},
+{
+"n": "Delta Acciones - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "DELT ACC A",
+"mon": "ARS"
+},
+{
+"n": "Delta Acciones Cl.B",
+"tipo": "Renta Variable en $"
+},
+{
+"n": "Delta Internacional - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "DELT INT A",
+"mon": "ARS"
+},
+{
+"n": "Delta Latinoamerica - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "DELT LAT A",
+"mon": "ARS"
+},
+{
+"n": "Delta Recursos Naturales - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "DELT R.N A",
+"mon": "ARS"
+},
+{
+"n": "Delta Select - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "DELT SEL A",
+"mon": "ARS"
+},
+{
+"n": "Fima Acciones - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "FIMA ACC A",
+"mon": "ARS"
+},
+{
+"n": "Fima PB Acciones - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "FIMA PB A",
+"mon": "ARS"
+},
+{
+"n": "Gainvest Renta Variable - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "GAINV RV A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "Galileo Acciones - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "GALI ACC A",
+"mon": "ARS"
+},
+{
+"n": "IAM Renta Variable - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "IAM RENT A",
+"mon": "ARS",
+"conf": true
+},
+{
+"n": "SF Value - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "GALI SF A",
+"mon": "ARS"
+},
+{
+"n": "Ualintec Renta Variable Pesos - Clase A",
+"tipo": "Renta Variable en $",
+"esp": "UAL RVP A",
+"mon": "ARS"
+},
+{
+"n": "Compass Renta Mixta Dólares - Clase A",
+"tipo": "Renta Variable USD",
+"esp": "COM RMD A",
+"mon": "USD EXT"
+},
+{
+"n": "Compass Renta Mixta Dólares - Clase B",
+"tipo": "Renta Variable USD",
+"esp": "COM RMD B",
+"mon": "USD EXT"
+},
+{
+"n": "Compass Small Cap.S.2 Cl. A",
+"tipo": "Renta Variable USD"
+},
+{
+"n": "Fima Acciones Latinoamerica - Clase A",
+"tipo": "Renta Variable USD",
+"esp": "FIMA LAT A",
+"mon": "USD EXT"
+},
+{
+"n": "Fima Acciones Latinoamerica - Clase B",
+"tipo": "Renta Variable USD",
+"esp": "FIMA LAT B",
+"mon": "USD EXT"
+}
+]
+}
