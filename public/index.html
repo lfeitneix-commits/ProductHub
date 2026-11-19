@@ -982,9 +982,9 @@ const ventajas = p => (p.interno.ventajas && p.interno.ventajas.length) ? p.inte
 /* Fondos que ofrecemos (ficha de FCI): lista de fondos locales por tipo, con buscador. Datos: public/data/config/fondos.json. */
 const MON_FD = {ARS:"Pesos", "USD EXT":"USD cable", USD:"USD MEP"};
 /* Rendimientos: valor de cuotaparte que los fondos informan a la Cámara Argentina de FCI (API pública de ArgentinaDatos, sin clave).
-   Se compara el último dato con el cierre del año anterior y con el de hace un año. La fuente tiene días incompletos
+   Se compara el último dato con el cierre del año anterior y con el de hace 3 meses. La fuente tiene días incompletos
    (desde 2026 guarda pocos fondos por día), así que solo se usa un día si trae la mayoría de los fondos. Se guarda en el navegador por un día. */
-const RD_KEY = "neix-hub-rend-v4", RD_API = "https://api.argentinadatos.com/v1/finanzas/fci/", RD_CATS = ["mercadoDinero","rentaFija","rentaVariable","rentaMixta","otros"];
+const RD_KEY = "neix-hub-rend-v5", RD_API = "https://api.argentinadatos.com/v1/finanzas/fci/", RD_CATS = ["mercadoDinero","rentaFija","rentaVariable","rentaMixta","otros"];
 async function rdCargar(nombres, anteriores = {}){   // anteriores: nombre actual -> nombre con el que figura en el histórico (fondos que cambiaron de nombre)
   Object.values(anteriores).forEach(a => nombres.add(a));
   try { const c = JSON.parse(localStorage.getItem(RD_KEY) || "null"); if (c && c.dia === todayISO() && c.r) return c; } catch(_) {}
@@ -995,30 +995,35 @@ async function rdCargar(nombres, anteriores = {}){   // anteriores: nombre actua
     if (intento < 2) { await new Promise(ok => setTimeout(ok, 800 * (intento + 1))); return get(cat, f, intento + 1); }   // error pasajero: reintenta
     const e = new Error("http"); e.status = r ? r.status : 0; throw e;
   };
-  const lista = (await Promise.all(RD_CATS.map(c => get(c, "ultimo").catch(() => [])))).flat();
+  const porCat = await Promise.all(RD_CATS.map(c => get(c, "ultimo").catch(() => [])));
+  const RD_RF = new Set((porCat[RD_CATS.indexOf("rentaFija")] || []).map(x => x && x.fondo)), lista = porCat.flat();
   const ult = {}; let fecha = "";
   lista.forEach(x => { if (x && x.fondo && nombres.has(x.fondo)) { ult[x.fondo] = [x.vcp, x.fecha]; if (x.fecha > fecha) fecha = x.fecha; } });
   if (!fecha) throw new Error("sin datos");
   const minimo = Math.max(20, Object.keys(ult).length * 0.6);
-  const enFecha = async desde => {   // día hábil completo más cercano, hacia atrás
-    const d = new Date(desde + "T12:00:00Z");
-    for (let k = 0; k < 12; k++) {
-      const f = d.toISOString().slice(0, 10), ruta = f.replace(/-/g, "/");
+  const enRF = lista.filter(x => x && x.fondo && nombres.has(x.fondo) && RD_RF.has(x.fondo)).length, minimoRF = Math.max(10, enRF * 0.6);
+  const enFecha = async (objetivo, haciaAdelante) => {   // día completo más cercano al objetivo (la fuente tiene días incompletos)
+    const base = new Date(objetivo + "T12:00:00Z"), pasos = [0];
+    for (let k = 1; k <= 25; k++) { pasos.push(-k); if (haciaAdelante) pasos.push(k); }
+    for (const p of pasos) {
+      const d = new Date(base); d.setUTCDate(d.getUTCDate() + p); if (d.getUTCDay() === 0 || d.getUTCDay() === 6) continue;
+      const f = d.toISOString().slice(0, 10), ruta = f.replace(/-/g, "/"); if (f >= fecha) continue;
       try {
-        const prim = await get(RD_CATS[0], ruta), rest = await Promise.all(RD_CATS.slice(1).map(c => get(c, ruta).catch(() => [])));
-        const m = {}; [prim, ...rest].flat().forEach(x => { if (x && x.fondo && nombres.has(x.fondo)) m[x.fondo] = x.vcp; });
+        const rf = await get("rentaFija", ruta).catch(() => []);   // la categoría con más fondos: si viene incompleta, el día no sirve
+        if ((rf || []).filter(x => x && nombres.has(x.fondo)).length < minimoRF) continue;
+        const rest = await Promise.all(RD_CATS.filter(c => c !== "rentaFija").map(c => get(c, ruta).catch(() => [])));
+        const m = {}; [rf, ...rest].flat().forEach(x => { if (x && x.fondo && nombres.has(x.fondo)) m[x.fondo] = x.vcp; });
         if (Object.keys(m).length >= minimo) return {f, m};
-        d.setUTCDate(d.getUTCDate() - 1);
-      } catch(e) { d.setUTCDate(d.getUTCDate() - 1); }
+      } catch(e) {}
     }
     return {f: "", m: {}};
   };
-  const haceUnAnio = new Date(fecha + "T12:00:00Z"); haceUnAnio.setUTCFullYear(haceUnAnio.getUTCFullYear() - 1);
-  const [ytd, anio] = await Promise.all([enFecha((+fecha.slice(0, 4) - 1) + "-12-31"), enFecha(haceUnAnio.toISOString().slice(0, 10))]);
-  const out = {dia: todayISO(), fecha, fYtd: ytd.f, f365: anio.f, anio: fecha.slice(0, 4), r: {}};
+  const hace3m = new Date(fecha + "T12:00:00Z"); hace3m.setUTCMonth(hace3m.getUTCMonth() - 3);
+  const [ytd, tres] = await Promise.all([enFecha((+fecha.slice(0, 4) - 1) + "-12-31", false), enFecha(hace3m.toISOString().slice(0, 10), true)]);
+  const out = {dia: todayISO(), fecha, fYtd: ytd.f, f3m: tres.f, anio: fecha.slice(0, 4), r: {}};
   Object.entries(ult).forEach(([n, [v, f]]) => {
     if (!v || (Date.parse(fecha) - Date.parse(f)) / 864e5 > 7) return;   // sin dato reciente
-    const b0 = ytd.m[n] || ytd.m[anteriores[n]], b1 = anio.m[n] || anio.m[anteriores[n]];
+    const b0 = ytd.m[n] || ytd.m[anteriores[n]], b1 = tres.m[n] || tres.m[anteriores[n]];
     const r = {}; if (b0) r.m = +((v / b0 - 1) * 100).toFixed(2); if (b1) r.a = +((v / b1 - 1) * 100).toFixed(2);
     if ("m" in r || "a" in r) out.r[n] = r;
   });
@@ -1034,11 +1039,11 @@ function fondosHTML(){
   const R = S.rend, rd = f => (R && R.r && f.cafci && R.r[f.cafci]) || {}, orden = S.fdOrden || "n";
   const ordenar = l => orden === "n" ? l : l.slice().sort((a, b) => { const x = rd(a)[orden], y = rd(b)[orden]; return (y === undefined ? -1e9 : y) - (x === undefined ? -1e9 : x); });
   const fila = f => `<tr data-q="${esc(sinAcento([f.n, f.esp || "", f.tipo].join(" ")))}"><td>${esc(f.n)}${ed && f.conf ? ` <span class="tiny muted">· a confirmar</span>` : ""}</td><td class="esp">${f.esp ? esc(f.esp) : `<span class="muted">No cotiza en BYMA</span>`}</td><td>${esc(MON_FD[f.mon] || "—")}</td><td class="r">${R ? pctFd(rd(f).m) : "…"}</td><td class="r">${R ? pctFd(rd(f).a) : "…"}</td></tr>`;
-  return `<div class="panel fds"><div class="fds-h"><h3 style="margin:0">Fondos que ofrecemos <span class="tiny muted">${F.lista.length}</span></h3><span class="tiny muted">${!R ? "Cargando rendimientos…" : R.error ? "No pudimos traer los rendimientos ahora. Probá más tarde." : `Rendimiento al ${fdate(R.fecha)}: en el año (desde el ${fdate(R.fYtd)}) y últimos 12 meses (desde el ${fdate(R.f365)}).`}</span></div>
+  return `<div class="panel fds"><div class="fds-h"><h3 style="margin:0">Fondos que ofrecemos <span class="tiny muted">${F.lista.length}</span></h3><span class="tiny muted">${!R ? "Cargando rendimientos…" : R.error ? "No pudimos traer los rendimientos ahora. Probá más tarde." : `Rendimiento al ${fdate(R.fecha)}: en el año (desde el ${fdate(R.fYtd)}) y últimos 3 meses (desde el ${R.f3m ? fdate(R.f3m) : "—"}).`}</span></div>
     <div class="search fds-q">${ico("_search")}<input class="input" id="fd_q" type="search" placeholder="Buscá un fondo, una sociedad gerente o la especie" autocomplete="off" aria-label="Buscar fondos" value="${esc(S.fdQ || "")}"></div>
     <div class="fds-bar"><div class="chips fds-t">${[["", "Todos"]].concat(tipos.map(t => [t, t])).map(([t, l]) => `<button class="chip" data-act="fdTipo" data-v="${esc(t)}" aria-pressed="${(S.fdTipo || "") === t}">${esc(l)}${t ? ` · ${F.lista.filter(f => f.tipo === t).length}` : ""}</button>`).join("")}</div>
-      <div class="seg fds-o"><span class="tiny muted">Ordenar</span>${[["n","Nombre"],["m","En el año"],["a","12 meses"]].map(([k, l]) => `<button data-act="fdOrden" data-v="${k}" aria-pressed="${orden === k}">${l}</button>`).join("")}</div></div>
-    ${tipos.map(t => `<details class="fold fds-g" data-tipo="${esc(t)}"><summary>${esc(t)} <span class="tiny muted fds-n">${F.lista.filter(f => f.tipo === t).length}</span></summary><div class="in"><div class="tw"><table class="fds-tab"><thead><tr><th>Fondo</th><th>Especie BYMA</th><th>Moneda</th><th class="r">En el año</th><th class="r">12 meses</th></tr></thead><tbody>${ordenar(F.lista.filter(f => f.tipo === t)).map(fila).join("")}</tbody></table></div></div></details>`).join("")}
+      <div class="seg fds-o"><span class="tiny muted">Ordenar</span>${[["n","Nombre"],["m","En el año"],["a","3 meses"]].map(([k, l]) => `<button data-act="fdOrden" data-v="${k}" aria-pressed="${orden === k}">${l}</button>`).join("")}</div></div>
+    ${tipos.map(t => `<details class="fold fds-g" data-tipo="${esc(t)}"><summary>${esc(t)} <span class="tiny muted fds-n">${F.lista.filter(f => f.tipo === t).length}</span></summary><div class="in"><div class="tw"><table class="fds-tab"><thead><tr><th>Fondo</th><th>Especie BYMA</th><th>Moneda</th><th class="r">En el año</th><th class="r">3 meses</th></tr></thead><tbody>${ordenar(F.lista.filter(f => f.tipo === t)).map(fila).join("")}</tbody></table></div></div></details>`).join("")}
     <p class="small muted fds-nada" hidden>No hay fondos con esa búsqueda.</p>
     <p class="tiny muted" style="margin:12px 0 0">Fuente: valor de cuotaparte informado a la Cámara Argentina de FCI (vía ArgentinaDatos). Los fondos sin dato no informan a la Cámara o tienen otro nombre. Rendimientos pasados no aseguran rendimientos futuros.</p></div>`;
 }
@@ -1049,7 +1054,7 @@ function fondosFiltrar(){
     let n = 0; const okTipo = !tipo || g.dataset.tipo === tipo;
     g.querySelectorAll("tbody tr").forEach(tr => { const ok = okTipo && pal.every(w => tr.dataset.q.includes(w)); tr.hidden = !ok; if (ok) n++; });
     g.hidden = !n; g.querySelector(".fds-n").textContent = n; total += n;
-    if (q || tipo) g.open = n > 0 && (!!q || n <= 40); 
+    if (q || tipo) g.open = n > 0; 
   });
   box.querySelector(".fds-nada").hidden = total > 0;
 }

@@ -345,7 +345,9 @@
 "tipo": "Renta Fija en $",
 "esp": "CONS LEY A",
 "mon": "ARS",
-"conf": true
+"conf": true,
+"cafci": "Blacktoro Ahorro - Clase B",
+"cafciPorValor": true
 },
 {
 "n": "Consultatio Ahorro Plus Arg. B",
@@ -643,7 +645,8 @@
 "tipo": "Renta Fija en $",
 "esp": "GAI EST3 A",
 "mon": "ARS",
-"cafci": "Gainvest Estrategia III - Clase A"
+"cafci": "Cohen Cobertura - Clase A",
+"cafciPorValor": true
 },
 {
 "n": "Gainvest FF - Clase A",
@@ -913,7 +916,9 @@
 "n": "BAVSA Renta Dólares - Clase A",
 "tipo": "Renta Fija en USD",
 "esp": "BVSA RD A",
-"mon": "USD EXT"
+"mon": "USD EXT",
+"cafci": "Cohen Disp. Transitorias Ley 27260 - Clase B",
+"cafciPorValor": true
 },
 {
 "n": "BAVSA Renta Dólares - Clase C",
@@ -1282,7 +1287,9 @@
 "tipo": "Fondos Mixtos en $",
 "esp": "GAI BAL8 A",
 "mon": "ARS",
-"conf": true
+"conf": true,
+"cafci": "GSS Cobertura - Clase A",
+"cafciPorValor": true
 },
 {
 "n": "Gainvest Global V - Clase A",

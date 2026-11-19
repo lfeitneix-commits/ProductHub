@@ -169,7 +169,7 @@ Los PDF escaneados (imagen, sin texto) no se pueden enlazar.
 
 ## Fondos que ofrecemos (ficha de FCI)
 Lista de fondos locales por tipo en `public/data/config/fondos.json` (sale de FONDOS_LOCALES_BYMA.xlsx). El campo `cafci` es el nombre exacto
-del fondo en la Cámara Argentina de FCI. El rendimiento (en el año y últimos 12 meses) lo calcula el navegador con el valor de cuotaparte de la
+del fondo en la Cámara Argentina de FCI. El rendimiento (en el año y últimos 3 meses) lo calcula el navegador con el valor de cuotaparte de la
 API pública de ArgentinaDatos (`api.argentinadatos.com/v1/finanzas/fci/...`, sin clave, permite pedidos desde el navegador) y lo guarda un día.
 No usa funciones de Vercel. La fuente tiene días incompletos desde 2026: solo se usa un día si trae la mayoría de los fondos,
-por eso no hay rendimiento del último mes.
+por eso se busca el día completo más cercano a cada fecha (para 3 meses, hasta 25 días antes o después).
