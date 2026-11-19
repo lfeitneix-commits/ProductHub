@@ -95,7 +95,8 @@
 "tipo": "Money Market",
 "esp": "DELT PES K",
 "mon": "ARS",
-"conf": true
+"conf": true,
+"cafci": "Delta Pesos - Clase K Ley Nº 27.743"
 },
 {
 "n": "Fima Premium - Clase A",
@@ -139,7 +140,8 @@
 "tipo": "Money Market",
 "esp": "IAM RENT B",
 "mon": "ARS",
-"conf": true
+"conf": true,
+"cafci": "IAM Renta Crecimiento - Clase B"
 },
 {
 "n": "Megainver Liquidez Pesos - Clase A",
@@ -209,7 +211,7 @@
 "esp": "BVSA PLU A",
 "mon": "ARS",
 "conf": true,
-"cafci": "BAVSA Pesos Plus - Clase A"
+"cafci": "BAVSA Ahorro Plus - Clase A"
 },
 {
 "n": "Champaquí Ahorro Pesos - Clase A",
@@ -297,14 +299,14 @@
 "tipo": "Renta Fija en $",
 "esp": "COMP R.F A",
 "mon": "ARS",
-"cafci": "Compass Renta Fija - Clase A"
+"cafci": "Compass Renta Fija III - Clase A"
 },
 {
 "n": "Compass Renta Fija - Clase B",
 "tipo": "Renta Fija en $",
 "esp": "COMP R.F B",
 "mon": "ARS",
-"cafci": "Compass Renta Fija - Clase B"
+"cafci": "Compass Renta Fija III - Clase B"
 },
 {
 "n": "Compass Renta Fija IV - Clase A",
@@ -330,15 +332,13 @@
 "n": "ConoSur Ahorro - Clase A",
 "tipo": "Renta Fija en $",
 "esp": "CONO AHO A",
-"mon": "ARS",
-"cafci": "ConoSur Ahorro - Clase A"
+"mon": "ARS"
 },
 {
 "n": "ConoSur Ahorro - Clase B",
 "tipo": "Renta Fija en $",
 "esp": "CONO AHO B",
-"mon": "ARS",
-"cafci": "ConoSur Ahorro - Clase B"
+"mon": "ARS"
 },
 {
 "n": "Consultatio (Ley 27.260/27.743) - Clase A",
@@ -383,8 +383,7 @@
 "n": "Consultatio Renta Balanceada - Clase A",
 "tipo": "Renta Fija en $",
 "esp": "CONS BAL A",
-"mon": "ARS",
-"cafci": "Consultatio Renta Balanceada - Clase A"
+"mon": "ARS"
 },
 {
 "n": "Consultatio Renta Fija Arg. B",
@@ -637,8 +636,7 @@
 "n": "Gainvest Capital - Clase A",
 "tipo": "Renta Fija en $",
 "esp": "GAIN CAP A",
-"mon": "ARS",
-"cafci": "Gainvest Capital - Clase A"
+"mon": "ARS"
 },
 {
 "n": "Gainvest Estrategia III - Clase A",
@@ -750,8 +748,7 @@
 "n": "Galileo Renta - Clase A",
 "tipo": "Renta Fija en $",
 "esp": "GALI R.F A",
-"mon": "ARS",
-"cafci": "Galileo Renta - Clase A"
+"mon": "ARS"
 },
 {
 "n": "IAM Renta Capital - Clase A",
@@ -916,8 +913,7 @@
 "n": "BAVSA Renta Dólares - Clase A",
 "tipo": "Renta Fija en USD",
 "esp": "BVSA RD A",
-"mon": "USD EXT",
-"cafci": "BAVSA Renta Dólares - Clase A"
+"mon": "USD EXT"
 },
 {
 "n": "BAVSA Renta Dólares - Clase C",
@@ -982,21 +978,20 @@
 "tipo": "Renta Fija en USD",
 "esp": "COMP RF A",
 "mon": "USD EXT",
-"conf": true
+"conf": true,
+"cafci": "Compass Renta Fija - Clase A"
 },
 {
 "n": "ConoSur Renta Fija Corporativa - Clase A",
 "tipo": "Renta Fija en USD",
 "esp": "CONO RFC A",
-"mon": "USD EXT",
-"cafci": "ConoSur Renta Fija Corporativa - Clase A"
+"mon": "USD EXT"
 },
 {
 "n": "ConoSur Renta Fija Corporativa - Clase B",
 "tipo": "Renta Fija en USD",
 "esp": "CONO RFC B",
-"mon": "USD EXT",
-"cafci": "ConoSur Renta Fija Corporativa - Clase B"
+"mon": "USD EXT"
 },
 {
 "n": "Consultatio Liquidez Cl.B",
@@ -1036,16 +1031,14 @@
 "tipo": "Renta Fija en USD",
 "esp": "FIMA DOL A",
 "mon": "USD EXT",
-"conf": true,
-"cafci": "Fima Premium Dólares - Clase A"
+"conf": true
 },
 {
 "n": "Fima Premium Dólares - Clase B",
 "tipo": "Renta Fija en USD",
 "esp": "FIMA DOL B",
 "mon": "USD EXT",
-"conf": true,
-"cafci": "Fima Premium Dólares - Clase B"
+"conf": true
 },
 {
 "n": "Fima Renta Dolares I - Clase A",
@@ -1128,7 +1121,7 @@
 "tipo": "Renta Fija en USD",
 "esp": "MEG CD A",
 "mon": "USD EXT",
-"cafci": "MEGAQM Corporativo Dólares - Clase A"
+"cafci": "MEGAQM Latam Corporativo - Clase A"
 },
 {
 "n": "MegaQM LATAM Corporativo C.B",
@@ -1204,7 +1197,7 @@
 "esp": "TORO TRU A",
 "mon": "USD EXT",
 "conf": true,
-"cafci": "Toronto Trust - Clase A"
+"cafci": "Toronto Trust Liquidez Dólar - Clase A"
 },
 {
 "n": "Toronto Trust - Clase B",
@@ -1212,7 +1205,7 @@
 "esp": "TORO TRU B",
 "mon": "USD EXT",
 "conf": true,
-"cafci": "Toronto Trust - Clase B"
+"cafci": "Toronto Trust Liquidez Dólar - Clase B"
 },
 {
 "n": "Ualintec Renta Dólares - Clase A",
@@ -1382,8 +1375,7 @@
 "tipo": "Fondos Mixtos en USD",
 "esp": "COMP USD A",
 "mon": "USD EXT",
-"conf": true,
-"cafci": "Compass Renta Mixta Dólares III\t- Clase A"
+"conf": true
 },
 {
 "n": "Compass Renta Mixta Dólares III - Clase H",

@@ -984,7 +984,7 @@ const MON_FD = {ARS:"Pesos", "USD EXT":"USD cable", USD:"USD MEP"};
 /* Rendimientos: valor de cuotaparte que los fondos informan a la Cámara Argentina de FCI (API pública de ArgentinaDatos, sin clave).
    Se compara el último dato con el cierre del año anterior y con el de hace un año. La fuente tiene días incompletos
    (desde 2026 guarda pocos fondos por día), así que solo se usa un día si trae la mayoría de los fondos. Se guarda en el navegador por un día. */
-const RD_KEY = "neix-hub-rend-v3", RD_API = "https://api.argentinadatos.com/v1/finanzas/fci/", RD_CATS = ["mercadoDinero","rentaFija","rentaVariable","rentaMixta","otros"];
+const RD_KEY = "neix-hub-rend-v4", RD_API = "https://api.argentinadatos.com/v1/finanzas/fci/", RD_CATS = ["mercadoDinero","rentaFija","rentaVariable","rentaMixta","otros"];
 async function rdCargar(nombres, anteriores = {}){   // anteriores: nombre actual -> nombre con el que figura en el histórico (fondos que cambiaron de nombre)
   Object.values(anteriores).forEach(a => nombres.add(a));
   try { const c = JSON.parse(localStorage.getItem(RD_KEY) || "null"); if (c && c.dia === todayISO() && c.r) return c; } catch(_) {}
