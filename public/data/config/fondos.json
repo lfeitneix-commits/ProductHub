@@ -49,7 +49,8 @@
 {
 "n": "Compass Liquidez Cl.B",
 "tipo": "Money Market",
-"cafci": "Vinci Compass Liquidez - Clase B"
+"cafci": "Vinci Compass Liquidez - Clase B",
+"cafciAnt": "Compass Liquidez - Clase B"
 },
 {
 "n": "ConoSur Liquidez - Clase A",
@@ -187,7 +188,8 @@
 "tipo": "Money Market",
 "esp": "COMP LIQ A",
 "mon": "ARS",
-"cafci": "Vinci Compass Liquidez - Clase A"
+"cafci": "Vinci Compass Liquidez - Clase A",
+"cafciAnt": "Compass Liquidez - Clase A"
 },
 {
 "n": "Allaria Estructurado Cl.B",

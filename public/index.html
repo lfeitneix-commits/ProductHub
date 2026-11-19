@@ -984,8 +984,9 @@ const MON_FD = {ARS:"Pesos", "USD EXT":"USD cable", USD:"USD MEP"};
 /* Rendimientos: valor de cuotaparte que los fondos informan a la Cámara Argentina de FCI (API pública de ArgentinaDatos, sin clave).
    Se compara el último dato con el cierre del año anterior y con el de hace un año. La fuente tiene días incompletos
    (desde 2026 guarda pocos fondos por día), así que solo se usa un día si trae la mayoría de los fondos. Se guarda en el navegador por un día. */
-const RD_KEY = "neix-hub-rend-v2", RD_API = "https://api.argentinadatos.com/v1/finanzas/fci/", RD_CATS = ["mercadoDinero","rentaFija","rentaVariable","rentaMixta","otros"];
-async function rdCargar(nombres){
+const RD_KEY = "neix-hub-rend-v3", RD_API = "https://api.argentinadatos.com/v1/finanzas/fci/", RD_CATS = ["mercadoDinero","rentaFija","rentaVariable","rentaMixta","otros"];
+async function rdCargar(nombres, anteriores = {}){   // anteriores: nombre actual -> nombre con el que figura en el histórico (fondos que cambiaron de nombre)
+  Object.values(anteriores).forEach(a => nombres.add(a));
   try { const c = JSON.parse(localStorage.getItem(RD_KEY) || "null"); if (c && c.dia === todayISO() && c.r) return c; } catch(_) {}
   const get = async (cat, f, intento = 0) => {
     const r = await fetch(RD_API + cat + "/" + f).catch(() => null);
@@ -1017,7 +1018,8 @@ async function rdCargar(nombres){
   const out = {dia: todayISO(), fecha, fYtd: ytd.f, f365: anio.f, anio: fecha.slice(0, 4), r: {}};
   Object.entries(ult).forEach(([n, [v, f]]) => {
     if (!v || (Date.parse(fecha) - Date.parse(f)) / 864e5 > 7) return;   // sin dato reciente
-    const r = {}; if (ytd.m[n]) r.m = +((v / ytd.m[n] - 1) * 100).toFixed(2); if (anio.m[n]) r.a = +((v / anio.m[n] - 1) * 100).toFixed(2);
+    const b0 = ytd.m[n] || ytd.m[anteriores[n]], b1 = anio.m[n] || anio.m[anteriores[n]];
+    const r = {}; if (b0) r.m = +((v / b0 - 1) * 100).toFixed(2); if (b1) r.a = +((v / b1 - 1) * 100).toFixed(2);
     if ("m" in r || "a" in r) out.r[n] = r;
   });
   try { localStorage.setItem(RD_KEY, JSON.stringify(out)); } catch(_) {}
@@ -1028,7 +1030,7 @@ function fondosHTML(){
   if (S.fondos === undefined) { S.fondos = null; fetch("data/config/fondos.json", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { S.fondos = j || {lista:[], tipos:[]}; if (route().startsWith("p-fci")) softRender(); }); }
   if (!S.fondos) return `<div class="panel"><h3>Fondos que ofrecemos</h3><p class="small muted">Cargando…</p></div>`;
   const F = S.fondos, ed = puedeGestionar(), tipos = (F.tipos || []).filter(t => F.lista.some(f => f.tipo === t));
-  if (S.rend === undefined) { S.rend = null; rdCargar(new Set(F.lista.map(f => f.cafci).filter(Boolean))).then(r => { S.rend = r; }).catch(() => { S.rend = {error: true, r: {}}; }).then(() => { if (route().startsWith("p-fci")) softRender(); }); }
+  if (S.rend === undefined) { S.rend = null; rdCargar(new Set(F.lista.map(f => f.cafci).filter(Boolean)), Object.fromEntries(F.lista.filter(f => f.cafci && f.cafciAnt).map(f => [f.cafci, f.cafciAnt]))).then(r => { S.rend = r; }).catch(() => { S.rend = {error: true, r: {}}; }).then(() => { if (route().startsWith("p-fci")) softRender(); }); }
   const R = S.rend, rd = f => (R && R.r && f.cafci && R.r[f.cafci]) || {}, orden = S.fdOrden || "n";
   const ordenar = l => orden === "n" ? l : l.slice().sort((a, b) => { const x = rd(a)[orden], y = rd(b)[orden]; return (y === undefined ? -1e9 : y) - (x === undefined ? -1e9 : x); });
   const fila = f => `<tr data-q="${esc(sinAcento([f.n, f.esp || "", f.tipo].join(" ")))}"><td>${esc(f.n)}${ed && f.conf ? ` <span class="tiny muted">· a confirmar</span>` : ""}</td><td class="esp">${f.esp ? esc(f.esp) : `<span class="muted">No cotiza en BYMA</span>`}</td><td>${esc(MON_FD[f.mon] || "—")}</td><td class="r">${R ? pctFd(rd(f).m) : "…"}</td><td class="r">${R ? pctFd(rd(f).a) : "…"}</td></tr>`;
