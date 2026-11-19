@@ -207,6 +207,7 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .fds-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.fds-bar .fds-t{margin-bottom:0}.fds-o{display:inline-flex;align-items:center}.fds-o .tiny{padding:0 8px}
 .fds-tab td.r,.fds-tab th.r{text-align:right;white-space:nowrap}.fds-tab .neg{color:#B23A3A}
 .fds-g{margin-top:8px}.fds-g[hidden]{display:none}.fds-tab{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}.fds-tab th:nth-child(1){width:44%}.fds-tab th:nth-child(2){width:18%}.fds-tab th:nth-child(3){width:12%}.fds-tab .esp .muted{font-family:inherit;font-size:12.5px}.fds-tab th{text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line-2)}.fds-tab td{padding:7px 8px;border-bottom:1px solid var(--line)}.fds-tab tr[hidden]{display:none}.fds-tab .esp{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;white-space:nowrap}
+.box .habil{display:grid;gap:6px;background:var(--surface-2);border-radius:10px;padding:12px 14px}.box .habil b{font-size:14px}.box .habil span{font-size:12.5px;color:var(--ink-2)}.box .habil .btn{justify-self:start;margin-top:4px}
 .otros{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 0}.otros .chips{display:flex;flex-wrap:wrap;gap:6px}.otros .chip{display:inline-flex;align-items:center;gap:6px;text-decoration:none}.otros .chip .ico{width:15px;height:15px}
 .optag{font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:4px;padding:2px 6px}
 .upl{display:grid;gap:10px;border:1px dashed var(--line-2);border-radius:10px;padding:12px 14px}
@@ -2188,7 +2189,7 @@ function abrirEnvio(canal, tipo, id){
     : `Hola${nombre?" "+nombre:""}, te comparto la propuesta que armamos a partir de lo que conversamos. Cualquier duda, me escribís.`;
   const asunto = tipo === "op" ? `${p.nombre} · Neix` : `${tipo === "pz" ? "Presentación" : "Propuesta"} Neix${P.cliente?" para "+P.cliente:""}`;
   const E = S.envio = {canal, tipo, id, asunto, archivo: null};
-  const listo = (txt) => { if (S.envio !== E) return; const n = $("#shAtt"); if (n) n.textContent = txt; ["#shSend","#shShare"].forEach(q => { const bt = $(q); if (bt) bt.disabled = false; }); };
+  const listo = (txt) => { if (S.envio !== E) return; const n = $("#shAtt"); if (n) n.textContent = txt; ["#shSend","#shShare","#shOld"].forEach(q => { const bt = $(q); if (bt) bt.disabled = false; }); };
   if (tipo === "prop") {   // la propuesta se puede mandar como documento, como presentación o las dos juntas
     E.files = {doc: null, pres: null}; E.err = {}; E.sel = {doc: true, pres: true};
     propPDFBlob().then(b => { E.files.doc = new File([b], propNombre(), {type:"application/pdf"}); propListo(); }).catch(() => { E.err.doc = true; propListo(); });
@@ -2196,14 +2197,18 @@ function abrirEnvio(canal, tipo, id){
   } else (tipo === "op" ? archivoOP(p) : pzPDFBlob().then(b => new File([b], pzNombre(), {type:"application/pdf"})))
     .then(f => { E.archivo = f; listo("PDF listo: " + f.name); })
     .catch(() => listo("No pudimos preparar el archivo. Se envía solo el mensaje."));
-  const cel = puedeCompartir(), wa = canal === "wa";
+  const cel = puedeCompartir(), wa = canal === "wa", directo = !wa && !!(S.me && S.me.email);   // mail directo desde la casilla del asesor (solo en el Hub publicado)
   const div = document.createElement("div"); div.className = "shm"; div.id = "shm"; div.dataset.act = "shBg";
   div.innerHTML = `<div class="box" role="dialog" aria-modal="true" aria-labelledby="shT"><h3 id="shT">${wa?"Enviar por WhatsApp":"Enviar por mail"}</h3>
+    ${directo ? `<label class="f" for="shTo">Para<input class="input" id="shTo" type="text" inputmode="email" autocomplete="email" placeholder="cliente@empresa.com · si son varios, separalos con coma"></label>
+    <label class="f" for="shAsunto">Asunto<input class="input" id="shAsunto" value="${esc(asunto)}"></label>` : ""}
     <label class="f" for="shMsg">Mensaje<textarea class="input" id="shMsg">${esc(msg)}</textarea></label>
     ${tipo === "prop" ? `<div class="f"><span>Adjuntar</span><label class="chk"><input type="checkbox" id="shDoc" checked> Documento</label><label class="chk"><input type="checkbox" id="shPres" checked> Presentación</label></div>` : ""}
     <div class="att" id="shAtt">${tipo === "prop" ? "Preparando el documento y la presentación…" : "Preparando el archivo…"}</div>
-    <p class="tiny muted" style="margin:0">${cel ? `Al tocar Enviar se abre el menú para compartir con el PDF adjunto: elegí ${wa?"WhatsApp":"Outlook"} y el contacto. El mensaje queda copiado; si no aparece, pegalo con Ctrl+V.` : `Este navegador no permite adjuntar archivos: se abre ${wa?"WhatsApp":"tu mail"} con el mensaje${tipo==="op"&&p&&p.onePager?" y el link al PDF":""}, y el PDF se descarga para arrastrarlo. Para adjuntarlo directo, usá Chrome o Edge.`}</p>
-    <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button><button class="btn primary" id="shSend" data-act="shSend" disabled>${wa?ico("_wa"):ico("_mail")}Enviar</button></div></div>`;
+    ${directo ? (S.me.mail ? `<p class="tiny muted" style="margin:0">Sale desde tu casilla de Outlook (${esc(S.me.email)}) con el PDF adjunto, y queda en tus Enviados.</p>`
+      : `<div class="habil"><b>Mandalo directo desde tu Outlook</b><span>Habilitalo una sola vez: Microsoft te pide permiso y volvés acá. Mientras tanto, podés enviarlo como antes.</span><a class="btn" href="/api/auth/login?mail=1&next=${encodeURIComponent(location.pathname + location.hash)}">${ico("_mail")}Habilitar envío desde Outlook</a></div>`) : ""}
+    <p class="tiny muted" style="margin:0${directo && S.me.mail ? ";display:none" : ""}">${cel ? `Al tocar Enviar se abre el menú para compartir con el PDF adjunto: elegí ${wa?"WhatsApp":"Outlook"} y el contacto. El mensaje queda copiado; si no aparece, pegalo con Ctrl+V.` : `Este navegador no permite adjuntar archivos: se abre ${wa?"WhatsApp":"tu mail"} con el mensaje${tipo==="op"&&p&&p.onePager?" y el link al PDF":""}, y el PDF se descarga para arrastrarlo. Para adjuntarlo directo, usá Chrome o Edge.`}</p>
+    <div class="btn-row" style="justify-content:flex-end"><button class="btn ghost" data-act="shClose">Cancelar</button>${directo && S.me.mail ? `<button class="btn ghost" data-act="shSend" data-viejo="1" id="shOld" disabled title="Abre tu mail o el menú de compartir, como antes">Usar Outlook</button>` : ""}<button class="btn primary" id="shSend" data-act="shSend" disabled>${wa?ico("_wa"):ico("_mail")}Enviar</button></div></div>`;
   document.body.appendChild(div);
   const f = $("#shSend"); if (f) f.focus();
 }
@@ -2211,13 +2216,35 @@ function propListo(){
   const E = S.envio; if (!E || E.tipo !== "prop") return;
   const est = k => E.files[k] ? "listo" : E.err[k] ? "no se pudo preparar" : "preparando…", sel = ["doc","pres"].filter(k => E.sel[k]);
   const n = $("#shAtt"); if (n) n.textContent = sel.length ? sel.map(k => (k === "doc" ? "Documento: " : "Presentación: ") + est(k)).join(" · ") : "Elegí qué adjuntar.";
-  const bt = $("#shSend"); if (bt) bt.disabled = !sel.length || sel.some(k => !E.files[k] && !E.err[k]);
+  const no = !sel.length || sel.some(k => !E.files[k] && !E.err[k]); ["#shSend", "#shOld"].forEach(q => { const bt = $(q); if (bt) bt.disabled = no; });
 }
 const archivosEnvio = E => E.tipo === "prop" ? ["doc","pres"].filter(k => E.sel[k] && E.files[k]).map(k => E.files[k]) : (E.archivo ? [E.archivo] : []);
 function cerrarEnvio(){ const m = $("#shm"); if (m) m.remove(); S.envio = null; }
 function telWA(t){ let d = String(t||"").replace(/\D/g, ""); if (!d) return ""; if (d.startsWith("0")) d = d.slice(1); if (d.length === 10) d = "549" + d; else if (d.length === 11 && d.startsWith("9")) d = "54" + d; return d; }
+const aBase64 = f => new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = ko; r.readAsDataURL(f); });
+async function enviarDirecto(b){
+  const E = S.envio, para = (($("#shTo") || {}).value || "").split(/[,;\s]+/).map(x => x.trim()).filter(Boolean);
+  if (!para.length) { toast("Escribí el mail del destinatario"); $("#shTo") && $("#shTo").focus(); return; }
+  if (!para.every(m => /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(m))) { toast("Revisá el mail del destinatario"); return; }
+  const archivos = archivosEnvio(E), peso = archivos.reduce((n, f) => n + f.size, 0);
+  if (peso > 3.2 * 1024 * 1024) { toast("Los adjuntos pesan más de 3 MB: usá el botón Usar Outlook"); return; }
+  const txt = b.innerHTML; b.disabled = true; b.textContent = "Enviando…";
+  try {
+    const r = await fetch("api/datos", {method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({accion:"mail", para, asunto: ($("#shAsunto") || {}).value || E.asunto, texto: ($("#shMsg") || {}).value || "", archivos: await Promise.all(archivos.map(async f => ({nombre: f.name, datos: await aBase64(f)})))})});
+    const j = await r.json().catch(() => ({}));
+    if (r.ok) { cerrarEnvio(); toast(`Mail enviado a ${para.join(", ")}`); return; }
+    if (j.habilitar && S.me) { S.me.mail = false; cerrarEnvio(); toast(j.error || "Hay que habilitar el envío desde tu Outlook"); abrirEnvio(E.canal, E.tipo, E.id); return; }
+    toast(j.error || "No pudimos enviar el mail. Probá de nuevo.");
+  } catch(e) { toast("No pudimos enviar el mail. Probá de nuevo."); }
+  b.disabled = false; b.innerHTML = txt;
+}
 async function enviar(b){
   const E = S.envio; if (!E) return;
+  if (E.canal === "mail" && S.me && S.me.mail && !(b && b.dataset.viejo)) {   // directo desde la casilla del asesor
+    (E.tipo === "op" ? [E.id] : E.tipo === "pz" ? S.pz.items : S.prop.items.map(x => x.id)).forEach(id => uso(id, "e"));
+    return enviarDirecto(b);
+  }
   (E.tipo === "op" ? [E.id] : E.tipo === "pz" ? S.pz.items : S.prop.items.map(x => x.id)).forEach(id => uso(id, "e"));
   const to = (($("#shTo")||{}).value || "").trim(), msg = ($("#shMsg")||{}).value || "", wa = E.canal === "wa";
   const archivos = archivosEnvio(E);

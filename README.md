@@ -173,3 +173,11 @@ del fondo en la Cámara Argentina de FCI. El rendimiento (en el año y últimos 
 API pública de ArgentinaDatos (`api.argentinadatos.com/v1/finanzas/fci/...`, sin clave, permite pedidos desde el navegador) y lo guarda un día.
 No usa funciones de Vercel. La fuente tiene días incompletos desde 2026: solo se usa un día si trae la mayoría de los fondos,
 por eso se busca el día completo más cercano a cada fecha (para 3 meses, hasta 25 días antes o después).
+
+## Enviar mails desde la casilla del asesor (Outlook)
+"Enviar por mail" manda el mail desde la casilla de Outlook de quien está usando el Hub (Microsoft Graph, `me/sendMail`), con los PDF
+adjuntos, y queda en sus Enviados. El permiso se pide aparte del ingreso: botón "Habilitar envío desde Outlook" → `/api/auth/login?mail=1`
+(scopes `offline_access Mail.Send`). El token para renovar el acceso queda cifrado en la cookie `neix_mail` (90 días; "Salir" la borra).
+El envío lo hace `api/datos.js` con `accion: "mail"` (no suma funciones). Adjuntos hasta 3 MB en total.
+Configuración (una vez): Entra › App registrations › Hub de Productos Neix › API permissions › Microsoft Graph › Delegated:
+`Mail.Send` y `offline_access` › Grant admin consent. Sin permiso, el botón Enviar funciona como antes (abre Outlook o el menú de compartir).
