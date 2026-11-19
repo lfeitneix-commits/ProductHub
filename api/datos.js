@@ -90,14 +90,27 @@ async function enviarMail(req, res, u) {
   }
   if (tok.refresh_token) res.setHeader("Set-Cookie", cookie(MAIL, await cifrar({ rt: tok.refresh_token, email: u.email }), 90 * 86400));
 
-  // 2) Enviar (queda en Enviados del asesor)
-  const html = `<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#222">${escHTML(texto).replace(/\r?\n/g, "<br>")}</div>`;
+  // 2) Armar el mail: el texto y la firma de Neix (datos del asesor + logo como imagen incrustada)
+  const f = body.firma && typeof body.firma === "object" ? body.firma : {};
+  const nombre = String(f.nombre || u.nombre || "").slice(0, 80), area = String(f.area || "").slice(0, 60), tel = String(f.tel || "").slice(0, 30);
+  const d = tel.replace(/\D/g, "").replace(/^0/, ""), wa = d ? (d.length === 10 ? "549" + d : d.length === 11 && d[0] === "9" ? "54" + d : d) : "";
+  const logo = /^data:image\/png;base64,[A-Za-z0-9+/=]{100,60000}$/.test(String(body.logo || "")) ? String(body.logo).split(",")[1] : "";
+  const a = 'style="color:#3D3D3D;text-decoration:none"', sep = '<span style="color:#B5AC9F">&nbsp;·&nbsp;</span>';
+  const html = `<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.5;color:#222">${escHTML(texto).replace(/\r?\n/g, "<br>")}</div>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:22px;border-top:1px solid #E4E0DA;font-family:Calibri,Arial,sans-serif;color:#3D3D3D"><tr><td style="padding-top:14px">
+${nombre ? `<div style="font-size:12pt;font-weight:bold;color:#232323">${escHTML(nombre)}</div>` : ""}
+<div style="font-size:10pt;color:#8C7F6B;margin-bottom:6px">${escHTML(area ? area + " · Neix" : "Neix · Inteligencia Financiera")}</div>
+<div style="font-size:10pt">${[tel ? (wa ? `<a href="https://wa.me/${wa}" ${a}>${escHTML(tel)}</a>` : escHTML(tel)) : "", `<a href="mailto:${escHTML(u.email)}" ${a}>${escHTML(u.email)}</a>`, `<a href="https://www.neix.com.ar" ${a}>www.neix.com.ar</a>`].filter(Boolean).join(sep)}</div>
+${logo ? `<div style="margin-top:12px"><img src="cid:logo-neix" alt="NEIX" width="86" style="display:block;width:86px;height:auto;border:0"></div>` : ""}
+<div style="font-size:7.5pt;line-height:1.4;color:#A39B90;margin-top:12px;max-width:560px">NEIX S.A. ALyC Propio registrado bajo el N° 145 de la CNV y Agente de Colocación y Distribución Integral de FCI registrado bajo el N° 14 de la CNV.</div>
+</td></tr></table>`;
   const g = await fetch("https://graph.microsoft.com/v1.0/me/sendMail", {
     method: "POST", headers: { Authorization: "Bearer " + tok.access_token, "Content-Type": "application/json" },
     body: JSON.stringify({ saveToSentItems: true, message: {
       subject: asunto, body: { contentType: "HTML", content: html },
       toRecipients: para.map((address) => ({ emailAddress: { address } })),
-      attachments: archivos.map((a) => ({ "@odata.type": "#microsoft.graph.fileAttachment", name: a.nombre, contentType: "application/pdf", contentBytes: a.datos })),
+      attachments: archivos.map((x) => ({ "@odata.type": "#microsoft.graph.fileAttachment", name: x.nombre, contentType: "application/pdf", contentBytes: x.datos }))
+        .concat(logo ? [{ "@odata.type": "#microsoft.graph.fileAttachment", name: "neix.png", contentType: "image/png", contentBytes: logo, isInline: true, contentId: "logo-neix" }] : []),
     } }),
   });
   if (g.status !== 202) {

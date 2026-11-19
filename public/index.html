@@ -2222,6 +2222,12 @@ const archivosEnvio = E => E.tipo === "prop" ? ["doc","pres"].filter(k => E.sel[
 function cerrarEnvio(){ const m = $("#shm"); if (m) m.remove(); S.envio = null; }
 function telWA(t){ let d = String(t||"").replace(/\D/g, ""); if (!d) return ""; if (d.startsWith("0")) d = d.slice(1); if (d.length === 10) d = "549" + d; else if (d.length === 11 && d.startsWith("9")) d = "54" + d; return d; }
 const aBase64 = f => new Promise((ok, ko) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = ko; r.readAsDataURL(f); });
+/* Firma del mail: datos del asesor (lista de asesores, o lo cargado en la propuesta o presentación). */
+function firmaMail(){
+  const me = S.me || {}, a = findAsesor(me.nombre) || (S.asesores || []).find(x => String(x.mail || "").toLowerCase() === String(me.email || "").toLowerCase()) || {};
+  const P = S.envio && S.envio.tipo === "pz" ? S.pz : S.prop;
+  return {nombre: a.nombre || me.nombre || "", area: a.area || "", tel: a.tel || (P && normNom(P.asesor) === normNom(a.nombre || me.nombre) ? P.tel : "") || ""};
+}
 async function enviarDirecto(b){
   const E = S.envio, para = (($("#shTo") || {}).value || "").split(/[,;\s]+/).map(x => x.trim()).filter(Boolean);
   if (!para.length) { toast("Escribí el mail del destinatario"); $("#shTo") && $("#shTo").focus(); return; }
@@ -2231,7 +2237,7 @@ async function enviarDirecto(b){
   const txt = b.innerHTML; b.disabled = true; b.textContent = "Enviando…";
   try {
     const r = await fetch("api/datos", {method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({accion:"mail", para, asunto: ($("#shAsunto") || {}).value || E.asunto, texto: ($("#shMsg") || {}).value || "", archivos: await Promise.all(archivos.map(async f => ({nombre: f.name, datos: await aBase64(f)})))})});
+      body: JSON.stringify({accion:"mail", para, asunto: ($("#shAsunto") || {}).value || E.asunto, texto: ($("#shMsg") || {}).value || "", firma: firmaMail(), logo: LOGO_DARK, archivos: await Promise.all(archivos.map(async f => ({nombre: f.name, datos: await aBase64(f)})))})});
     const j = await r.json().catch(() => ({}));
     if (r.ok) { cerrarEnvio(); toast(`Mail enviado a ${para.join(", ")}`); return; }
     if (j.habilitar && S.me) { S.me.mail = false; cerrarEnvio(); toast(j.error || "Hay que habilitar el envío desde tu Outlook"); abrirEnvio(E.canal, E.tipo, E.id); return; }
