@@ -1,0 +1,147 @@
+{
+  "categoria": "Productos bancarios",
+  "id": "referenciamiento-bancario",
+  "nombre": "Referenciamiento de productos bancarios",
+  "cliente": {
+    "titular": "Los productos de los bancos, con el acompañamiento de Neix",
+    "bajada": "Te referenciamos con Banco Supervielle, Banco CMF y Banco Mariva para comercio exterior, préstamos, leasing, venta de cartera, emisiones en el mercado de capitales y avales.",
+    "queEs": "Además de nuestras soluciones de mercado de capitales, acercamos a las empresas los productos bancarios que necesitan, a través de los bancos con los que trabajamos: Banco Supervielle, Banco CMF y Banco Mariva. Neix analiza la necesidad, presenta la empresa al banco y acompaña la gestión hasta el cierre.",
+    "paraQuien": "Empresas y pymes que necesitan financiamiento, garantías o herramientas de comercio exterior bancarias, además de las alternativas del mercado de capitales.",
+    "lineas": [
+      [
+        "Comercio exterior",
+        "Financiación de importaciones y exportaciones, cartas de crédito y cobranzas documentarias. Ordena el flujo de fondos entre el embarque y el cobro o el pago."
+      ],
+      [
+        "Préstamos",
+        "Créditos para capital de trabajo o inversión, a tasa fija o variable. Con distintos plazos y formas de pago según el flujo de la empresa."
+      ],
+      [
+        "Leasing",
+        "El banco compra el bien (rodados, maquinaria, equipos) y la empresa lo usa pagando un canon. Al final, tiene la opción de comprarlo por un valor residual."
+      ],
+      [
+        "Venta de cartera",
+        "La empresa cede al banco créditos que tiene a cobrar y recibe hoy los fondos, con un descuento. Libera capital de trabajo sin tomar un préstamo tradicional."
+      ],
+      [
+        "Emisión en el mercado de capitales",
+        "Emisión de deuda de la empresa: obligaciones negociables (ON) y fideicomisos financieros. El banco participa como organizador, colocador o garante de la emisión."
+      ],
+      [
+        "Avales bancarios",
+        "Garantías del banco para licitaciones, anticipos de clientes, cumplimiento de contratos o pagos. Evitan inmovilizar efectivo como garantía."
+      ]
+    ],
+    "bancos": [
+      "Banco Supervielle",
+      "Banco CMF",
+      "Banco Mariva"
+    ],
+    "beneficios": [
+      [
+        "Un solo interlocutor",
+        "Neix te acompaña con los tres bancos: no tenés que gestionar cada relación por separado."
+      ],
+      [
+        "La mejor alternativa",
+        "Comparamos lo que ofrece cada banco con lo que se consigue en el mercado de capitales."
+      ],
+      [
+        "Acompañamiento",
+        "Armamos la carpeta con vos y seguimos la operación hasta el cierre."
+      ]
+    ],
+    "comoFunciona": [
+      "Nos contás qué necesita tu empresa.",
+      "Definimos el producto y el banco más adecuados.",
+      "Presentamos la empresa al banco y armamos la carpeta.",
+      "Acompañamos la gestión hasta el cierre."
+    ],
+    "aTener": [
+      "Cada banco hace su propio análisis crediticio y define las condiciones.",
+      "La documentación depende del producto y del banco."
+    ],
+    "enNeix": "Referenciamos a tu empresa con Banco Supervielle, Banco CMF y Banco Mariva y acompañamos cada operación, sumándola a tu estrategia de financiamiento en el mercado de capitales.",
+    "ficha": {
+      "liquidez": "Según el producto",
+      "mercado": "Banco Supervielle, Banco CMF y Banco Mariva",
+      "minimo": "A consultar",
+      "moneda": "Pesos o dólares",
+      "plazo": "Según el producto",
+      "riesgo": "Según la calificación de la empresa"
+    }
+  },
+  "estado": "a_validar",
+  "fuente": "Borrador del Hub: esquema de referenciamiento con Supervielle, CMF y Mariva",
+  "impuestos": [],
+  "interno": {
+    "competencia": [],
+    "objeciones": [],
+    "operativa": [
+      "Relevar la necesidad de la empresa (producto, monto, plazo, moneda).",
+      "Definir el banco: Supervielle, CMF o Mariva.",
+      "Armar la carpeta crediticia y presentar la empresa al banco.",
+      "Acompañar la gestión hasta el cierre."
+    ],
+    "perfiles": [
+      "Pymes",
+      "Empresas grandes",
+      "Importadores y exportadores"
+    ],
+    "pitch": "Además del mercado de capitales, te acercamos los productos bancarios que necesitás con Supervielle, CMF y Mariva, y te acompañamos en toda la gestión.",
+    "preguntas": [
+      "¿Qué necesitás financiar o garantizar?",
+      "¿Con qué bancos trabajás hoy?"
+    ],
+    "relacionados": [
+      "avales-sgr",
+      "cheques",
+      "on-emision",
+      "fideicomisos"
+    ],
+    "senales": [
+      "Necesita un producto bancario puntual (leasing, aval, comercio exterior)",
+      "Se financia con un solo banco"
+    ],
+    "video": ""
+  },
+  "match": {
+    "eventos": [
+      "necesita_financiamiento",
+      "importa_exporta"
+    ],
+    "horizonte": [
+      "corto",
+      "medio",
+      "largo"
+    ],
+    "minimoUSD": null,
+    "objetivos": [
+      "financiamiento"
+    ],
+    "perfiles": [
+      "conservador",
+      "moderado",
+      "agresivo"
+    ],
+    "tenencia": [],
+    "tipos": [
+      "pyme",
+      "grande"
+    ]
+  },
+  "observaciones": [
+    "Confirmar con qué banco se hace cada producto (hoy figuran los tres para todos).",
+    "Validar textos con Banca Corporativa."
+  ],
+  "riesgoNivel": 2,
+  "simulador": null,
+  "ultimaRevision": null,
+  "unidades": [
+    "Banca Corporativa"
+  ],
+  "validador": "",
+  "vence": null,
+  "revisionRepo": "2026-11-20T15:00:00Z"
+}
