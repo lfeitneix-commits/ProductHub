@@ -2891,6 +2891,7 @@ const NEIA_KEY = "neix-hub-neia";
 S.neia = (() => { try { return JSON.parse(sessionStorage.getItem(NEIA_KEY) || "null") || {api: [], open: false}; } catch(_) { return {api: [], open: false}; } })();
 const neiaGuardar = () => { try { const a = S.neia.api; let k = 0; a.forEach((m, i) => { if (m.role === "user" && typeof m.content === "string" && a.length - i <= 60) k = k || i; }); sessionStorage.setItem(NEIA_KEY, JSON.stringify({api: a.slice(k), open: S.neia.open})); } catch(_) {} };
 const AREA_NEIA = {"banca privada":"Banca Privada","banca corporativa":"Banca Corporativa","financial advisors":"Financial Advisors","fas":"Financial Advisors","mercado de capitales":"Mercado de Capitales","mesa":"Mercado de Capitales"};
+const neiaCatalogo = () => S.productos.map(p => { const f = p.cliente.ficha || {}; return {id: p.id, nombre: p.nombre, tipo: p.categoria, areas: p.unidades, necesidades: needsDe(p).map(n => n.label), riesgo: RISK_TXT[p.riesgoNivel] || f.riesgo || "", moneda: f.moneda || "", plazo: f.plazo || "", minimo: f.minimo || "", titular: p.cliente.titular}; });
 async function neiaHerramienta(nombre, inp){
   inp = inp || {};
   if (nombre === "buscar_productos") {
@@ -2904,7 +2905,8 @@ async function neiaHerramienta(nombre, inp){
     }).slice(0, 15);
     return l.length ? l.map(p => ({id: p.id, nombre: p.nombre, tipo: p.categoria, areas: p.unidades, titular: p.cliente.titular})) : {resultado: "Sin productos con esa búsqueda. Probá otras palabras."};
   }
-  if (nombre === "catalogo_productos") return S.productos.map(p => { const f = p.cliente.ficha || {}; return {id: p.id, nombre: p.nombre, tipo: p.categoria, areas: p.unidades, necesidades: needsDe(p).map(n => n.label), riesgo: RISK_TXT[p.riesgoNivel] || f.riesgo || "", moneda: f.moneda || "", plazo: f.plazo || "", minimo: f.minimo || "", titular: p.cliente.titular}; });
+  if (nombre === "catalogo_productos") return neiaCatalogo();
+  if (nombre === "obtener_ficha" && Array.isArray(inp.ids)) { const l = await Promise.all(inp.ids.slice(0, 8).map(id => neiaHerramienta("obtener_ficha", {id}))); return l.length === 1 ? l[0] : l; }
   if (nombre === "obtener_ficha") {
     const p = S.byId[inp.id] || S.productos.find(x => sinAcento(x.nombre) === sinAcento(inp.id || ""));
     if (!p) return {error: "No existe un producto con ese id. Usá buscar_productos."};
@@ -2973,22 +2975,38 @@ function neiaPintar(){
       <span class="btn-row"><button class="btn ghost icon" data-act="neiaNueva" title="Conversación nueva" aria-label="Conversación nueva">${ico("_plus")}</button><button class="btn ghost icon" data-act="neiaCerrar" aria-label="Cerrar">✕</button></span></div>
     <div class="neia-msgs" id="neiaMsgs">${v.length ? "" : `<div class="neia-m a"><p>Hola, soy NEIA. Contame a quién vas a ver o pegame una cartera: te armo propuestas, rotaciones y comparaciones con los productos y fondos de Neix y datos de mercado.</p><div class="neia-sug">${["Voy a ver a una empresa que necesita financiamiento, ¿qué le puedo ofrecer?","Cliente moderado con 70% en money market en pesos: ¿cómo roto la cartera?","Caución vs. money market vs. T+1: ¿qué conviene hoy?","¿Qué fondo de renta fija en dólares rindió más en 3 meses?"].map(s => `<button class="chip" data-act="neiaSug" data-v="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
       ${v.map(m => `<div class="neia-m ${m.rol}">${m.rol === "a" ? neiaMd(m.t) + (m.fuentes && m.fuentes.length ? `<div class="neia-fu">Fuentes: ${m.fuentes.map(([u, t]) => `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(t.length > 40 ? t.slice(0, 38) + "…" : t)}</a>`).join(" · ")}</div>` : "") : `<p>${esc(m.t)}</p>`}</div>`).join("")}
-      ${N.pensando ? `<div class="neia-m a neia-pens"><span></span><span></span><span></span>${N.estado ? `<em>${esc(N.estado)}</em>` : ""}</div>` : ""}
+      ${N.pensando && N.vivo ? `<div class="neia-m a" id="neiaVivo">${neiaMd(N.vivo)}</div>` : N.pensando ? `<div class="neia-m a neia-pens"><span></span><span></span><span></span>${N.estado ? `<em>${esc(N.estado)}</em>` : ""}</div>` : ""}
       ${N.error ? `<div class="neia-m a neia-err"><p>${esc(N.error)}</p></div>` : ""}</div>
     <form class="neia-in" onsubmit="return false"><textarea class="input" id="neiaTxt" rows="1" placeholder="Preguntale a NEIA…" ${N.pensando ? "disabled" : ""}></textarea><button class="btn primary icon" data-act="neiaEnviar" aria-label="Enviar" ${N.pensando ? "disabled" : ""}>${ico("_send")}</button></form></div>`;
   const ms = $("#neiaMsgs"); if (ms) ms.scrollTop = ms.scrollHeight;
   if (!N.pensando) { const t = $("#neiaTxt"); if (t && !esCelular()) t.focus(); }
 }
 const NEIA_ESTADO = {catalogo_productos: "Revisando el catálogo…", buscar_productos: "Buscando productos…", obtener_ficha: "Leyendo la ficha…", listar_instructivos: "Mirando los instructivos…", listar_simuladores: "Mirando los simuladores…", buscar_fondos: "Buscando fondos y rendimientos…"};
+async function neiaLeer(r){   // lee la respuesta en vivo (una línea JSON por evento): va mostrando el texto y devuelve el mensaje completo
+  if (!r.ok || !/ndjson/.test(r.headers.get("content-type") || "")) {
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || (r.status === 404 ? "NEIA no está disponible en esta vista." : "No pude responder. Probá de nuevo."));
+    return j;
+  }
+  const rd = r.body.getReader(), dec = new TextDecoder(); let buf = "", fin = null, t0 = 0;
+  const linea = l => { if (!l.trim()) return; const o = JSON.parse(l); if (o.error) throw new Error(o.error); if (o.fin) fin = o.fin; if (o.t) { S.neia.vivo = (S.neia.vivo || "") + o.t; const now = Date.now(); if (now - t0 > 80) { t0 = now; neiaVivo(); } } };
+  for (;;) { const {done, value} = await rd.read(); if (done) break; buf += dec.decode(value, {stream: true}); const ls = buf.split("\n"); buf = ls.pop(); ls.forEach(linea); }
+  linea(buf);
+  if (!fin) throw new Error("Se cortó la respuesta. Probá de nuevo.");
+  return fin;
+}
+function neiaVivo(){   // actualiza solo la burbuja que se está escribiendo
+  const el = $("#neiaVivo"); if (!el) return neiaPintar();
+  el.innerHTML = neiaMd(S.neia.vivo || ""); const ms = $("#neiaMsgs"); if (ms && ms.scrollHeight - ms.scrollTop - ms.clientHeight < 140) ms.scrollTop = ms.scrollHeight;
+}
 async function neiaEnviar(texto){
   const N = S.neia; texto = String(texto || "").trim(); if (!texto || N.pensando) return;
   N.error = ""; N.api.push({role: "user", content: texto}); N.pensando = true; N.estado = "Pensando…"; neiaPintar();
   try {
     for (let vuelta = 0; vuelta < 10; vuelta++) {
-      const r = await fetch("api/analisis", {method: "POST", credentials: "same-origin", headers: {"Content-Type": "application/json"}, body: JSON.stringify({accion: "neia", messages: N.api})});
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(j.error || (r.status === 404 ? "NEIA no está disponible en esta vista." : "No pude responder. Probá de nuevo."));
-      N.api.push({role: "assistant", content: j.content || []});
+      const r = await fetch("api/analisis", {method: "POST", credentials: "same-origin", headers: {"Content-Type": "application/json"}, body: JSON.stringify({accion: "neia", messages: N.api, catalogo: neiaCatalogo()})});
+      const j = await neiaLeer(r);
+      N.api.push({role: "assistant", content: j.content || []}); N.vivo = "";
       if (j.stop_reason === "refusal") { N.api.pop(); while (N.api.length && N.api[N.api.length - 1].role === "user" && typeof N.api[N.api.length - 1].content !== "string") N.api.splice(-2, 2); N.api.pop(); N.error = "No puedo ayudar con eso."; break; }
       const usos = (j.content || []).filter(b => b.type === "tool_use");
       if (j.stop_reason === "pause_turn") { N.estado = "Buscando en la web…"; neiaPintar(); continue; }   // la búsqueda web sigue en la próxima vuelta
@@ -3001,7 +3019,7 @@ async function neiaEnviar(texto){
     N.error = e.message || "No pude responder. Probá de nuevo.";
     while (N.api.length && !(N.api[N.api.length - 1].role === "assistant" && (N.api[N.api.length - 1].content || []).some(b => b.type === "text"))) { const m = N.api.pop(); if (m.role === "user" && typeof m.content === "string") break; }   // deja la conversación en un estado válido
   }
-  N.pensando = false; N.estado = ""; neiaGuardar(); neiaPintar();
+  N.pensando = false; N.estado = ""; N.vivo = ""; neiaGuardar(); neiaPintar();
 }
 
 /* ── Uso del Hub ──

@@ -63,9 +63,9 @@ const NEIA_SYSTEM = `Sos NEIA, la asistente de Neix S.A., una ALyC argentina. En
 4. **Consultas del Hub.** Fichas, argumentos, operativa, instructivos, simuladores, fondos.
 
 ## De dónde sacás la información
-- Productos, fondos, instructivos y simuladores de Neix: SOLO de tus herramientas. Para armar una propuesta empezá por catalogo_productos y después obtener_ficha de los que vayas a recomendar. Nunca des un dato de un producto de Neix sin haberlo consultado antes en esta conversación.
+- Productos, fondos, instructivos y simuladores de Neix: SOLO de tus herramientas. El catálogo resumido de productos está al final de estas instrucciones: usalo para elegir, y pedí con obtener_ficha (varios ids en una sola llamada) solo las fichas que necesites para dar condiciones concretas. Nunca des un dato de un producto de Neix sin haberlo consultado antes en esta conversación.
 - Rendimientos de fondos: buscar_fondos (dato de la Cámara de FCI, con fecha).
-- Contexto de mercado (tasas de caución y plazo fijo, dólar MEP y CCL, riesgo país, inflación, precios y TIR de bonos y ONs, noticias de un emisor o de una empresa): usá web_search cuando el análisis lo necesite, y decí la fecha y la fuente de cada dato. Preferí fuentes argentinas confiables (BCRA, BYMA, INDEC, CNV, medios financieros). Si no conseguís un dato, decilo y seguí con lo que hay.
+- Contexto de mercado (tasas de caución y plazo fijo, dólar MEP y CCL, riesgo país, inflación, precios y TIR de bonos y ONs, noticias de un emisor o de una empresa): usá web_search solo cuando el dato cambia la recomendación (no para preguntas generales ni para armar una propuesta de productos), con pocas búsquedas bien dirigidas, y decí la fecha y la fuente de cada dato. Preferí fuentes argentinas confiables (BCRA, BYMA, INDEC, CNV, medios financieros). Si no conseguís un dato, decilo y seguí con lo que hay.
 - Para una empresa o un emisor puntual también podés buscar en la web qué hace y su situación pública.
 
 ## Lo que no hacés
@@ -81,12 +81,10 @@ const NEIA_SYSTEM = `Sos NEIA, la asistente de Neix S.A., una ALyC argentina. En
 - Cuando nombres un producto de Neix, linkealo a su ficha así: [Nombre del producto](#p-ID). Para un simulador: [Simulador de descuento de documentos](#sim-descuento). Para los instructivos: [Instructivos](#instructivos).
 - Cuando cites rendimientos pasados, aclarás la fecha y que no aseguran rendimientos futuros (una vez por respuesta alcanza).`;
 const NEIA_TOOLS = [
-  { name: "catalogo_productos", description: "Catálogo completo de productos del Hub en versión resumida: id, nombre, tipo, áreas, necesidades que cubre, riesgo, moneda, plazo, mínimo y titular. Usalo primero para armar propuestas, rotaciones o comparaciones.",
-    input_schema: { type: "object", properties: {}, required: [], additionalProperties: false }, strict: true },
   { name: "buscar_productos", description: "Busca productos del Hub por texto libre (nombre, necesidad, tipo de cliente), área (Banca Privada, Banca Corporativa, Financial Advisors, Mercado de Capitales) o necesidad (fin: financiarse, liq: rentabilizar liquidez, renta: generar renta, usd: dolarizar e invertir afuera, cob: cubrirse, pat: ordenar el patrimonio). Pasá \"\" en los campos que no uses. Devuelve id, nombre, tipo, áreas y titular.",
     input_schema: { type: "object", properties: { texto: { type: "string" }, area: { type: "string" }, necesidad: { type: "string" } }, required: ["texto", "area", "necesidad"], additionalProperties: false }, strict: true },
-  { name: "obtener_ficha", description: "Ficha completa de un producto por su id: qué es, para quién, beneficios, cómo funciona, lo que hay que saber, datos (moneda, plazo, riesgo, mínimo, liquidez, dónde opera), argumento para el asesor, perfiles, señales, operativa, productos relacionados y si tiene one pager o simulador.",
-    input_schema: { type: "object", properties: { id: { type: "string" } }, required: ["id"], additionalProperties: false }, strict: true },
+  { name: "obtener_ficha", description: "Fichas completas de uno o más productos por id (pedí todas las que necesites en una sola llamada): qué es, para quién, beneficios, cómo funciona, lo que hay que saber, datos (moneda, plazo, riesgo, mínimo, liquidez, dónde opera), argumento para el asesor, perfiles, señales, operativa, productos relacionados y si tiene one pager o simulador.",
+    input_schema: { type: "object", properties: { ids: { type: "array", items: { type: "string" } } }, required: ["ids"], additionalProperties: false }, strict: true },
   { name: "listar_instructivos", description: "Lista los instructivos generales del Hub (videos y guías: apertura de cuenta, cómo operar, alta en EPYME, etc.).",
     input_schema: { type: "object", properties: {}, required: [], additionalProperties: false }, strict: true },
   { name: "listar_simuladores", description: "Lista los simuladores del Hub (caución, descuento de documentos, cheques Neix vs. banco, FAL) con su link.",
@@ -102,23 +100,34 @@ async function neiaChat(body, res) {
   if (inicios.length) messages = messages.slice(inicios[0]);
   if (!messages.length || messages[0].role !== "user") return res.status(400).json({ error: "Faltan los mensajes" });
   if (JSON.stringify(messages).length > 3500000) return res.status(413).json({ error: "La conversación es muy larga: empezá una nueva" });
+  // Catálogo resumido que manda el navegador: va en el system (queda en caché) y ahorra una vuelta de herramientas.
+  const cat = Array.isArray(body.catalogo) ? JSON.stringify(body.catalogo).slice(0, 60000) : "";
+  const system = [{ type: "text", text: NEIA_SYSTEM }];
+  if (cat) system.push({ type: "text", text: "## Catálogo de productos del Hub (resumen)\n" + cat });
+  let empezo = false;
+  const linea = (o) => { if (!empezo) { empezo = true; res.status(200); res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8"); res.setHeader("Cache-Control", "no-store"); } res.write(JSON.stringify(o) + "\n"); };
   try {
-    const r = await client.beta.messages.create({
+    // Se transmite el texto a medida que se escribe; al final va el contenido completo (con los bloques de razonamiento) que el navegador reenvía tal cual.
+    const stream = client.beta.messages.stream({
       model: NEIA_MODELO, max_tokens: 16000,
       betas: ["server-side-fallback-2026-07-01"], fallbacks: "default",   // si el modelo declina, la API reintenta sola con el de respaldo
-      output_config: { effort: "medium" },                               // análisis de carteras y propuestas: un poco más de razonamiento
+      output_config: { effort: "low" },                                  // respuestas rápidas
       cache_control: { type: "ephemeral" },
-      system: NEIA_SYSTEM, tools: [...NEIA_TOOLS, { type: "web_search_20260209", name: "web_search", max_uses: 5 }], messages,
+      system, tools: [...NEIA_TOOLS, { type: "web_search_20260209", name: "web_search", max_uses: 3 }], messages,
     });
-    // Se devuelve el contenido completo (incluidos los bloques de razonamiento): el navegador lo reenvía tal cual en la próxima vuelta.
-    return res.status(200).json({ content: r.content, stop_reason: r.stop_reason });
+    stream.on("text", (t) => linea({ t }));
+    const r = await stream.finalMessage();
+    linea({ fin: { content: r.content, stop_reason: r.stop_reason } });
+    return res.end();
   } catch (error) {
-    if (error instanceof Anthropic.RateLimitError) return res.status(429).json({ error: "Muchas consultas juntas. Probá en un minuto." });
-    if (error instanceof Anthropic.AuthenticationError) return res.status(500).json({ error: "La clave de Anthropic no es válida" });
-    if (error instanceof Anthropic.BadRequestError) { console.error(error); return res.status(400).json({ error: "No pude procesar la consulta. Empezá una conversación nueva." }); }
-    if (error instanceof Anthropic.APIError) return res.status(502).json({ error: `Error de la API (${error.status})` });
-    console.error(error);
-    return res.status(500).json({ error: "Error inesperado" });
+    let st = 500, msg = "Error inesperado";
+    if (error instanceof Anthropic.RateLimitError) { st = 429; msg = "Muchas consultas juntas. Probá en un minuto."; }
+    else if (error instanceof Anthropic.AuthenticationError) msg = "La clave de Anthropic no es válida";
+    else if (error instanceof Anthropic.BadRequestError) { console.error(error); st = 400; msg = "No pude procesar la consulta. Empezá una conversación nueva."; }
+    else if (error instanceof Anthropic.APIError) { st = 502; msg = error.status === 529 ? "Anthropic está con mucha demanda. Probá de nuevo en unos segundos." : `Error de la API (${error.status})`; }
+    else console.error(error);
+    if (empezo) { linea({ error: msg }); return res.end(); }
+    return res.status(st).json({ error: msg });
   }
 }
 
