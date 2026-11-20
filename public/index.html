@@ -246,12 +246,15 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .neia-fab{display:inline-flex;align-items:center;gap:9px;border:0;border-radius:999px;background:#232323;color:#F3F0EB;padding:11px 18px 11px 14px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
 .neia-fab:hover{background:#000}
 .neia-av{width:18px;height:18px;flex:none;color:#E9DFCF}
-.neia-panel{width:min(400px,calc(100vw - 24px));height:min(600px,calc(100vh - 110px));display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px -20px rgba(0,0,0,.45);overflow:hidden}
+.neia-panel{width:min(460px,calc(100vw - 24px));height:min(680px,calc(100vh - 110px));display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px -20px rgba(0,0,0,.45);overflow:hidden}
 .neia-h{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 14px;background:#232323;color:#F3F0EB}.neia-h>div{flex:1;display:grid}.neia-h b{font-size:15px}.neia-h span{font-size:12px;color:#CFC6B8}.neia-h .btn{color:#F3F0EB}
 .neia-msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
-.neia-m{max-width:88%;border-radius:14px;padding:9px 13px;font-size:13.5px;line-height:1.5}.neia-m p{margin:0}.neia-m p+p,.neia-m ul{margin-top:6px}.neia-m ul{padding-left:18px;margin-bottom:0}
+.neia-m{max-width:92%;border-radius:14px;padding:9px 13px;font-size:13.5px;line-height:1.5}.neia-m p{margin:0}.neia-m p+p,.neia-m ul{margin-top:6px}.neia-m ul{padding-left:18px;margin-bottom:0}
 .neia-m.a{background:var(--surface);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}.neia-m.u{background:#232323;color:#F3F0EB;align-self:flex-end;border-bottom-right-radius:4px}
 .neia-m a{color:#AB1930;font-weight:500}.neia-err{border-color:#E8C9C9!important;color:#8A2B2B}
+.neia-m h5{margin:8px 0 2px;font-size:13.5px;font-weight:700}.neia-m h5:first-child{margin-top:0}.neia-m ol{padding-left:20px;margin:6px 0 0}.neia-m ol+p,.neia-m ul+p,.neia-tw+p{margin-top:6px}
+.neia-tw{overflow-x:auto;margin-top:6px}.neia-m table{border-collapse:collapse;font-size:12.5px;width:100%}.neia-m th,.neia-m td{border-bottom:1px solid var(--line);padding:5px 8px 5px 0;text-align:left;vertical-align:top}.neia-m th{font-weight:600;color:var(--ink-2)}
+.neia-fu{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--ink-3)}.neia-fu a{color:var(--ink-2);font-weight:400}
 .neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
 .neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
 @keyframes neiaP{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
@@ -2886,7 +2889,7 @@ function softRender(){ const a = document.activeElement; if (a && (a.tagName==="
    NEIA no tiene acceso al centro de costos. El servidor (api/analisis.js, accion "neia") solo hace de puente con Claude. */
 const NEIA_KEY = "neix-hub-neia";
 S.neia = (() => { try { return JSON.parse(sessionStorage.getItem(NEIA_KEY) || "null") || {api: [], open: false}; } catch(_) { return {api: [], open: false}; } })();
-const neiaGuardar = () => { try { sessionStorage.setItem(NEIA_KEY, JSON.stringify({api: S.neia.api.slice(-40), open: S.neia.open})); } catch(_) {} };
+const neiaGuardar = () => { try { const a = S.neia.api; let k = 0; a.forEach((m, i) => { if (m.role === "user" && typeof m.content === "string" && a.length - i <= 60) k = k || i; }); sessionStorage.setItem(NEIA_KEY, JSON.stringify({api: a.slice(k), open: S.neia.open})); } catch(_) {} };
 const AREA_NEIA = {"banca privada":"Banca Privada","banca corporativa":"Banca Corporativa","financial advisors":"Financial Advisors","fas":"Financial Advisors","mercado de capitales":"Mercado de Capitales","mesa":"Mercado de Capitales"};
 async function neiaHerramienta(nombre, inp){
   inp = inp || {};
@@ -2901,6 +2904,7 @@ async function neiaHerramienta(nombre, inp){
     }).slice(0, 15);
     return l.length ? l.map(p => ({id: p.id, nombre: p.nombre, tipo: p.categoria, areas: p.unidades, titular: p.cliente.titular})) : {resultado: "Sin productos con esa búsqueda. Probá otras palabras."};
   }
+  if (nombre === "catalogo_productos") return S.productos.map(p => { const f = p.cliente.ficha || {}; return {id: p.id, nombre: p.nombre, tipo: p.categoria, areas: p.unidades, necesidades: needsDe(p).map(n => n.label), riesgo: RISK_TXT[p.riesgoNivel] || f.riesgo || "", moneda: f.moneda || "", plazo: f.plazo || "", minimo: f.minimo || "", titular: p.cliente.titular}; });
   if (nombre === "obtener_ficha") {
     const p = S.byId[inp.id] || S.productos.find(x => sinAcento(x.nombre) === sinAcento(inp.id || ""));
     if (!p) return {error: "No existe un producto con ese id. Usá buscar_productos."};
@@ -2924,19 +2928,37 @@ async function neiaHerramienta(nombre, inp){
   }
   return {error: "Herramienta desconocida"};
 }
-function neiaMd(t){   // markdown mínimo: negrita, links internos o https, listas y saltos de línea
-  let h = esc(t);
-  h = h.replace(/\[([^\]]+)\]\((#[\w-]+|https:\/\/[^\s)]+)\)/g, (m, txt, url) => url.startsWith("#") ? `<a href="${url}" data-neia-link>${txt}</a>` : `<a href="${url}" target="_blank" rel="noopener">${txt}</a>`);
-  h = h.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
-  h = h.split(/\n{2,}/).map(par => { const ls = par.split("\n"); return ls.every(x => /^\s*[-·•]\s+/.test(x)) ? `<ul>${ls.map(x => `<li>${x.replace(/^\s*[-·•]\s+/, "")}</li>`).join("")}</ul>` : `<p>${ls.join("<br>")}</p>`; }).join("");
-  return h;
-}
-function neiaVista(){   // mensajes visibles: lo que escribe el asesor y el texto final de cada respuesta
-  const out = [];
-  S.neia.api.forEach(m => {
-    if (m.role === "user" && typeof m.content === "string") out.push({rol: "u", t: m.content});
-    if (m.role === "assistant" && Array.isArray(m.content)) { const t = m.content.filter(b => b.type === "text").map(b => b.text).join("\n\n").trim(); if (t) out.push({rol: "a", t}); }
+function neiaMd(t){   // markdown mínimo: títulos, negrita, links internos o https, listas, tablas y saltos de línea
+  const inl = x => esc(x).replace(/\[([^\]]+)\]\((#[\w-]+|https:\/\/[^\s)]+)\)/g, (m, txt, url) => url.startsWith("#") ? `<a href="${url}" data-neia-link>${txt}</a>` : `<a href="${url}" target="_blank" rel="noopener">${txt}</a>`).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  const fila = x => x.trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+  const out = []; let lista = null, tabla = null, par = [];
+  const cerrar = () => { if (par.length) { out.push(`<p>${par.join("<br>")}</p>`); par = []; } if (lista) { out.push(`<${lista.t}>${lista.i.map(x => `<li>${x}</li>`).join("")}</${lista.t}>`); lista = null; } if (tabla) { const [h, ...rs] = tabla; out.push(`<div class="neia-tw"><table><thead><tr>${h.map(c => `<th>${inl(c)}</th>`).join("")}</tr></thead><tbody>${rs.map(r => `<tr>${r.map(c => `<td>${inl(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`); tabla = null; } };
+  String(t).split("\n").forEach(l => {
+    let m;
+    if (/^\s*\|.*\|\s*$/.test(l)) { if (/^\s*\|[\s:|-]+\|\s*$/.test(l)) return; if (!tabla) { cerrar(); tabla = []; } tabla.push(fila(l)); return; }
+    if (tabla) cerrar();
+    if (!l.trim()) { cerrar(); return; }
+    if ((m = l.match(/^\s*#{1,4}\s+(.*)$/))) { cerrar(); out.push(`<h5>${inl(m[1])}</h5>`); return; }
+    if ((m = l.match(/^\s*[-·•*]\s+(.*)$/)) || (m = l.match(/^\s*\d+[.)]\s+(.*)$/))) { const tp = /^\s*\d/.test(l) ? "ol" : "ul"; if (par.length || (lista && lista.t !== tp)) cerrar(); if (!lista) lista = {t: tp, i: []}; lista.i.push(inl(m[1])); return; }
+    if (lista) cerrar();
+    par.push(inl(l));
   });
+  cerrar();
+  return out.join("");
+}
+function neiaVista(){   // una burbuja por pregunta: lo que escribió el asesor y la respuesta (sin los "voy a buscar…" previos a cada herramienta)
+  const out = []; let cur = null;
+  S.neia.api.forEach(m => {
+    if (m.role === "user" && typeof m.content === "string") { out.push({rol: "u", t: m.content}); cur = null; return; }
+    if (m.role !== "assistant" || !Array.isArray(m.content)) return;
+    const ultHerr = m.content.map(b => b.type).reduce((k, tp, i) => tp === "tool_use" || tp === "server_tool_use" ? i : k, -1);
+    let t = "", prevTxt = false; const fu = [];
+    m.content.forEach((b, i) => { if (i <= ultHerr) return; if (b.type === "text") { t += (t && !prevTxt ? "\n\n" : "") + b.text; prevTxt = true; (b.citations || []).forEach(c => { if (c.url && /^https:/.test(c.url)) fu.push([c.url, c.title || c.url]); }); } else prevTxt = false; });
+    if (!t.trim()) return;
+    if (!cur) { cur = {rol: "a", t: "", fu: new Map()}; out.push(cur); }
+    cur.t += (cur.t ? "\n\n" : "") + t.trim(); fu.forEach(([u, ti]) => { if (!cur.fu.has(u)) cur.fu.set(u, ti); });
+  });
+  out.forEach(m => { if (m.fu) { m.fuentes = [...m.fu].slice(0, 6); delete m.fu; } });
   return out;
 }
 function neiaPintar(){
@@ -2944,31 +2966,32 @@ function neiaPintar(){
   if (!w) { w = document.createElement("div"); w.id = "neia"; document.body.appendChild(w); }
   const N = S.neia, oculto = route() === "ingresar";
   w.hidden = oculto;
-  if (!N.open) { w.className = "neia-cerrada"; w.innerHTML = `<button class="neia-fab" data-act="neiaAbrir" aria-label="Abrir NEIA, la asistente"><svg class="neia-av" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c.5 4.6 2.9 7 7.5 7.5-4.6.5-7 2.9-7.5 7.5-.5-4.6-2.9-7-7.5-7.5 4.6-.5 7-2.9 7.5-7.5z"/><path d="M19 15.5c.2 1.8 1.1 2.7 2.9 2.9-1.8.2-2.7 1.1-2.9 2.9-.2-1.8-1.1-2.7-2.9-2.9 1.8-.2 2.7-1.1 2.9-2.9z" opacity=".6"/></svg>NEIA</button>`; return; }
+  if (!N.open) { w.className = "neia-cerrada"; w.innerHTML = `<button class="neia-fab" data-act="neiaAbrir" aria-label="Abrir NEIA, la asistente"><svg class="neia-av" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M20 11.5c0 4.1-3.6 7.5-8 7.5-1.2 0-2.3-.2-3.3-.6L4 20l1.3-3.7C4.5 15 4 13.3 4 11.5 4 7.4 7.6 4 12 4s8 3.4 8 7.5z"/></svg>NEIA</button>`; return; }
   const v = neiaVista();
   w.className = "neia-abierta";
-  w.innerHTML = `<div class="neia-panel" role="dialog" aria-label="NEIA, la asistente del Hub"><div class="neia-h"><svg class="neia-av" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c.5 4.6 2.9 7 7.5 7.5-4.6.5-7 2.9-7.5 7.5-.5-4.6-2.9-7-7.5-7.5 4.6-.5 7-2.9 7.5-7.5z"/><path d="M19 15.5c.2 1.8 1.1 2.7 2.9 2.9-1.8.2-2.7 1.1-2.9 2.9-.2-1.8-1.1-2.7-2.9-2.9 1.8-.2 2.7-1.1 2.9-2.9z" opacity=".6"/></svg><div><b>NEIA</b><span>Asistente del Hub de Productos</span></div>
+  w.innerHTML = `<div class="neia-panel" role="dialog" aria-label="NEIA, la asistente del Hub"><div class="neia-h"><svg class="neia-av" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M20 11.5c0 4.1-3.6 7.5-8 7.5-1.2 0-2.3-.2-3.3-.6L4 20l1.3-3.7C4.5 15 4 13.3 4 11.5 4 7.4 7.6 4 12 4s8 3.4 8 7.5z"/></svg><div><b>NEIA</b><span>Productos, carteras e inversiones</span></div>
       <span class="btn-row"><button class="btn ghost icon" data-act="neiaNueva" title="Conversación nueva" aria-label="Conversación nueva">${ico("_plus")}</button><button class="btn ghost icon" data-act="neiaCerrar" aria-label="Cerrar">✕</button></span></div>
-    <div class="neia-msgs" id="neiaMsgs">${v.length ? "" : `<div class="neia-m a"><p>Hola, soy NEIA. Preguntame por productos, instructivos, simuladores o fondos del Hub.</p><div class="neia-sug">${["¿Qué tenemos para una pyme que cobra con cheques?","Argumento para cauciones","Money market que más rindió en 3 meses","¿Dónde está el instructivo de apertura de cuenta?"].map(s => `<button class="chip" data-act="neiaSug" data-v="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
-      ${v.map(m => `<div class="neia-m ${m.rol}">${m.rol === "a" ? neiaMd(m.t) : `<p>${esc(m.t)}</p>`}</div>`).join("")}
+    <div class="neia-msgs" id="neiaMsgs">${v.length ? "" : `<div class="neia-m a"><p>Hola, soy NEIA. Contame a quién vas a ver o pegame una cartera: te armo propuestas, rotaciones y comparaciones con los productos y fondos de Neix y datos de mercado.</p><div class="neia-sug">${["Voy a ver a una empresa que necesita financiamiento, ¿qué le puedo ofrecer?","Cliente moderado con 70% en money market en pesos: ¿cómo roto la cartera?","Caución vs. money market vs. T+1: ¿qué conviene hoy?","¿Qué fondo de renta fija en dólares rindió más en 3 meses?"].map(s => `<button class="chip" data-act="neiaSug" data-v="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
+      ${v.map(m => `<div class="neia-m ${m.rol}">${m.rol === "a" ? neiaMd(m.t) + (m.fuentes && m.fuentes.length ? `<div class="neia-fu">Fuentes: ${m.fuentes.map(([u, t]) => `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(t.length > 40 ? t.slice(0, 38) + "…" : t)}</a>`).join(" · ")}</div>` : "") : `<p>${esc(m.t)}</p>`}</div>`).join("")}
       ${N.pensando ? `<div class="neia-m a neia-pens"><span></span><span></span><span></span>${N.estado ? `<em>${esc(N.estado)}</em>` : ""}</div>` : ""}
       ${N.error ? `<div class="neia-m a neia-err"><p>${esc(N.error)}</p></div>` : ""}</div>
     <form class="neia-in" onsubmit="return false"><textarea class="input" id="neiaTxt" rows="1" placeholder="Preguntale a NEIA…" ${N.pensando ? "disabled" : ""}></textarea><button class="btn primary icon" data-act="neiaEnviar" aria-label="Enviar" ${N.pensando ? "disabled" : ""}>${ico("_send")}</button></form></div>`;
   const ms = $("#neiaMsgs"); if (ms) ms.scrollTop = ms.scrollHeight;
   if (!N.pensando) { const t = $("#neiaTxt"); if (t && !esCelular()) t.focus(); }
 }
-const NEIA_ESTADO = {buscar_productos: "Buscando productos…", obtener_ficha: "Leyendo la ficha…", listar_instructivos: "Mirando los instructivos…", listar_simuladores: "Mirando los simuladores…", buscar_fondos: "Buscando fondos y rendimientos…"};
+const NEIA_ESTADO = {catalogo_productos: "Revisando el catálogo…", buscar_productos: "Buscando productos…", obtener_ficha: "Leyendo la ficha…", listar_instructivos: "Mirando los instructivos…", listar_simuladores: "Mirando los simuladores…", buscar_fondos: "Buscando fondos y rendimientos…"};
 async function neiaEnviar(texto){
   const N = S.neia; texto = String(texto || "").trim(); if (!texto || N.pensando) return;
-  N.error = ""; N.api.push({role: "user", content: texto}); N.pensando = true; N.estado = ""; neiaPintar();
+  N.error = ""; N.api.push({role: "user", content: texto}); N.pensando = true; N.estado = "Pensando…"; neiaPintar();
   try {
-    for (let vuelta = 0; vuelta < 8; vuelta++) {
+    for (let vuelta = 0; vuelta < 10; vuelta++) {
       const r = await fetch("api/analisis", {method: "POST", credentials: "same-origin", headers: {"Content-Type": "application/json"}, body: JSON.stringify({accion: "neia", messages: N.api})});
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || (r.status === 404 ? "NEIA no está disponible en esta vista." : "No pude responder. Probá de nuevo."));
       N.api.push({role: "assistant", content: j.content || []});
       if (j.stop_reason === "refusal") { N.api.pop(); while (N.api.length && N.api[N.api.length - 1].role === "user" && typeof N.api[N.api.length - 1].content !== "string") N.api.splice(-2, 2); N.api.pop(); N.error = "No puedo ayudar con eso."; break; }
       const usos = (j.content || []).filter(b => b.type === "tool_use");
+      if (j.stop_reason === "pause_turn") { N.estado = "Buscando en la web…"; neiaPintar(); continue; }   // la búsqueda web sigue en la próxima vuelta
       if (j.stop_reason !== "tool_use" || !usos.length) break;
       N.estado = NEIA_ESTADO[usos[0].name] || "Buscando…"; neiaPintar();
       const res = await Promise.all(usos.map(async b => { try { return {type: "tool_result", tool_use_id: b.id, content: JSON.stringify(await neiaHerramienta(b.name, b.input))}; } catch(e) { return {type: "tool_result", tool_use_id: b.id, content: "Error al consultar el Hub", is_error: true}; } }));

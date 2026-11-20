@@ -54,24 +54,35 @@ Español rioplatense, directo, con números. No inventes rendimientos ni precios
    (neiaHerramienta en public/index.html), que solo tiene fichas, instructivos, simuladores y fondos: no hay ninguna herramienta ni dato
    del centro de costos, así que no puede darlos aunque se los pidan. Esta función solo hace de puente con la API de Claude. */
 const NEIA_MODELO = "claude-sonnet-5-5"; // el mismo modelo que NEIA en el tablero de rentabilidad
-const NEIA_SYSTEM = `Sos NEIA, la asistente de Neix S.A., una ALyC argentina. En el Hub de Productos ayudás a los asesores comerciales (Banca Privada, Banca Corporativa, Financial Advisors y la Mesa) a encontrar el producto adecuado, entender cómo funciona, armar el argumento para el cliente y ubicar instructivos, simuladores y fondos.
+const NEIA_SYSTEM = `Sos NEIA, la asistente de Neix S.A., una ALyC argentina. En el Hub de Productos sos la copiloto de los asesores comerciales (Banca Privada, Banca Corporativa, Financial Advisors y la Mesa): gente con muchos años de experiencia que te usa para pensar y armar propuestas rápido.
 
-## Qué información tenés
-Solo la del Hub de Productos, a través de tus herramientas: fichas de productos (para el cliente y para el asesor), instructivos, simuladores y la lista de fondos comunes de inversión con su rendimiento. No sabés nada más de Neix que lo que te dan esas herramientas. Nunca des un dato de un producto sin haberlo consultado antes en esta conversación.
+## Para qué te usan
+1. **Preparar una reunión.** "Voy a ver a una empresa que necesita financiamiento, ¿qué le ofrezco?" → mirá el catálogo, elegí las 2 a 4 alternativas que mejor encajan, y para cada una decí en una línea por qué, para qué situación conviene y la condición clave (plazo, moneda, garantía, mínimo). Sumá 2 o 3 preguntas para afinar en la reunión (monto, plazo, si cobra con cheques o facturas, calificación, si ya tiene cuenta, etc.) y lo que pueda venir después (cross-sell).
+2. **Rotación de cartera.** El asesor te cuenta o pega una cartera (activos, montos o porcentajes, perfil y horizonte del cliente). Analizala: concentración por moneda, plazo, riesgo, liquidez y emisor; qué está flojo frente a las alternativas; y proponé una rotación concreta con productos y fondos que ofrece Neix (qué vender, qué comprar, en qué proporción aproximada y por qué). Marcá los supuestos que hiciste.
+3. **Análisis de opciones de inversión.** Comparar alternativas (caución vs. money market vs. T+1, ON vs. bono soberano, pesos vs. dólar, CER vs. tasa fija, etc.): rendimiento, riesgo, liquidez, moneda, plazo, impuestos si aplica y para qué perfil sirve cada una. Usá tablas cortas en markdown cuando comparás.
+4. **Consultas del Hub.** Fichas, argumentos, operativa, instructivos, simuladores, fondos.
+
+## De dónde sacás la información
+- Productos, fondos, instructivos y simuladores de Neix: SOLO de tus herramientas. Para armar una propuesta empezá por catalogo_productos y después obtener_ficha de los que vayas a recomendar. Nunca des un dato de un producto de Neix sin haberlo consultado antes en esta conversación.
+- Rendimientos de fondos: buscar_fondos (dato de la Cámara de FCI, con fecha).
+- Contexto de mercado (tasas de caución y plazo fijo, dólar MEP y CCL, riesgo país, inflación, precios y TIR de bonos y ONs, noticias de un emisor o de una empresa): usá web_search cuando el análisis lo necesite, y decí la fecha y la fuente de cada dato. Preferí fuentes argentinas confiables (BCRA, BYMA, INDEC, CNV, medios financieros). Si no conseguís un dato, decilo y seguí con lo que hay.
+- Para una empresa o un emisor puntual también podés buscar en la web qué hace y su situación pública.
 
 ## Lo que no hacés
-- No das información del centro de costos ni de la gestión interna de Neix: rentabilidad, EERR, resultados por área, costos, gastos, proveedores, sueldos, comisiones internas, presupuestos ni nada parecido. No la tenés. Si te la piden, respondé en una línea: "Eso no lo manejo desde el Hub de Productos." y ofrecé ayudar con productos. No digas dónde está esa información ni que existe otra herramienta.
-- No inventás tasas, precios, montos ni condiciones que no estén en las fichas. Si un dato no está, decilo.
-- No das recomendaciones de inversión personalizadas a clientes finales: ayudás al asesor con la información de los productos.
+- No das información del centro de costos ni de la gestión interna de Neix: rentabilidad, EERR, resultados por área, costos, gastos, proveedores, sueldos, comisiones internas, presupuestos ni nada parecido. No la tenés. Si te la piden, respondé en una línea: "Eso no lo manejo desde el Hub de Productos." y ofrecé ayudar con productos o inversiones. No digas dónde está esa información ni que existe otra herramienta.
+- No inventás tasas, precios ni condiciones. Lo que es estimación, lo marcás como estimación.
+- Recomendás productos que ofrece Neix. Si la mejor opción para el caso no está en el Hub, podés mencionarla como idea, aclarando que no figura en el Hub.
+- Tus análisis son insumo para el asesor, que conoce al cliente y decide. Respetá el perfil de riesgo que te den; si no te lo dan y importa, asumí uno razonable y decilo.
 - No opinás sobre personas.
 
 ## Cómo respondés
-- Español rioplatense, breve y directo: 1 a 5 líneas salvo que te pidan más. Sin preámbulos.
-- Los asesores tienen experiencia: no les expliques cómo vender.
-- Cuando nombres un producto, linkealo a su ficha así: [Nombre del producto](#p-ID). Para un simulador: [Simulador de descuento de documentos](#sim-descuento). Para los instructivos: [Instructivos](#instructivos).
-- Para buscar productos por necesidad, área o palabra, usá buscar_productos; para el detalle, obtener_ficha. Probá variantes si una búsqueda no trae nada.
-- Rendimientos de fondos: aclarás la fecha y que rendimientos pasados no aseguran rendimientos futuros.`;
+- Español rioplatense, directo, sin preámbulos ni relleno. Consultas simples: 1 a 5 líneas. Propuestas, rotaciones y comparaciones: lo necesario, con títulos cortos, viñetas o una tabla.
+- No les expliques cómo vender ni les des consejos de manejo comercial.
+- Cuando nombres un producto de Neix, linkealo a su ficha así: [Nombre del producto](#p-ID). Para un simulador: [Simulador de descuento de documentos](#sim-descuento). Para los instructivos: [Instructivos](#instructivos).
+- Cuando cites rendimientos pasados, aclarás la fecha y que no aseguran rendimientos futuros (una vez por respuesta alcanza).`;
 const NEIA_TOOLS = [
+  { name: "catalogo_productos", description: "Catálogo completo de productos del Hub en versión resumida: id, nombre, tipo, áreas, necesidades que cubre, riesgo, moneda, plazo, mínimo y titular. Usalo primero para armar propuestas, rotaciones o comparaciones.",
+    input_schema: { type: "object", properties: {}, required: [], additionalProperties: false }, strict: true },
   { name: "buscar_productos", description: "Busca productos del Hub por texto libre (nombre, necesidad, tipo de cliente), área (Banca Privada, Banca Corporativa, Financial Advisors, Mercado de Capitales) o necesidad (fin: financiarse, liq: rentabilizar liquidez, renta: generar renta, usd: dolarizar e invertir afuera, cob: cubrirse, pat: ordenar el patrimonio). Pasá \"\" en los campos que no uses. Devuelve id, nombre, tipo, áreas y titular.",
     input_schema: { type: "object", properties: { texto: { type: "string" }, area: { type: "string" }, necesidad: { type: "string" } }, required: ["texto", "area", "necesidad"], additionalProperties: false }, strict: true },
   { name: "obtener_ficha", description: "Ficha completa de un producto por su id: qué es, para quién, beneficios, cómo funciona, lo que hay que saber, datos (moneda, plazo, riesgo, mínimo, liquidez, dónde opera), argumento para el asesor, perfiles, señales, operativa, productos relacionados y si tiene one pager o simulador.",
@@ -84,16 +95,20 @@ const NEIA_TOOLS = [
     input_schema: { type: "object", properties: { texto: { type: "string" }, tipo: { type: "string" } }, required: ["texto", "tipo"], additionalProperties: false }, strict: true },
 ];
 async function neiaChat(body, res) {
-  const messages = Array.isArray(body.messages) ? body.messages.slice(-40) : [];
+  let messages = Array.isArray(body.messages) ? body.messages : [];
+  // Recorta las conversaciones largas empezando siempre por una pregunta del asesor (nunca a mitad de una vuelta de herramientas).
+  const inicios = messages.map((m, i) => m && m.role === "user" && typeof m.content === "string" ? i : -1).filter(i => i >= 0);
+  while (inicios.length > 1 && (messages.length - inicios[0] > 60 || JSON.stringify(messages.slice(inicios[0])).length > 3000000)) inicios.shift();
+  if (inicios.length) messages = messages.slice(inicios[0]);
   if (!messages.length || messages[0].role !== "user") return res.status(400).json({ error: "Faltan los mensajes" });
-  if (JSON.stringify(messages).length > 400000) return res.status(413).json({ error: "La conversación es muy larga: empezá una nueva" });
+  if (JSON.stringify(messages).length > 3500000) return res.status(413).json({ error: "La conversación es muy larga: empezá una nueva" });
   try {
     const r = await client.beta.messages.create({
-      model: NEIA_MODELO, max_tokens: 8000,
+      model: NEIA_MODELO, max_tokens: 16000,
       betas: ["server-side-fallback-2026-07-01"], fallbacks: "default",   // si el modelo declina, la API reintenta sola con el de respaldo
-      output_config: { effort: "low" },                                  // chat: respuestas rápidas
+      output_config: { effort: "medium" },                               // análisis de carteras y propuestas: un poco más de razonamiento
       cache_control: { type: "ephemeral" },
-      system: NEIA_SYSTEM, tools: NEIA_TOOLS, messages,
+      system: NEIA_SYSTEM, tools: [...NEIA_TOOLS, { type: "web_search_20260209", name: "web_search", max_uses: 5 }], messages,
     });
     // Se devuelve el contenido completo (incluidos los bloques de razonamiento): el navegador lo reenvía tal cual en la próxima vuelta.
     return res.status(200).json({ content: r.content, stop_reason: r.stop_reason });
@@ -106,6 +121,8 @@ async function neiaChat(body, res) {
     return res.status(500).json({ error: "Error inesperado" });
   }
 }
+
+export const config = { maxDuration: 120 };   // propuestas con búsqueda web pueden tardar
 
 export default async function handler(req, res) {
   if (req.method !== "POST") { res.setHeader("Allow", "POST"); return res.status(405).json({ error: "Usá POST" }); }
