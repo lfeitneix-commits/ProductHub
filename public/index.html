@@ -2892,8 +2892,39 @@ S.neia = (() => { try { return JSON.parse(sessionStorage.getItem(NEIA_KEY) || "n
 const neiaGuardar = () => { try { const a = S.neia.api; let k = 0; a.forEach((m, i) => { if (m.role === "user" && typeof m.content === "string" && a.length - i <= 60) k = k || i; }); sessionStorage.setItem(NEIA_KEY, JSON.stringify({api: a.slice(k), open: S.neia.open})); } catch(_) {} };
 const AREA_NEIA = {"banca privada":"Banca Privada","banca corporativa":"Banca Corporativa","financial advisors":"Financial Advisors","fas":"Financial Advisors","mercado de capitales":"Mercado de Capitales","mesa":"Mercado de Capitales"};
 const neiaCatalogo = () => S.productos.map(p => { const f = p.cliente.ficha || {}; return {id: p.id, nombre: p.nombre, tipo: p.categoria, areas: p.unidades, necesidades: needsDe(p).map(n => n.label), riesgo: RISK_TXT[p.riesgoNivel] || f.riesgo || "", moneda: f.moneda || "", plazo: f.plazo || "", minimo: f.minimo || "", titular: p.cliente.titular}; });
+const neiaJSON = (u, ms = 9000) => fetch(u, {signal: AbortSignal.timeout(ms)}).then(r => r.ok ? r.json() : null).catch(() => null);
+async function neiaMercado(){   // fuentes públicas sin clave: dolarapi.com y ArgentinaDatos
+  if (S.neiaMerc && Date.now() - S.neiaMerc.t < 10 * 60000) return S.neiaMerc.d;
+  const AD = "https://api.argentinadatos.com/v1/finanzas/";
+  const [dol, rp, inf, infIa, pf, dep] = await Promise.all([neiaJSON("https://dolarapi.com/v1/dolares"), neiaJSON(AD + "indices/riesgo-pais/ultimo"), neiaJSON(AD + "indices/inflacion"), neiaJSON(AD + "indices/inflacionInteranual"), neiaJSON(AD + "tasas/plazoFijo"), neiaJSON(AD + "tasas/depositos30Dias", 15000)]);
+  const d = {
+    dolar: (dol || []).map(x => ({casa: x.nombre, compra: x.compra, venta: x.venta, fecha: x.fechaActualizacion})),
+    riesgoPais: rp ? {puntosBasicos: rp.valor, fecha: rp.fecha} : null,
+    inflacionMensual: (inf || []).slice(-12).map(x => ({mes: x.fecha.slice(0, 7), pct: x.valor})),
+    inflacionInteranual: infIa && infIa.length ? {mes: infIa[infIa.length - 1].fecha.slice(0, 7), pct: infIa[infIa.length - 1].valor} : null,
+    plazoFijo30Dias: (pf || []).filter(x => x.tnaClientes).sort((a, b) => b.tnaClientes - a.tnaClientes).slice(0, 10).map(x => ({banco: x.entidad, tnaClientesPct: +(x.tnaClientes * 100).toFixed(2), tnaNoClientesPct: x.tnaNoClientes ? +(x.tnaNoClientes * 100).toFixed(2) : null})),
+    depositos30Dias: dep && dep.length ? {tnaPct: dep[dep.length - 1].valor, fecha: dep[dep.length - 1].fecha} : null,
+    fuentes: "dolarapi.com, ArgentinaDatos (BCRA, INDEC, JP Morgan)"
+  };
+  if (dol || rp) S.neiaMerc = {t: Date.now(), d};
+  return d;
+}
+async function neiaPrecios(inp){
+  const panel = {soberanos: "soberanos", soberano: "soberanos", bonos: "soberanos", letras: "letras", lecaps: "letras", ons: "ons", on: "ons", corporativos: "ons"}[sinAcento(inp.panel || "").trim()] || "";
+  const tk = (inp.tickers || []).map(t => String(t).toUpperCase().trim()).filter(Boolean);
+  const r = await fetch("api/analisis", {method: "POST", credentials: "same-origin", headers: {"Content-Type": "application/json"}, body: JSON.stringify({accion: "precios", panel: tk.length ? "" : panel || "soberanos"})});
+  const j = await r.json().catch(() => null);
+  if (!r.ok || !j) return {error: "No pude traer los precios ahora. Probá con web_search."};
+  const fila = (p, x) => ({ticker: x[0], panel: p, ultimo: x[1], compra: x[2] || null, venta: x[3] || null, varDiaPct: x[4], volumen: x[5]});
+  let l = Object.entries(j.paneles).flatMap(([p, xs]) => xs.map(x => fila(p, x)));
+  if (tk.length) l = l.filter(x => tk.some(t => x.ticker === t || x.ticker === t + "D" || x.ticker === t + "C" || x.ticker === t + "O" || (t.length > 4 && /[DC]$/.test(t) && x.ticker === t.slice(0, -1))));
+  else l = l.filter(x => x.volumen > 0).sort((a, b) => b.volumen - a.volumen).slice(0, 30);
+  return {fuente: j.fuente, consultado: j.hora, nota: "Precio cada 100 de VN. Bonos: sin sufijo = pesos, D = dólar MEP, C = cable. ONs: O = pesos, D = MEP, C = cable.", precios: l.slice(0, 60), sinDato: tk.filter(t => !l.some(x => x.ticker.startsWith(t.replace(/[DC]$/, ""))))};
+}
 async function neiaHerramienta(nombre, inp){
   inp = inp || {};
+  if (nombre === "datos_mercado") return neiaMercado();
+  if (nombre === "precios_bonos") return neiaPrecios(inp);
   if (nombre === "buscar_productos") {
     const pal = sinAcento(inp.texto || "").split(/\s+/).filter(w => w.length > 1), area = AREA_NEIA[sinAcento(inp.area || "").trim()] || "", need = NEEDS.find(n => n.k === inp.necesidad);
     const l = S.productos.filter(p => {
@@ -2981,7 +3012,7 @@ function neiaPintar(){
   const ms = $("#neiaMsgs"); if (ms) ms.scrollTop = ms.scrollHeight;
   if (!N.pensando) { const t = $("#neiaTxt"); if (t && !esCelular()) t.focus(); }
 }
-const NEIA_ESTADO = {catalogo_productos: "Revisando el catálogo…", buscar_productos: "Buscando productos…", obtener_ficha: "Leyendo la ficha…", listar_instructivos: "Mirando los instructivos…", listar_simuladores: "Mirando los simuladores…", buscar_fondos: "Buscando fondos y rendimientos…"};
+const NEIA_ESTADO = {datos_mercado: "Mirando el mercado…", precios_bonos: "Trayendo precios de BYMA…", catalogo_productos: "Revisando el catálogo…", buscar_productos: "Buscando productos…", obtener_ficha: "Leyendo la ficha…", listar_instructivos: "Mirando los instructivos…", listar_simuladores: "Mirando los simuladores…", buscar_fondos: "Buscando fondos y rendimientos…"};
 async function neiaLeer(r){   // lee la respuesta en vivo (una línea JSON por evento): va mostrando el texto y devuelve el mensaje completo
   if (!r.ok || !/ndjson/.test(r.headers.get("content-type") || "")) {
     const j = await r.json().catch(() => ({}));

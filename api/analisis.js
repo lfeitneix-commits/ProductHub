@@ -53,7 +53,7 @@ Español rioplatense, directo, con números. No inventes rendimientos ni precios
    La misma NEIA del tablero de rentabilidad, pero acá solo conoce el Hub de Productos. Las herramientas se ejecutan en el navegador
    (neiaHerramienta en public/index.html), que solo tiene fichas, instructivos, simuladores y fondos: no hay ninguna herramienta ni dato
    del centro de costos, así que no puede darlos aunque se los pidan. Esta función solo hace de puente con la API de Claude. */
-const NEIA_MODELO = "claude-sonnet-5-5"; // el mismo modelo que NEIA en el tablero de rentabilidad
+const NEIA_MODELO = "claude-opus-5-5"; // el modelo más capaz: lo usan profesionales de finanzas
 const NEIA_SYSTEM = `Sos NEIA, la asistente de Neix S.A., una ALyC argentina. Sos una experta en finanzas y mercado de capitales argentino, con el criterio de una portfolio manager senior y de una banquera corporativa con años de mesa. En el Hub de Productos sos la copiloto de los asesores comerciales (Banca Privada, Banca Corporativa, Financial Advisors y la Mesa): profesionales con mucha experiencia que te tratan como a una colega par y esperan análisis de ese nivel.
 
 ## Tu criterio de experta
@@ -74,7 +74,8 @@ const NEIA_SYSTEM = `Sos NEIA, la asistente de Neix S.A., una ALyC argentina. So
 ## De dónde sacás la información
 - Productos, fondos, instructivos y simuladores de Neix: SOLO de tus herramientas. El catálogo resumido de productos está al final de estas instrucciones: usalo para elegir, y pedí con obtener_ficha (varios ids en una sola llamada) solo las fichas que necesites para dar condiciones concretas. Nunca des un dato de un producto de Neix sin haberlo consultado antes en esta conversación.
 - Rendimientos de fondos: buscar_fondos (dato de la Cámara de FCI, con fecha).
-- Contexto de mercado (tasas de caución y plazo fijo, dólar MEP y CCL, riesgo país, inflación, precios y TIR de bonos y ONs, noticias de un emisor o de una empresa): usá web_search solo cuando el dato cambia la recomendación (no para preguntas generales ni para armar una propuesta de productos), con pocas búsquedas bien dirigidas, y decí la fecha y la fuente de cada dato. Preferí fuentes argentinas confiables (BCRA, BYMA, INDEC, CNV, medios financieros). Si no conseguís un dato, decilo y seguí con lo que hay.
+- Datos de mercado en vivo, antes que la web: datos_mercado (dólar oficial, mayorista, MEP, CCL, blue y cripto; riesgo país; inflación mensual de los últimos 12 meses e interanual; tasas de plazo fijo por banco; tasa de depósitos a 30 días) y precios_bonos (precios de BYMA con demora de bonos soberanos y provinciales, letras y ONs: bonos: sin sufijo = pesos, D = dólar MEP, C = cable; ONs: O = pesos, D = MEP, C = cable; precio cada 100 de valor nominal). Con esos datos calculás vos lo que haga falta (devaluación implícita, breakeven, tasa real, brecha, paridad, TIR aproximada si tenés el flujo) mostrando el cálculo en una línea.
+- Lo que no esté en esas herramientas (tasa de caución, TIR y flujos de un bono o una ON, curvas, licitaciones del Tesoro, calificaciones, noticias de un emisor o de una empresa): usá web_search solo cuando el dato cambia la recomendación (no para preguntas generales ni para armar una propuesta de productos), con pocas búsquedas bien dirigidas, y decí la fecha y la fuente de cada dato. Preferí fuentes argentinas confiables (BCRA, BYMA, INDEC, CNV, medios financieros). Si no conseguís un dato, decilo y seguí con lo que hay.
 - Para una empresa o un emisor puntual también podés buscar en la web qué hace y su situación pública.
 
 ## Lo que no hacés
@@ -99,6 +100,10 @@ const NEIA_TOOLS = [
     input_schema: { type: "object", properties: {}, required: [], additionalProperties: false }, strict: true },
   { name: "listar_simuladores", description: "Lista los simuladores del Hub (caución, descuento de documentos, cheques Neix vs. banco, FAL) con su link.",
     input_schema: { type: "object", properties: {}, required: [], additionalProperties: false }, strict: true },
+  { name: "datos_mercado", description: "Datos de mercado argentinos del día: cotizaciones del dólar (oficial, mayorista, MEP/bolsa, CCL, blue, cripto, tarjeta), riesgo país, inflación mensual de los últimos 12 meses e interanual, tasas de plazo fijo por banco y tasa de depósitos a 30 días. Cada dato con su fecha.",
+    input_schema: { type: "object", properties: {}, required: [], additionalProperties: false }, strict: true },
+  { name: "precios_bonos", description: "Precios de BYMA (con demora) de bonos soberanos y provinciales, letras y ONs: último, compra, venta, variación del día y volumen. Pasá tickers (por ejemplo [\"AL30\",\"GD30D\",\"YMCJD\"]; la base trae también sus variantes D y C) o, sin tickers, un panel (\"soberanos\", \"letras\" u \"ons\") para ver los más operados.",
+    input_schema: { type: "object", properties: { tickers: { type: "array", items: { type: "string" } }, panel: { type: "string" } }, required: ["tickers", "panel"], additionalProperties: false }, strict: true },
   { name: "buscar_fondos", description: "Busca fondos comunes de inversión que ofrece Neix por texto (nombre, sociedad gerente, especie) y/o tipo (Money Market, Renta Fija en $, Renta Fija en USD, Fondos Mixtos en $, Fondos Mixtos en USD, Renta Variable en $, Renta Variable USD). Pasá \"\" en lo que no uses. Devuelve especie, moneda y rendimiento en el año y últimos 3 meses con su fecha, ordenados por rendimiento de 3 meses.",
     input_schema: { type: "object", properties: { texto: { type: "string" }, tipo: { type: "string" } }, required: ["texto", "tipo"], additionalProperties: false }, strict: true },
 ];
@@ -123,7 +128,7 @@ async function neiaChat(body, res) {
   try {
     // Se transmite el texto a medida que se escribe; al final va el contenido completo (con los bloques de razonamiento) que el navegador reenvía tal cual.
     const stream = client.beta.messages.stream({
-      model: NEIA_MODELO, max_tokens: 16000,
+      model: NEIA_MODELO, max_tokens: 16000, thinking: { type: "adaptive" },
       betas: ["server-side-fallback-2026-07-01"], fallbacks: "default",   // si el modelo declina, la API reintenta sola con el de respaldo
       output_config: { effort },                                         // bajo para consultas, medio para análisis
       cache_control: { type: "ephemeral" },
@@ -145,11 +150,32 @@ async function neiaChat(body, res) {
   }
 }
 
+// Precios de BYMA vía data912 (no permite pedidos desde el navegador, por eso pasan por acá). Caché de un minuto por panel.
+const PANELES = { soberanos: "arg_bonds", letras: "arg_notes", ons: "arg_corp" }, cachePrecios = {};
+async function precios(body, res) {
+  const pans = PANELES[body.panel] ? [body.panel] : Object.keys(PANELES), out = {};
+  try {
+    await Promise.all(pans.map(async (k) => {
+      const c = cachePrecios[k];
+      if (c && Date.now() - c.t < 60000) { out[k] = c.d; return; }
+      const r = await fetch(`https://data912.com/live/${PANELES[k]}`, { signal: AbortSignal.timeout(8000) });
+      if (!r.ok) throw new Error(String(r.status));
+      const d = (await r.json()).map((x) => [x.symbol, x.c, x.px_bid, x.px_ask, x.pct_change, x.v]);
+      cachePrecios[k] = { t: Date.now(), d }; out[k] = d;
+    }));
+    res.setHeader("Cache-Control", "no-store");
+    return res.status(200).json({ fuente: "data912 (BYMA, con demora)", hora: new Date().toISOString(), paneles: out });
+  } catch (e) {
+    return res.status(502).json({ error: "No pude traer los precios ahora" });
+  }
+}
+
 export const config = { maxDuration: 120 };   // propuestas con búsqueda web pueden tardar
 
 export default async function handler(req, res) {
   if (req.method !== "POST") { res.setHeader("Allow", "POST"); return res.status(405).json({ error: "Usá POST" }); }
   const datos = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+  if (datos.accion === "precios") return precios(datos, res);
   if (datos.accion === "neia") {
     if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: "NEIA todavía no está activada en el Hub (falta la clave de Anthropic en Vercel)." });
     return neiaChat(datos, res);
