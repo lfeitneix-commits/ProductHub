@@ -242,6 +242,22 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .ges-tile.alerta b{color:#A3712A}.ges-tile.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .ges-tabla tbody tr[data-href]{cursor:pointer}.ges-tabla tbody tr[data-href]:hover{background:var(--surface-2)}.ges-tabla a{text-decoration:none;color:inherit}.ges-tabla td b{font-weight:500}
 @media (max-width:760px){.ges-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#neia{position:fixed;right:20px;bottom:20px;z-index:60}
+.neia-fab{display:inline-flex;align-items:center;gap:9px;border:0;border-radius:999px;background:#232323;color:#F3F0EB;padding:8px 18px 8px 8px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
+.neia-fab:hover{background:#000}
+.neia-av{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#AB1930,#6E0F1F);color:#fff;font-weight:700;font-size:14px;flex:none}
+.neia-panel{width:min(400px,calc(100vw - 24px));height:min(600px,calc(100vh - 110px));display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px -20px rgba(0,0,0,.45);overflow:hidden}
+.neia-h{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 14px;background:#232323;color:#F3F0EB}.neia-h>div{flex:1;display:grid}.neia-h b{font-size:15px}.neia-h span{font-size:12px;color:#CFC6B8}.neia-h .btn{color:#F3F0EB}
+.neia-msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.neia-m{max-width:88%;border-radius:14px;padding:9px 13px;font-size:13.5px;line-height:1.5}.neia-m p{margin:0}.neia-m p+p,.neia-m ul{margin-top:6px}.neia-m ul{padding-left:18px;margin-bottom:0}
+.neia-m.a{background:var(--surface);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}.neia-m.u{background:#232323;color:#F3F0EB;align-self:flex-end;border-bottom-right-radius:4px}
+.neia-m a{color:#AB1930;font-weight:500}.neia-err{border-color:#E8C9C9!important;color:#8A2B2B}
+.neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
+.neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
+@keyframes neiaP{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.neia-in{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:var(--surface)}.neia-in textarea{flex:1;min-height:40px;max-height:120px;field-sizing:content;resize:none}
+@media (max-width:900px){#neia{right:12px;bottom:76px}.neia-abierta{left:12px}.neia-panel{width:100%;height:calc(100vh - 150px)}}
+body:has(.ed-bar) #neia.neia-cerrada{bottom:84px}
 .otros{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 0}.otros .chips{display:flex;flex-wrap:wrap;gap:6px}.otros .chip{display:inline-flex;align-items:center;gap:6px;text-decoration:none}.otros .chip .ico{width:15px;height:15px}
 .optag{font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:4px;padding:2px 6px}
 .upl{display:grid;gap:10px;border:1px dashed var(--line-2);border-radius:10px;padding:12px 14px}
@@ -888,6 +904,7 @@ function render(anim){
   if (r === "presentaciones") { refreshDeck(); pzFiltrar(); }
   if (r === "gestion") gesFiltrar();
   if (!r.startsWith("p-")) S._vista = "";
+  neiaPintar();
   if ($("#fd_q")) { fondosFiltrar(); if (S.fdAbiertos) document.querySelectorAll(".fds-g").forEach(g => { if (S.fdAbiertos.includes(g.dataset.tipo)) g.open = true; }); }
 }
 /* Pie interno: solo la sesión (quién entró y Salir). El "Hablemos" con datos de contacto no hace falta en una herramienta interna. */
@@ -2351,6 +2368,7 @@ async function enviar(b){
   toast(archivos.length > 1 ? "Se descargaron los archivos: arrastralos al mensaje para adjuntarlos" : archivos.length ? "Se descargó el archivo: arrastralo al mensaje para adjuntarlo" : "Se abrió el mensaje");
 }
 document.addEventListener("keydown", e => { if (e.key === "Escape" && S.envio) cerrarEnvio(); });
+document.addEventListener("keydown", e => { if (e.target && e.target.id === "neiaTxt" && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); neiaEnviar(e.target.value); } });
 document.addEventListener("toggle", e => { if (e.target.matches && e.target.matches("details.uso")) S.usoAbierto = e.target.open; }, true);
 /* Tampoco cambian con las flechas del teclado ni con la rueda del mouse. */
 document.addEventListener("keydown", e => { if ((e.key === "ArrowUp" || e.key === "ArrowDown") && e.target.matches && e.target.matches('input[type="number"]')) e.preventDefault(); });
@@ -2682,6 +2700,8 @@ function historialHTML(abierto){
 
 /* ── Eventos ── */
 document.addEventListener("click", e => {
+  const ln = e.target.closest("a[data-neia-link]");
+  if (ln) { const h = ln.getAttribute("href"); if (h.startsWith("#sim-")) { e.preventDefault(); S.sim = h.slice(5); if (route() === "simuladores") render(); else location.hash = "#simuladores"; } if (esCelular()) { S.neia.open = false; neiaGuardar(); neiaPintar(); } return; }
   const fila = e.target.closest(".ges-tabla tr[data-href]"); if (fila && !e.target.closest("a,button")) { location.hash = fila.dataset.href; return; }
   const b = e.target.closest("[data-act]"); if (!b) return;
   const a = b.dataset.act, v = b.dataset.v, id = b.dataset.id;
@@ -2735,6 +2755,11 @@ document.addEventListener("click", e => {
   else if (a==="validar") validar(id);
   else if (a==="notaMkt") notaMkt(id);
   else if (a==="save") save(id);
+  else if (a==="neiaAbrir") { S.neia.open = true; neiaGuardar(); neiaPintar(); }
+  else if (a==="neiaCerrar") { S.neia.open = false; neiaGuardar(); neiaPintar(); }
+  else if (a==="neiaNueva") { S.neia.api = []; S.neia.error = ""; neiaGuardar(); neiaPintar(); }
+  else if (a==="neiaSug") neiaEnviar(v);
+  else if (a==="neiaEnviar") { const t = $("#neiaTxt"); if (t) neiaEnviar(t.value); }
   else if (a==="gesTab") { S.gesTab = v; render(); }
   else if (a==="gesF") { S.gesF = S.gesF === v ? "" : v; document.querySelectorAll(".ges-tile").forEach(x => { const on = x.dataset.v === S.gesF; x.classList.toggle("on", on); x.setAttribute("aria-pressed", String(on)); }); gesFiltrar(); }
   else if (a==="edSec") { S.ed.sec = v; render(); window.scrollTo({top: Math.min(window.scrollY, ($(".ed-tabs") || {offsetTop: 0}).offsetTop - 80)}); }
@@ -2856,6 +2881,106 @@ function watchNotas(){
   }, ()=>{});
 }
 function softRender(){ const a = document.activeElement; if (a && (a.tagName==="TEXTAREA" || (a.tagName==="INPUT" && a.type!=="checkbox"))) return; render(); }
+/* ── NEIA en el Hub ──
+   Chat con la asistente de Neix. Las herramientas se ejecutan acá y solo leen datos del Hub (fichas, instructivos, simuladores y fondos):
+   NEIA no tiene acceso al centro de costos. El servidor (api/analisis.js, accion "neia") solo hace de puente con Claude. */
+const NEIA_KEY = "neix-hub-neia";
+S.neia = (() => { try { return JSON.parse(sessionStorage.getItem(NEIA_KEY) || "null") || {api: [], open: false}; } catch(_) { return {api: [], open: false}; } })();
+const neiaGuardar = () => { try { sessionStorage.setItem(NEIA_KEY, JSON.stringify({api: S.neia.api.slice(-40), open: S.neia.open})); } catch(_) {} };
+const AREA_NEIA = {"banca privada":"Banca Privada","banca corporativa":"Banca Corporativa","financial advisors":"Financial Advisors","fas":"Financial Advisors","mercado de capitales":"Mercado de Capitales","mesa":"Mercado de Capitales"};
+async function neiaHerramienta(nombre, inp){
+  inp = inp || {};
+  if (nombre === "buscar_productos") {
+    const pal = sinAcento(inp.texto || "").split(/\s+/).filter(w => w.length > 1), area = AREA_NEIA[sinAcento(inp.area || "").trim()] || "", need = NEEDS.find(n => n.k === inp.necesidad);
+    const l = S.productos.filter(p => {
+      if (area && !p.unidades.includes(area)) return false;
+      if (need && !p.match.objetivos.some(o => need.objs.includes(o))) return false;
+      if (!pal.length) return true;
+      const h = sinAcento([p.nombre, p.categoria, p.cliente.titular, p.cliente.bajada, p.cliente.queEs, p.cliente.paraQuien, p.interno.perfiles.join(" "), p.match.objetivos.map(o => OBJ[o] || "").join(" "), (p.cliente.lineas || []).map(x => x.join(" ")).join(" ")].join(" "));
+      return pal.some(w => h.includes(w));
+    }).slice(0, 15);
+    return l.length ? l.map(p => ({id: p.id, nombre: p.nombre, tipo: p.categoria, areas: p.unidades, titular: p.cliente.titular})) : {resultado: "Sin productos con esa búsqueda. Probá otras palabras."};
+  }
+  if (nombre === "obtener_ficha") {
+    const p = S.byId[inp.id] || S.productos.find(x => sinAcento(x.nombre) === sinAcento(inp.id || ""));
+    if (!p) return {error: "No existe un producto con ese id. Usá buscar_productos."};
+    const c = p.cliente, i = p.interno;
+    return {id: p.id, nombre: p.nombre, tipo: p.categoria, areas: p.unidades, riesgo: RISK_TXT[p.riesgoNivel] || "", titular: c.titular, bajada: c.bajada, queEs: c.queEs, paraQuien: c.paraQuien,
+      queIncluye: c.lineas || undefined, beneficios: c.beneficios, comoFunciona: c.comoFunciona, loQueHayQueSaber: c.aTener, enNeix: c.enNeix, datos: c.ficha,
+      argumento: i.pitch, porQueOfrecerlo: i.ventajas, perfiles: i.perfiles, cuandoAparece: i.senales, operativa: i.operativa, teoria: i.teoria, ejemplo: i.ejemplo,
+      relacionados: (i.relacionados || []).filter(id => S.byId[id]).map(id => ({id, nombre: S.byId[id].nombre})), onePager: p.onePager ? "oficial" : p.sinOnePager ? "no tiene" : "automático (armado con la ficha)", simulador: p.simulador || null,
+      vigente: estadoDe(p).txt};
+  }
+  if (nombre === "listar_instructivos") return (S.instructivos || []).filter(x => !x.oculto && instUrl(x)).map(x => ({titulo: x.titulo, tipo: esVideo(instUrl(x)) ? "video" : esArchivoHub(instUrl(x)) ? "PDF" : "link"}));
+  if (nombre === "listar_simuladores") return SIM_BUSCA.map(m => ({nombre: m.t, link: "#sim-" + m.k, sirvePara: m.q}));
+  if (nombre === "buscar_fondos") {
+    if (!S.fondos) { const j = await fetch("data/config/fondos.json").then(r => r.ok ? r.json() : null).catch(() => null); S.fondos = j || {lista: [], tipos: []}; }
+    if (!S.rend || S.rend.error) { try { S.rend = await rdCargar(new Set(S.fondos.lista.map(f => f.cafci).filter(Boolean)), Object.fromEntries(S.fondos.lista.filter(f => f.cafci && f.cafciAnt).map(f => [f.cafci, f.cafciAnt]))); } catch(_) { S.rend = {error: true, r: {}}; } }
+    const pal = sinAcento(inp.texto || "").split(/\s+/).filter(Boolean), tipo = sinAcento(inp.tipo || "");
+    const R = S.rend || {r: {}}, l = S.fondos.lista.filter(f => (!tipo || sinAcento(f.tipo).includes(tipo)) && pal.every(w => sinAcento(f.n + " " + (f.esp || "")).includes(w)))
+      .map(f => { const r = (f.cafci && R.r[f.cafci]) || {}; return {fondo: f.n, tipo: f.tipo, especie: f.esp || "no cotiza en BYMA", moneda: MON_FD[f.mon] || "", rendEnElAnio: r.m, rend3Meses: r.a}; })
+      .sort((a, b) => (b.rend3Meses ?? -1e9) - (a.rend3Meses ?? -1e9)).slice(0, 25);
+    return {fechaDato: R.fecha || null, desdeEnElAnio: R.fYtd || null, desde3Meses: R.f3m || null, fondos: l, nota: "Rendimiento en %; los fondos sin dato no informan a la Cámara de FCI."};
+  }
+  return {error: "Herramienta desconocida"};
+}
+function neiaMd(t){   // markdown mínimo: negrita, links internos o https, listas y saltos de línea
+  let h = esc(t);
+  h = h.replace(/\[([^\]]+)\]\((#[\w-]+|https:\/\/[^\s)]+)\)/g, (m, txt, url) => url.startsWith("#") ? `<a href="${url}" data-neia-link>${txt}</a>` : `<a href="${url}" target="_blank" rel="noopener">${txt}</a>`);
+  h = h.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  h = h.split(/\n{2,}/).map(par => { const ls = par.split("\n"); return ls.every(x => /^\s*[-·•]\s+/.test(x)) ? `<ul>${ls.map(x => `<li>${x.replace(/^\s*[-·•]\s+/, "")}</li>`).join("")}</ul>` : `<p>${ls.join("<br>")}</p>`; }).join("");
+  return h;
+}
+function neiaVista(){   // mensajes visibles: lo que escribe el asesor y el texto final de cada respuesta
+  const out = [];
+  S.neia.api.forEach(m => {
+    if (m.role === "user" && typeof m.content === "string") out.push({rol: "u", t: m.content});
+    if (m.role === "assistant" && Array.isArray(m.content)) { const t = m.content.filter(b => b.type === "text").map(b => b.text).join("\n\n").trim(); if (t) out.push({rol: "a", t}); }
+  });
+  return out;
+}
+function neiaPintar(){
+  let w = $("#neia");
+  if (!w) { w = document.createElement("div"); w.id = "neia"; document.body.appendChild(w); }
+  const N = S.neia, oculto = route() === "ingresar";
+  w.hidden = oculto;
+  if (!N.open) { w.className = "neia-cerrada"; w.innerHTML = `<button class="neia-fab" data-act="neiaAbrir" aria-label="Abrir NEIA, la asistente"><span class="neia-av">N</span>NEIA</button>`; return; }
+  const v = neiaVista();
+  w.className = "neia-abierta";
+  w.innerHTML = `<div class="neia-panel" role="dialog" aria-label="NEIA, la asistente del Hub"><div class="neia-h"><span class="neia-av">N</span><div><b>NEIA</b><span>Asistente del Hub de Productos</span></div>
+      <span class="btn-row"><button class="btn ghost icon" data-act="neiaNueva" title="Conversación nueva" aria-label="Conversación nueva">${ico("_plus")}</button><button class="btn ghost icon" data-act="neiaCerrar" aria-label="Cerrar">✕</button></span></div>
+    <div class="neia-msgs" id="neiaMsgs">${v.length ? "" : `<div class="neia-m a"><p>Hola, soy NEIA. Preguntame por productos, instructivos, simuladores o fondos del Hub.</p><div class="neia-sug">${["¿Qué tenemos para una pyme que cobra con cheques?","Argumento para cauciones","Money market que más rindió en 3 meses","¿Dónde está el instructivo de apertura de cuenta?"].map(s => `<button class="chip" data-act="neiaSug" data-v="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
+      ${v.map(m => `<div class="neia-m ${m.rol}">${m.rol === "a" ? neiaMd(m.t) : `<p>${esc(m.t)}</p>`}</div>`).join("")}
+      ${N.pensando ? `<div class="neia-m a neia-pens"><span></span><span></span><span></span>${N.estado ? `<em>${esc(N.estado)}</em>` : ""}</div>` : ""}
+      ${N.error ? `<div class="neia-m a neia-err"><p>${esc(N.error)}</p></div>` : ""}</div>
+    <form class="neia-in" onsubmit="return false"><textarea class="input" id="neiaTxt" rows="1" placeholder="Preguntale a NEIA…" ${N.pensando ? "disabled" : ""}></textarea><button class="btn primary icon" data-act="neiaEnviar" aria-label="Enviar" ${N.pensando ? "disabled" : ""}>${ico("_send")}</button></form></div>`;
+  const ms = $("#neiaMsgs"); if (ms) ms.scrollTop = ms.scrollHeight;
+  if (!N.pensando) { const t = $("#neiaTxt"); if (t && !esCelular()) t.focus(); }
+}
+const NEIA_ESTADO = {buscar_productos: "Buscando productos…", obtener_ficha: "Leyendo la ficha…", listar_instructivos: "Mirando los instructivos…", listar_simuladores: "Mirando los simuladores…", buscar_fondos: "Buscando fondos y rendimientos…"};
+async function neiaEnviar(texto){
+  const N = S.neia; texto = String(texto || "").trim(); if (!texto || N.pensando) return;
+  N.error = ""; N.api.push({role: "user", content: texto}); N.pensando = true; N.estado = ""; neiaPintar();
+  try {
+    for (let vuelta = 0; vuelta < 8; vuelta++) {
+      const r = await fetch("api/analisis", {method: "POST", credentials: "same-origin", headers: {"Content-Type": "application/json"}, body: JSON.stringify({accion: "neia", messages: N.api})});
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || (r.status === 404 ? "NEIA no está disponible en esta vista." : "No pude responder. Probá de nuevo."));
+      N.api.push({role: "assistant", content: j.content || []});
+      if (j.stop_reason === "refusal") { N.api.pop(); while (N.api.length && N.api[N.api.length - 1].role === "user" && typeof N.api[N.api.length - 1].content !== "string") N.api.splice(-2, 2); N.api.pop(); N.error = "No puedo ayudar con eso."; break; }
+      const usos = (j.content || []).filter(b => b.type === "tool_use");
+      if (j.stop_reason !== "tool_use" || !usos.length) break;
+      N.estado = NEIA_ESTADO[usos[0].name] || "Buscando…"; neiaPintar();
+      const res = await Promise.all(usos.map(async b => { try { return {type: "tool_result", tool_use_id: b.id, content: JSON.stringify(await neiaHerramienta(b.name, b.input))}; } catch(e) { return {type: "tool_result", tool_use_id: b.id, content: "Error al consultar el Hub", is_error: true}; } }));
+      N.api.push({role: "user", content: res});
+    }
+  } catch(e) {
+    N.error = e.message || "No pude responder. Probá de nuevo.";
+    while (N.api.length && !(N.api[N.api.length - 1].role === "assistant" && (N.api[N.api.length - 1].content || []).some(b => b.type === "text"))) { const m = N.api.pop(); if (m.role === "user" && typeof m.content === "string") break; }   // deja la conversación en un estado válido
+  }
+  N.pensando = false; N.estado = ""; neiaGuardar(); neiaPintar();
+}
+
 /* ── Uso del Hub ──
    Cada navegador suma en el teléfono o la compu qué fichas se miran y qué se envía, y lo manda una vez por día
    (así no se gastan las escrituras del plan gratis). Solo totales por producto, sin datos de quién. */
