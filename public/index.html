@@ -2931,7 +2931,7 @@ async function neiaHerramienta(nombre, inp){
   return {error: "Herramienta desconocida"};
 }
 function neiaMd(t){   // markdown mínimo: títulos, negrita, links internos o https, listas, tablas y saltos de línea
-  const inl = x => esc(x).replace(/\[([^\]]+)\]\((#[\w-]+|https:\/\/[^\s)]+)\)/g, (m, txt, url) => url.startsWith("#") ? `<a href="${url}" data-neia-link>${txt}</a>` : `<a href="${url}" target="_blank" rel="noopener">${txt}</a>`).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  const inl = x => esc(x).replace(/\]\(https:\/\/producthubneix\.vercel\.app\/?(#[\w-]+)\)/g, "]($1)").replace(/\[([^\]]+)\]\((#[\w-]+|https:\/\/[^\s)]+)\)/g, (m, txt, url) => url.startsWith("#") ? `<a href="${url}" data-neia-link>${txt}</a>` : `<a href="${url}" target="_blank" rel="noopener">${txt}</a>`).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
   const fila = x => x.trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim());
   const out = []; let lista = null, tabla = null, par = [];
   const cerrar = () => { if (par.length) { out.push(`<p>${par.join("<br>")}</p>`); par = []; } if (lista) { out.push(`<${lista.t}>${lista.i.map(x => `<li>${x}</li>`).join("")}</${lista.t}>`); lista = null; } if (tabla) { const [h, ...rs] = tabla; out.push(`<div class="neia-tw"><table><thead><tr>${h.map(c => `<th>${inl(c)}</th>`).join("")}</tr></thead><tbody>${rs.map(r => `<tr>${r.map(c => `<td>${inl(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`); tabla = null; } };
