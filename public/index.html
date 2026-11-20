@@ -219,6 +219,29 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .uchk input:checked + span i{background:#fff}
 .uchk input:checked + span::after{content:"✓";width:auto;font-size:12px;margin-left:2px}
 .uchk input:focus-visible + span{outline:2px solid var(--focus);outline-offset:2px}
+.ed-tabs{display:flex;flex-wrap:wrap;margin:0 0 16px;position:sticky;top:76px;z-index:5;box-shadow:0 6px 18px -14px rgba(0,0,0,.35)}
+.ed-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start;padding-bottom:90px}.ed-grid.solo{grid-template-columns:minmax(0,760px)}
+.ed-f .ed-ayuda{font-weight:400;color:var(--ink-3)}.ed-f textarea{min-height:84px;resize:vertical}
+.ed-list{display:grid;gap:8px}.ed-row{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:start}.ed-row .ed-n{padding-top:12px}.ed-row .ed-acc{padding-top:4px}.ed-par{display:grid;gap:6px}.ed-par input{font-weight:500}
+.ed-row textarea.ed-ta{field-sizing:content;min-height:44px;height:auto;resize:vertical;line-height:1.45;padding-top:10px;padding-bottom:10px}.ed-row .ed-par textarea.ed-ta{min-height:44px}
+.ed-n{font-size:12px;color:var(--ink-3);text-align:right}.ed-acc{display:flex;gap:2px}.ed-acc .btn{padding:6px 9px}.ed-add{justify-self:start}
+.ed-riesgo{display:inline-flex;flex-wrap:wrap}.ed-riesgo button{font-size:12px}
+.ed-prev{position:sticky;top:140px;max-height:calc(100vh - 160px);overflow:auto;border-radius:var(--r);padding:2px 4px}
+.ed-prev-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.ed-prev-card{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--bg)}
+.ed-prev-hero{background:#262523;color:#F3F0EB;padding:18px 20px}.ed-prev-hero .kicker{font-size:11px;opacity:.8}.ed-prev-hero h2{font-weight:300;font-size:26px;margin:6px 0 8px}.ed-prev-hero p{margin:10px 0 0;color:#CFC6B8;font-size:14px}
+.ed-prev-in{padding:16px;zoom:.82}
+.ed-bar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -10px 24px -18px rgba(0,0,0,.3);padding:12px max(24px,calc((100vw - 1180px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ed-bar #edDirty{color:#A3712A;font-weight:500}
+@media (max-width:1000px){.ed-grid{grid-template-columns:minmax(0,1fr)}.ed-prev{position:static;max-height:none}}
+@media (max-width:900px){.ed-bar{bottom:64px}.ed-tabs{top:56px}}
+.ges-tabs{display:flex;flex-wrap:wrap;margin:0 0 18px}.ges-tabs .pend-n{min-width:18px;height:18px;font-size:11px;padding:0 5px;margin-left:4px}
+.ges-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.ges-tile{display:grid;gap:4px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;cursor:pointer;font:inherit;color:inherit;transition:border-color .15s,box-shadow .15s}
+.ges-tile b{font-size:26px;font-weight:400}.ges-tile .tiny{color:var(--ink-3)}.ges-tile:hover{border-color:var(--ink-3)}
+.ges-tile.alerta b{color:#A3712A}.ges-tile.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.ges-tabla tbody tr[data-href]{cursor:pointer}.ges-tabla tbody tr[data-href]:hover{background:var(--surface-2)}.ges-tabla a{text-decoration:none;color:inherit}.ges-tabla td b{font-weight:500}
+@media (max-width:760px){.ges-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .otros{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 0}.otros .chips{display:flex;flex-wrap:wrap;gap:6px}.otros .chip{display:inline-flex;align-items:center;gap:6px;text-decoration:none}.otros .chip .ico{width:15px;height:15px}
 .optag{font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:4px;padding:2px 6px}
 .upl{display:grid;gap:10px;border:1px dashed var(--line-2);border-radius:10px;padding:12px 14px}
@@ -823,7 +846,12 @@ function volver(){ if (prevRoute !== null) { volviendo = true; history.back(); }
 function route(){ const h = (location.hash || "").slice(1); return (!h || h === "catalogo") ? "soluciones" : h; }
 function go(h){ if (location.hash.slice(1) === h) render(); else location.hash = h; }
 let rutaActual = null;
+window.addEventListener("beforeunload", e => { if (S.ed && S.ed.dirty) { e.preventDefault(); e.returnValue = ""; } });
 window.addEventListener("hashchange", () => {
+  if (S.ed && !location.hash.startsWith("#editar-" + S.ed.id)) {   // salir de la edición con cambios sin guardar
+    if (S.ed.dirty && !confirm("Hay cambios sin guardar en la ficha. ¿Salir igual?")) { history.replaceState(null, "", "#editar-" + S.ed.id); return; }
+    S.ed = null;
+  }
   if (S.envio || $("#shm")) cerrarEnvio();
   if (rutaActual !== null) scrollPos[rutaActual] = window.scrollY;
   const r = route(), y = volviendo ? (scrollPos[r] || 0) : 0;
@@ -1100,45 +1128,77 @@ function operativa(p){
   <div class="panel"><h3>Video o instructivo</h3>${i.video?`<a class="btn" href="${esc(i.video)}" target="_blank" rel="noopener">Abrir material ↗</a>`:`<p class="small muted">Este producto no tiene video propio. Si existe un instructivo, Marketing lo suma desde Editar.</p>`}</div></div>`;
 }
 
-/* ── Editor ── */
-const EDIT_FIELDS = [
- ["Cabecera",[["nombre","Nombre"],["categoria","Tipo"],["unidades","Áreas a las que corresponde","units"],["validador","Validador de negocio"],["vence","Revisar antes de","date"],["fuente","Fuente"]]],
- ["Vista cliente",[["cliente.titular","Titular: qué le resuelve"],["cliente.bajada","Bajada","area"],["cliente.queEs","De qué se trata","area"],["cliente.paraQuien","Para quién es","area"],["cliente.comoFunciona","Cómo funciona (un paso por línea)","list"],["cliente.beneficios","Beneficios (Título | descripción, uno por línea)","pairs"],["cliente.aTener","Lo que tenés que saber (uno por línea)","list"],["cliente.enNeix","En Neix","area"],["cliente.ficha.moneda","Moneda"],["cliente.ficha.plazo","Plazo"],["cliente.ficha.riesgo","Riesgo"],["cliente.ficha.minimo","Monto"],["cliente.ficha.liquidez","Liquidez"],["cliente.ficha.mercado","Dónde opera"]]],
- ["Para el asesor",[["interno.ventajas","Por qué ofrecerlo (Ventaja | detalle, una por línea). Si queda vacío, se muestran los beneficios del cliente","pairs"],["interno.ingreso","Cómo cobramos (opcional)","area"],["interno.perfiles","A quién (uno por línea)","list"],["interno.senales","Cuándo aparece (una por línea)","list"],["interno.preguntas","Qué preguntar (una por línea)","list"],["interno.operativa","Operativa (un paso por línea)","list"],["interno.video","Link a video o instructivo"],["observaciones","Pendientes del relevamiento (uno por línea)","list"]]]
-];
 const getP = (o, path) => path.split(".").reduce((a,k)=>a==null?a:a[k], o);
 function setP(o, path, v){ const ks = path.split("."); let a = o; ks.slice(0,-1).forEach(k=>{ a[k] = a[k] || {}; a = a[k]; }); a[ks[ks.length-1]] = v; }
-function vEditar(id){
-  const p = S.byId[id]; if (!p) return stateMsg("No encontramos esa ficha", "");
-  if (!puedeGestionar()) return stateMsg("Solo Marketing edita las fichas", "Si ves algo para corregir, dejá una nota al validar la ficha.");
-  return `<div class="crumb"><a href="#gestion">Gestión</a><span>/</span><span>${esc(p.nombre)}</span></div><div class="page-head"><div><div class="eyebrow">Editar ficha</div><h1>${esc(p.nombre)}</h1></div>
-  <div class="btn-row"><button class="btn ghost" data-act="prodDel" data-id="${id}">Eliminar producto</button><a class="btn" href="#gestion">Volver a Gestión</a><button class="btn primary" data-act="save" data-id="${id}">Guardar cambios</button></div></div>
-  <form id="editForm" class="stack" onsubmit="return false"><div class="panel"><h3>One pager oficial</h3>${p.onePager
+/* ── Editar ficha ──
+   Formulario por secciones con vista previa en vivo. Se edita una copia (S.ed.p) y se guarda con "Guardar cambios". */
+const ED_SECS = [["cab","Cabecera"],["cli","Para el cliente"],["dat","Datos"],["ase","Para el asesor"],["op","One pager"]];
+const ED = {
+  cab: [["nombre","Nombre","text"],["categoria","Tipo de producto","cat"],["unidades","Áreas a las que corresponde","units"],["validador","Validador de negocio","text","mail de quien valida"],["vence","Revisar antes de","date"],["fuente","Fuente","text","de dónde sale la información"]],
+  cli: [["cliente.titular","Titular","text","qué le resuelve al cliente, en una frase"],["cliente.bajada","Bajada","area"],["cliente.queEs","De qué se trata","area"],["cliente.paraQuien","Para quién es","area"],["cliente.beneficios","Beneficios","pairs"],["cliente.comoFunciona","Cómo funciona","list","Paso"],["cliente.aTener","Lo que tenés que saber","list","Aclaración"],["cliente.enNeix","En Neix","area"]],
+  dat: [["cliente.ficha.moneda","Moneda","text"],["cliente.ficha.plazo","Plazo","text"],["cliente.ficha.riesgo","Riesgo (texto)","text"],["riesgoNivel","Nivel de riesgo","riesgo"],["cliente.ficha.minimo","Monto mínimo","text"],["cliente.ficha.liquidez","Liquidez","text"],["cliente.ficha.mercado","Dónde opera","text"]],
+  ase: [["interno.ventajas","Por qué ofrecerlo","pairs","si queda vacío, se muestran los beneficios del cliente"],["interno.ingreso","Cómo cobramos","area","opcional"],["interno.perfiles","A quién","list","Perfil"],["interno.senales","Cuándo aparece","list","Señal"],["interno.preguntas","Qué preguntar","list","Pregunta"],["interno.operativa","Paso a paso operativo","list","Paso"],["interno.video","Link a video o instructivo","text","https://…"],["observaciones","Pendientes internos","list","Pendiente"]],
+};
+function edEstado(id){
+  if (!S.ed || S.ed.id !== id) { const p = JSON.parse(JSON.stringify(S.byId[id])); ["cliente.beneficios","cliente.comoFunciona","cliente.aTener","interno.ventajas","interno.perfiles","interno.senales","interno.preguntas","interno.operativa","observaciones"].forEach(k => { if (!Array.isArray(getP(p, k))) setP(p, k, []); }); S.ed = {id, p, sec: (S.ed && S.ed.sec) || "cab", dirty: false}; }
+  return S.ed;
+}
+function edCampo([k, l, t, ayuda]){
+  const p = S.ed.p, v = getP(p, k), fid = "ed_" + k.replace(/\./g, "_"), lab = `${esc(l)}${ayuda && t !== "list" ? ` <span class="ed-ayuda">${esc(ayuda)}</span>` : ""}`;
+  if (t === "units") return `<div class="f ed-f"><span>${lab}</span><div class="ed-units">${Object.keys(UNI).map(u => `<label class="uchk" style="--u:${UNI_COLOR[u]}"><input type="checkbox" data-eu="${esc(u)}" ${(v || []).includes(u) ? "checked" : ""}><span><i></i>${esc(u === "Mercado de Capitales" ? "Mesa · Mercado de Capitales" : u)}</span></label>`).join("")}</div></div>`;
+  if (t === "cat") { const cats = CAT_ORDER.concat([...new Set(S.productos.map(x => x.categoria))].filter(c => !CAT_ORDER.includes(c)));
+    return `<label class="f ed-f" for="${fid}">${lab}<select class="input" id="${fid}" data-ek="${k}">${cats.map(c => `<option ${c === v ? "selected" : ""}>${esc(c)}</option>`).join("")}${v && !cats.includes(v) ? `<option selected>${esc(v)}</option>` : ""}</select></label>`; }
+  if (t === "riesgo") return `<div class="f ed-f"><span>${lab}</span><div class="seg ed-riesgo">${[1,2,3,4,5].map(n => `<button type="button" data-act="edRiesgo" data-v="${n}" aria-pressed="${+v === n}">${risk(n)}</button>`).join("")}</div></div>`;
+  if (t === "list" || t === "pairs") {
+    const l2 = v || [], par = t === "pairs";
+    return `<div class="f ed-f"><span>${esc(l)}${ayuda && par ? ` <span class="ed-ayuda">${esc(ayuda)}</span>` : ""}</span><div class="ed-list">${l2.map((it, i) => `<div class="ed-row${par ? " par" : ""}"><span class="ed-n">${i + 1}</span>
+      ${par ? `<span class="ed-par"><input class="input" data-el="${k}" data-i="${i}" data-j="0" value="${esc(it[0] || "")}" placeholder="Título"><textarea class="input ed-ta" data-el="${k}" data-i="${i}" data-j="1" rows="2" placeholder="Descripción">${esc(it[1] || "")}</textarea></span>`
+            : `<textarea class="input ed-ta" data-el="${k}" data-i="${i}" rows="1" placeholder="${esc(ayuda || "")}">${esc(it || "")}</textarea>`}
+      <span class="ed-acc"><button type="button" class="btn ghost icon" data-act="edMov" data-k="${k}" data-i="${i}" data-v="-1" aria-label="Subir" ${i === 0 ? "disabled" : ""}>↑</button><button type="button" class="btn ghost icon" data-act="edMov" data-k="${k}" data-i="${i}" data-v="1" aria-label="Bajar" ${i === l2.length - 1 ? "disabled" : ""}>↓</button><button type="button" class="btn ghost icon" data-act="edDel" data-k="${k}" data-i="${i}" aria-label="Quitar">✕</button></span></div>`).join("")}
+      <button type="button" class="btn ghost ed-add" data-act="edAdd" data-k="${k}" data-v="${t}">${ico("_plus")}Agregar</button></div></div>`;
+  }
+  if (t === "area") return `<label class="f ed-f" for="${fid}">${lab}<textarea class="input" id="${fid}" data-ek="${k}" rows="3">${esc(v || "")}</textarea></label>`;
+  return `<label class="f ed-f" for="${fid}">${lab}<input class="input" id="${fid}" data-ek="${k}" type="${t === "date" ? "date" : "text"}" value="${esc(v || "")}"></label>`;
+}
+function edOnePager(p, id){
+  return `<div class="panel"><h3>One pager oficial</h3>${p.onePager
      ? `<div class="op-file"><button type="button" class="op-file-n" data-act="opVer" data-id="${id}"><span class="op-ic">PDF</span><span><b>${esc(p.onePager.archivo||"One pager.pdf")}</b><small>Cargado el ${fdate(p.onePager.fecha)} · tocá para verlo</small></span></button>
         <span class="btn-row"><button type="button" class="btn" data-act="opVer" data-id="${id}">Ver</button>${S.assets?`<button type="button" class="btn ghost" data-act="opQuitar" data-id="${id}">Eliminar</button>`:""}</span></div>`
-     : (S.assets ? `<p class="small muted" style="margin-bottom:10px">Todavía no tiene el PDF oficial.</p><div class="upl" style="border:0;padding:0"><label class="drop" for="up_pdf" id="dropPdf"><input id="up_pdf" type="file" accept="application/pdf"><span class="op-ic">PDF</span><span class="drop-t"><b id="dropNom">Elegí el PDF del one pager</b><small id="dropSub">o arrastralo acá</small></span><span class="btn drop-b">Buscar archivo</span></label><button class="btn primary" type="button" data-act="upOP" data-id="${id}" id="upBtn" disabled>Subir one pager</button></div>` : `<p class="small muted">Todavía no tiene el PDF oficial.</p>`)}</div>${EDIT_FIELDS.map(([g,fs])=>`<div class="panel"><h3>${g}</h3><div class="stack">${fs.map(([k,l,t])=>{
-    const v = getP(p,k); let val = v;
-    if (t==="list") val = (v||[]).join("\n"); if (t==="pairs") val = (v||[]).map(x=>x.join(" | ")).join("\n");
-    const fid = "ed_"+k.replace(/\./g,"_");
-    if (t === "units") return `<div class="f"><span>${esc(l)}</span><div class="ed-units" data-k="${k}" data-t="units">${Object.keys(UNI).map(u => `<label class="uchk" style="--u:${UNI_COLOR[u]}"><input type="checkbox" value="${esc(u)}" ${(v || []).includes(u) ? "checked" : ""}><span><i></i>${esc(u === "Mercado de Capitales" ? "Mesa · Mercado de Capitales" : u)}</span></label>`).join("")}</div></div>`;
-    return `<label class="f" for="${fid}">${esc(l)}${t==="area"||t==="list"||t==="pairs"?`<textarea class="input" id="${fid}" data-k="${k}" data-t="${t||""}">${esc(val)}</textarea>`:`<input class="input" id="${fid}" data-k="${k}" data-t="${t||""}" type="${t==="date"?"date":"text"}" value="${esc(val)}">`}</label>`; }).join("")}</div></div>`).join("")}</form>`;
+     : (S.assets ? `<p class="small muted" style="margin-bottom:10px">Todavía no tiene el PDF oficial. Mientras tanto, el Hub arma uno con el contenido de la ficha.</p><div class="upl" style="border:0;padding:0"><label class="drop" for="up_pdf" id="dropPdf"><input id="up_pdf" type="file" accept="application/pdf"><span class="op-ic">PDF</span><span class="drop-t"><b id="dropNom">Elegí el PDF del one pager</b><small id="dropSub">o arrastralo acá</small></span><span class="btn drop-b">Buscar archivo</span></label><button class="btn primary" type="button" data-act="upOP" data-id="${id}" id="upBtn" disabled>Subir one pager</button></div>` : `<p class="small muted">Todavía no tiene el PDF oficial.</p>`)}
+    <p class="tiny muted" style="margin:12px 0 0">El one pager se sube y se elimina al momento: no hace falta tocar Guardar cambios.</p></div>`;
+}
+function edPreview(){
+  const E = S.ed, p = Object.assign({}, S.byId[E.id], E.p);
+  if (E.sec === "op") return "";
+  const cuerpo = E.sec === "ase" ? playbook(p) : clienteView(p);
+  return `<div class="ed-prev-h"><span class="eyebrow">Vista previa · ${E.sec === "ase" ? "Para el asesor" : "Para el cliente"}</span><span class="tiny muted">Así la ven los asesores al guardar</span></div>
+    <div class="ed-prev-card"><div class="ed-prev-hero"><span class="kicker">${esc(p.categoria)}</span><h2>${esc(p.nombre)}</h2><span class="units" style="display:flex;gap:4px">${units(p)}</span><p>${esc(p.cliente.titular)}</p></div><div class="ed-prev-in">${cuerpo}</div></div>`;
+}
+function edRefrescar(){ const pv = $("#edPrev"); if (pv) pv.innerHTML = edPreview(); const d = $("#edDirty"); if (d) d.hidden = !S.ed.dirty; }
+function vEditar(id){
+  const base = S.byId[id]; if (!base) return stateMsg("No encontramos esa ficha", "");
+  if (!puedeGestionar()) return stateMsg("Solo Marketing edita las fichas", "Si ves algo para corregir, dejá una nota en la ficha.");
+  const E = edEstado(id), p = E.p, e = estadoDe(base);
+  return `<div class="crumb"><a href="#gestion" data-act="edVolver">Gestión</a><span>/</span><span>${esc(base.nombre)}</span></div>
+  <div class="page-head"><div><div class="eyebrow">Editar ficha</div><h1>${esc(p.nombre || base.nombre)}</h1><p class="muted" style="margin-top:6px"><span class="pill ${e.cls}">${e.txt}</span> <span class="tiny" style="margin-left:6px">Revisar antes del ${fdate(e.vence)}</span></p></div>
+  <div class="btn-row"><a class="btn" href="#p-${id}" target="_blank" rel="noopener">Ver ficha publicada</a><button class="btn ghost" data-act="prodDel" data-id="${id}">Eliminar producto</button></div></div>
+  <div class="seg ed-tabs" role="tablist">${ED_SECS.map(([k, l]) => `<button role="tab" data-act="edSec" data-v="${k}" aria-pressed="${E.sec === k}">${l}</button>`).join("")}</div>
+  <div class="ed-grid${E.sec === "op" ? " solo" : ""}"><form id="editForm" class="stack" onsubmit="return false">
+    ${E.sec === "op" ? edOnePager(base, id) : `<div class="panel stack">${ED[E.sec].map(edCampo).join("")}</div>`}
+  </form>${E.sec === "op" ? "" : `<aside class="ed-prev" id="edPrev">${edPreview()}</aside>`}</div>
+  <div class="ed-bar"><span class="tiny" id="edDirty" ${E.dirty ? "" : "hidden"}>● Cambios sin guardar</span><span class="btn-row"><button class="btn ghost" data-act="edVolver">Volver a Gestión</button><button class="btn primary" data-act="save" data-id="${id}">Guardar cambios</button></span></div>`;
 }
 async function save(id){
-  const p = JSON.parse(JSON.stringify(S.byId[id]));
+  const E = edEstado(id), p = JSON.parse(JSON.stringify(E.p));
   if (p.onePager && p.onePager.repo) delete p.onePager; // el one pager que viene del repo no se copia a la base
-  const un = document.querySelector('#editForm [data-t="units"]');
-  if (un && !un.querySelector("input:checked")) { toast("Elegí al menos un área"); return; }
-  document.querySelectorAll("#editForm [data-k]").forEach(el => {
-    const t = el.dataset.t;
-    if (t === "units") { setP(p, el.dataset.k, Object.keys(UNI).filter(u => el.querySelector(`input[value="${u}"]`).checked)); return; }
-    const raw = el.value; let v = raw.trim();
-    if (t==="list") v = raw.split("\n").map(s=>s.trim()).filter(Boolean);
-    if (t==="pairs") v = raw.split("\n").map(s=>s.trim()).filter(Boolean).map(s=>{ const i = s.indexOf("|"); return i<0 ? [s,""] : [s.slice(0,i).trim(), s.slice(i+1).trim()]; });
-    setP(p, el.dataset.k, v);
-  });
+  const base = S.byId[id]; if (base.onePager && !base.onePager.repo) p.onePager = base.onePager; else if (!base.onePager) delete p.onePager;   // el one pager se maneja aparte
+  p.nombre = String(p.nombre || "").trim(); if (!p.nombre) { toast("La ficha necesita un nombre"); S.ed.sec = "cab"; render(); return; }
+  if (!(p.unidades || []).length) { toast("Elegí al menos un área"); S.ed.sec = "cab"; render(); return; }
+  ["cliente.comoFunciona","cliente.aTener","interno.perfiles","interno.senales","interno.preguntas","interno.operativa","observaciones"].forEach(k => setP(p, k, (getP(p, k) || []).map(x => String(x || "").trim()).filter(Boolean)));
+  ["cliente.beneficios","interno.ventajas"].forEach(k => setP(p, k, (getP(p, k) || []).map(x => [String(x[0] || "").trim(), String(x[1] || "").trim()]).filter(x => x[0] || x[1])));
   p.ultimaRevision = todayISO(); p.editadoEl = new Date().toISOString();
-  const b = document.querySelector('[data-act="save"]'); if (b) { b.disabled = true; b.textContent = "Guardando"; }
-  try { window.neixQue = "editó la ficha"; await S.db.doc("productos/"+id).set(p); toast("Ficha guardada"); go("gestion"); }
+  const b = document.querySelector('.ed-bar [data-act="save"]'); if (b) { b.disabled = true; b.textContent = "Guardando"; }
+  try { window.neixQue = "editó la ficha"; await S.db.doc("productos/"+id).set(p); S.ed = null; toast("Ficha guardada"); go("gestion"); }
   catch(e) { toast(e && e.code === "permission_denied" ? "No tenés permiso para editar fichas" : "No se pudo guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); if (b) { b.disabled = false; b.textContent = "Guardar cambios"; } }
 }
 /* Ver el one pager en una ventana emergente, y eliminarlo para subir otro. */
@@ -2413,28 +2473,38 @@ function usoHTML(){
   }
   return `<details class="fold uso" style="margin-bottom:18px" ${S.usoAbierto ? "open" : ""}><summary>Uso del Hub <span class="tiny muted">qué fichas se miran y qué se envía</span></summary><div class="in">${cuerpo}</div></details>`;
 }
+/* Gestión: pestañas (Fichas · Pendientes · Instructivos · Uso del Hub · Historial). */
+const GES_TABS = [["fichas","Fichas"],["pend","Pendientes"],["inst","Instructivos"],["uso","Uso del Hub"],["hist","Historial"]];
 function vGestion(){
   const rows = S.productos.map(p=>({p, e:estadoDe(p)})).sort((a,b)=>(a.e.d??999)-(b.e.d??999));
-  const n = k => rows.filter(r=>r.e.k===k).length, pronto = rows.filter(r=>r.e.d!==null && r.e.d>=0 && r.e.d<=30).length, obs = rows.reduce((a,r)=>a+r.p.observaciones.length,0);
-  const aviso = S.base === true ? ""
-    : S.base === false ? `<div class="alert warn" style="margin-bottom:16px"><b>Sin base de datos</b>Los cambios de Gestión se ven solo en esta pantalla y se pierden al recargar.</div>` : "";
-  const ocultos = S.ocultos || [];
-  const eliminados = ocultos.length ? `<details class="fold" style="margin-bottom:18px"><summary>Productos eliminados <span class="tiny muted">(${ocultos.length})</span></summary><div class="in stack" style="gap:8px">${ocultos.map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span>${esc(p.nombre)} <span class="tiny muted">· ${esc(p.categoria)}</span></span><button class="btn ghost" data-act="prodRestaurar" data-id="${p.id}">Restaurar</button></div>`).join("")}</div></details>` : "";
-  return `<div class="page-head"><div><div class="eyebrow">Gestión · solo administradores</div><h1>Vigencia de las fichas</h1>
-  <p class="muted">Cada ficha tiene un validador de negocio y una fecha de revisión. Cuando vence, el Hub la marca para que nadie envíe información desactualizada.</p></div></div>
-  ${aviso}<div class="tiles">${stat("Validadas", n("validado"))}${stat("A validar", n("a_validar"))}${stat("Vencen en 30 días", pronto)}${stat("Vencidas", n("vencida"), n("vencida")>0)}${stat("Con one pager oficial", S.productos.filter(p=>p.onePager).length + " de " + S.productos.length)}${stat("Pendientes del relevamiento", obs)}</div>
-  ${pendientesHTML(rows)}
-  <div class="btn-row" style="margin-bottom:18px"><button class="btn primary" data-act="prodNuevo">${ico("_plus")}Nuevo producto</button></div>
-  ${usoHTML()}${historialHTML()}${eliminados}${instEditorHTML()}
-  <div class="search ges-search">${ico("_search")}<input class="input" id="ges_q" type="search" placeholder="Buscá una ficha por nombre, categoría o área" value="${esc(S.gesQ||"")}" aria-label="Buscar fichas" autocomplete="off"></div>
-  <div class="tw"><table class="ges-tabla"><thead><tr><th>Ficha</th><th>Tipo</th><th>Unidades</th><th>Estado</th><th>One pager</th><th>Revisar antes</th><th>Última modificación</th><th></th></tr></thead><tbody>
-  ${rows.map(({p,e})=>{ const c = ultimoCambio(p.id); return `<tr data-q="${esc(sinAcento([p.nombre, p.categoria, p.unidades.join(" "), p.unidades.map(u=>UNI[u]||"").join(" "), e.txt, c ? nombreDe(c) : ""].join(" ")))}"><td><a href="#editar-${p.id}">${esc(p.nombre)}</a></td><td class="muted">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">${fdate(p.onePager.fecha)}</span>`:`<span class="tiny muted">Falta</span>`}</td><td class="num">${fdate(e.vence)}</td><td>${c ? `<span class="small">${esc(nombreDe(c))}</span><br><span class="tiny muted">${fechaHora(c.fecha)}</span>` : `<span class="tiny muted">Sin cambios</span>`}</td><td><a href="#editar-${p.id}">Editar</a></td></tr>`; }).join("")}
-  <tr class="ges-nada" hidden><td colspan="8" class="muted small">No hay fichas con esa búsqueda.</td></tr></tbody></table></div>`;
+  const tab = S.gesTab || "fichas", nPend = pendientes(rows).total;
+  const aviso = S.base === false ? `<div class="alert warn" style="margin-bottom:16px"><b>Sin base de datos</b>Los cambios de Gestión se ven solo en esta pantalla y se pierden al recargar.</div>` : "";
+  let cuerpo = "";
+  if (tab === "fichas") {
+    const n = k => rows.filter(r=>r.e.k===k).length, pronto = rows.filter(r=>r.e.d!==null && r.e.d<=30).length, sinOp = rows.filter(r=>!r.p.onePager && !r.p.sinOnePager).length, F = S.gesF || "";
+    const tile = (k, l, v, sub, alerta) => `<button class="ges-tile${F === k ? " on" : ""}${alerta ? " alerta" : ""}" data-act="gesF" data-v="${k}" aria-pressed="${F === k}"><span class="eyebrow">${l}</span><b class="num">${v}</b><span class="tiny">${sub}</span></button>`;
+    const ocultos = S.ocultos || [];
+    cuerpo = `<div class="ges-tiles">${tile("validado","Validadas",n("validado"),"de " + rows.length + " fichas")}${tile("a_validar","A validar",n("a_validar"),"sin validación vigente", n("a_validar") > 0)}${tile("pronto","Vencen pronto",pronto,"vencidas o en 30 días", pronto > 0)}${tile("sinop","Sin one pager",sinOp,"usan el automático")}</div>
+    <div class="search ges-search">${ico("_search")}<input class="input" id="ges_q" type="search" placeholder="Buscá una ficha por nombre, tipo, área o quién la modificó" value="${esc(S.gesQ||"")}" aria-label="Buscar fichas" autocomplete="off"></div>
+    <div class="panel" style="padding:0;overflow:hidden"><div class="tw"><table class="ges-tabla"><thead><tr><th>Ficha</th><th>Tipo</th><th>Áreas</th><th>Estado</th><th>One pager</th><th>Revisar antes</th><th>Última modificación</th></tr></thead><tbody>
+    ${rows.map(({p,e})=>{ const c = ultimoCambio(p.id); return `<tr data-q="${esc(sinAcento([p.nombre, p.categoria, p.unidades.join(" "), p.unidades.map(u=>UNI[u]||"").join(" "), e.txt, c ? nombreDe(c) : ""].join(" ")))}" data-k="${e.k}" data-pronto="${e.d!==null && e.d<=30 ? 1 : 0}" data-op="${p.onePager || p.sinOnePager ? 1 : 0}" data-href="#editar-${p.id}"><td><a href="#editar-${p.id}"><b>${esc(p.nombre)}</b></a></td><td class="muted small">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">Oficial</span>`:p.sinOnePager?`<span class="tiny muted">No lleva</span>`:`<span class="tiny muted">Automático</span>`}</td><td class="num small">${fdate(e.vence)}</td><td>${c ? `<span class="small">${esc(nombreDe(c))}</span><br><span class="tiny muted">${fechaHora(c.fecha)}</span>` : `<span class="tiny muted">Sin cambios</span>`}</td></tr>`; }).join("")}
+    <tr class="ges-nada" hidden><td colspan="7" class="muted small">No hay fichas con esa búsqueda o filtro.</td></tr></tbody></table></div></div>
+    ${ocultos.length ? `<details class="fold" style="margin-top:16px"><summary>Productos eliminados <span class="tiny muted">(${ocultos.length})</span></summary><div class="in stack" style="gap:8px">${ocultos.map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span>${esc(p.nombre)} <span class="tiny muted">· ${esc(p.categoria)}</span></span><button class="btn ghost" data-act="prodRestaurar" data-id="${p.id}">Restaurar</button></div>`).join("")}</div></details>` : ""}`;
+  } else if (tab === "pend") cuerpo = pendientesHTML(rows);
+  else if (tab === "inst") cuerpo = instEditorHTML();
+  else if (tab === "uso") { S.usoAbierto = true; cuerpo = usoHTML(); }
+  else cuerpo = historialHTML(true) || `<div class="empty">Todavía no hay cambios registrados.</div>`;
+  return `<div class="page-head"><div><div class="eyebrow">Gestión · Marketing y administradores</div><h1>Gestión del Hub</h1>
+  <p class="muted">Fichas, one pagers, instructivos y lo que piden los asesores.</p></div>
+  <div class="btn-row"><button class="btn primary" data-act="prodNuevo">${ico("_plus")}Nuevo producto</button></div></div>
+  ${aviso}<div class="seg ges-tabs" role="tablist">${GES_TABS.map(([k, l]) => `<button role="tab" data-act="gesTab" data-v="${k}" aria-pressed="${tab === k}">${l}${k === "pend" && nPend ? ` <span class="pend-n">${nPend}</span>` : ""}${k === "fichas" ? ` <span class="tiny muted">${rows.length}</span>` : ""}</button>`).join("")}</div>
+  <div class="ges-body">${cuerpo}</div>`;
 }
 /* Buscador de Gestión: filtra la tabla sin volver a dibujarla (no se pierde el cursor). */
 function gesFiltrar(){
   const q = sinAcento((S.gesQ || "").trim()), t = $(".ges-tabla"); if (!t) return;
-  let vis = 0; t.querySelectorAll("tbody tr[data-q]").forEach(tr => { const ok = !q || q.split(/\s+/).every(w => tr.dataset.q.includes(w)); tr.hidden = !ok; if (ok) vis++; });
+  const F = S.gesF || "", pasa = tr => !F || (F === "pronto" ? tr.dataset.pronto === "1" : F === "sinop" ? tr.dataset.op === "0" : tr.dataset.k === F);
+  let vis = 0; t.querySelectorAll("tbody tr[data-q]").forEach(tr => { const ok = pasa(tr) && (!q || q.split(/\s+/).every(w => tr.dataset.q.includes(w))); tr.hidden = !ok; if (ok) vis++; });
   const n = t.querySelector(".ges-nada"); if (n) n.hidden = vis > 0;
 }
 
@@ -2603,15 +2673,16 @@ window.neixCambio = c => { S.cambios.unshift(c); };
 const fechaHora = iso => iso ? new Date(iso).toLocaleString("es-AR", {day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit", hour12:false, timeZone:"America/Argentina/Buenos_Aires"}).replace(",", " ·") + " hs" : "";
 const nombreDe = c => c.nombre || ((S.asesores||[]).find(a => a.mail === c.quien) || {}).nombre || c.quien || "";
 const ultimoCambio = id => S.cambios.find(c => c.id === id && c.col !== "config") || null;
-function historialHTML(){
+function historialHTML(abierto){
   if (!S.cambios.length) return "";
   const que = c => c.que || (c.col === "validaciones" ? "validó" : "editó");
-  return `<details class="fold" style="margin-bottom:18px"><summary>Historial de cambios <span class="tiny muted">(${S.cambios.length})</span></summary><div class="in"><div class="tw"><table class="hist"><thead><tr><th>Fecha y hora</th><th>Quién</th><th>Qué</th><th>Ficha</th></tr></thead><tbody>
+  return `<details class="fold" style="margin-bottom:18px" ${abierto ? "open" : ""}><summary>Historial de cambios <span class="tiny muted">(${S.cambios.length})</span></summary><div class="in"><div class="tw"><table class="hist"><thead><tr><th>Fecha y hora</th><th>Quién</th><th>Qué</th><th>Ficha</th></tr></thead><tbody>
    ${S.cambios.slice(0, 50).map(c => `<tr><td class="num">${fechaHora(c.fecha)}</td><td>${esc(nombreDe(c))}</td><td>${esc(que(c))}</td><td>${c.col === "config" ? "Instructivos generales" : `<a href="#editar-${esc(c.id)}">${esc((S.byId[c.id] || (S.ocultos || []).find(x => x.id === c.id) || {}).nombre || c.id)}</a>`}</td></tr>`).join("")}</tbody></table></div></div></details>`;
 }
 
 /* ── Eventos ── */
 document.addEventListener("click", e => {
+  const fila = e.target.closest(".ges-tabla tr[data-href]"); if (fila && !e.target.closest("a,button")) { location.hash = fila.dataset.href; return; }
   const b = e.target.closest("[data-act]"); if (!b) return;
   const a = b.dataset.act, v = b.dataset.v, id = b.dataset.id;
   if (a==="fUnidad"||a==="fCat") { S[a] = S[a]===v && v ? "" : v; render(); }
@@ -2664,6 +2735,14 @@ document.addEventListener("click", e => {
   else if (a==="validar") validar(id);
   else if (a==="notaMkt") notaMkt(id);
   else if (a==="save") save(id);
+  else if (a==="gesTab") { S.gesTab = v; render(); }
+  else if (a==="gesF") { S.gesF = S.gesF === v ? "" : v; document.querySelectorAll(".ges-tile").forEach(x => { const on = x.dataset.v === S.gesF; x.classList.toggle("on", on); x.setAttribute("aria-pressed", String(on)); }); gesFiltrar(); }
+  else if (a==="edSec") { S.ed.sec = v; render(); window.scrollTo({top: Math.min(window.scrollY, ($(".ed-tabs") || {offsetTop: 0}).offsetTop - 80)}); }
+  else if (a==="edAdd") { const l = getP(S.ed.p, b.dataset.k) || []; l.push(v === "pairs" ? ["", ""] : ""); setP(S.ed.p, b.dataset.k, l); S.ed.dirty = true; render(); const ins = document.querySelectorAll(`[data-el="${b.dataset.k}"]`); const last = ins[v === "pairs" ? ins.length - 2 : ins.length - 1]; if (last) last.focus(); }
+  else if (a==="edDel") { const l = getP(S.ed.p, b.dataset.k) || []; l.splice(+b.dataset.i, 1); S.ed.dirty = true; render(); }
+  else if (a==="edMov") { const l = getP(S.ed.p, b.dataset.k) || [], i = +b.dataset.i, j = i + (+v); if (j >= 0 && j < l.length) { [l[i], l[j]] = [l[j], l[i]]; S.ed.dirty = true; render(); } }
+  else if (a==="edRiesgo") { S.ed.p.riesgoNivel = +v; S.ed.dirty = true; render(); }
+  else if (a==="edVolver") { e.preventDefault(); if (S.ed && S.ed.dirty && !confirm("Hay cambios sin guardar. ¿Salir igual?")) return; S.ed = null; go("gestion"); }
   else if (a==="enviarLink") enviarLink(b);
   else if (a==="ingOtra") { S.ing = {}; render(); }
   else if (a==="completarLink") completarLink(b);
@@ -2685,6 +2764,13 @@ document.addEventListener("click", e => {
   else if (a==="simset") { S.simv[S.sim][b.dataset.k] = v; $("#simForm").innerHTML = simForm(); calcSim(); }
 });
 document.addEventListener("input", e => {
+  const te = e.target;
+  if (S.ed && te.dataset && (te.dataset.ek || te.dataset.el)) {   // edición de ficha: actualiza la copia y la vista previa
+    if (te.dataset.ek) setP(S.ed.p, te.dataset.ek, te.value);
+    else { const l = getP(S.ed.p, te.dataset.el) || [], i = +te.dataset.i; if (te.dataset.j !== undefined) { l[i] = l[i] || ["", ""]; l[i][+te.dataset.j] = te.value; } else l[i] = te.value; setP(S.ed.p, te.dataset.el, l); }
+    if (te.dataset.ek === "nombre") { const h = $(".page-head h1"); if (h) h.textContent = te.value || "Sin nombre"; }
+    S.ed.dirty = true; clearTimeout(S._edT); S._edT = setTimeout(edRefrescar, 200); return;
+  }
   const t = e.target;
   if (t.id==="q") { S.q = t.value; const pos = t.selectionStart; render(); const n = $("#q"); if (n) { n.focus(); try { n.setSelectionRange(pos,pos); } catch(_){} } }
   else if (t.dataset.s === "asesor" && S.sim === "cpd") { const v = S.simv.cpd, a = findAsesor(t.value); v.asesor = t.value;
@@ -2719,6 +2805,7 @@ function pdfElegido(f){
 document.addEventListener("change", e => {
   const t = e.target;
   if (t.id === "up_pdf") { pdfElegido(t.files[0]); return; }
+  if (t.dataset && t.dataset.eu && S.ed) { const u = new Set(S.ed.p.unidades || []); t.checked ? u.add(t.dataset.eu) : u.delete(t.dataset.eu); S.ed.p.unidades = Object.keys(UNI).filter(x => u.has(x)); S.ed.dirty = true; edRefrescar(); return; }
   if ((t.id === "shDoc" || t.id === "shPres") && S.envio && S.envio.tipo === "prop") { S.envio.sel[t.id === "shDoc" ? "doc" : "pres"] = t.checked; propListo(); return; }
   if (t.dataset.instpdf !== undefined) { instSubirPdf(+t.dataset.instpdf, t.files[0]); return; }
   if (t.id==="fEstado") { S.fEstado = t.value; render(); }
