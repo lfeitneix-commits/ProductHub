@@ -243,9 +243,9 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .ges-tabla tbody tr[data-href]{cursor:pointer}.ges-tabla tbody tr[data-href]:hover{background:var(--surface-2)}.ges-tabla a{text-decoration:none;color:inherit}.ges-tabla td b{font-weight:500}
 @media (max-width:760px){.ges-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 #neia{position:fixed;right:20px;bottom:20px;z-index:60}
-.neia-fab{display:inline-flex;align-items:center;gap:9px;border:0;border-radius:999px;background:#232323;color:#F3F0EB;padding:8px 18px 8px 8px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
+.neia-fab{display:inline-flex;align-items:center;gap:9px;border:0;border-radius:999px;background:#232323;color:#F3F0EB;padding:11px 18px 11px 14px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
 .neia-fab:hover{background:#000}
-.neia-av{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#AB1930,#6E0F1F);color:#fff;font-weight:700;font-size:14px;flex:none}
+.neia-av{width:18px;height:18px;flex:none;color:#E9DFCF}
 .neia-panel{width:min(400px,calc(100vw - 24px));height:min(600px,calc(100vh - 110px));display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px -20px rgba(0,0,0,.45);overflow:hidden}
 .neia-h{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 14px;background:#232323;color:#F3F0EB}.neia-h>div{flex:1;display:grid}.neia-h b{font-size:15px}.neia-h span{font-size:12px;color:#CFC6B8}.neia-h .btn{color:#F3F0EB}
 .neia-msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
@@ -2944,10 +2944,10 @@ function neiaPintar(){
   if (!w) { w = document.createElement("div"); w.id = "neia"; document.body.appendChild(w); }
   const N = S.neia, oculto = route() === "ingresar";
   w.hidden = oculto;
-  if (!N.open) { w.className = "neia-cerrada"; w.innerHTML = `<button class="neia-fab" data-act="neiaAbrir" aria-label="Abrir NEIA, la asistente"><span class="neia-av">N</span>NEIA</button>`; return; }
+  if (!N.open) { w.className = "neia-cerrada"; w.innerHTML = `<button class="neia-fab" data-act="neiaAbrir" aria-label="Abrir NEIA, la asistente"><svg class="neia-av" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c.5 4.6 2.9 7 7.5 7.5-4.6.5-7 2.9-7.5 7.5-.5-4.6-2.9-7-7.5-7.5 4.6-.5 7-2.9 7.5-7.5z"/><path d="M19 15.5c.2 1.8 1.1 2.7 2.9 2.9-1.8.2-2.7 1.1-2.9 2.9-.2-1.8-1.1-2.7-2.9-2.9 1.8-.2 2.7-1.1 2.9-2.9z" opacity=".6"/></svg>NEIA</button>`; return; }
   const v = neiaVista();
   w.className = "neia-abierta";
-  w.innerHTML = `<div class="neia-panel" role="dialog" aria-label="NEIA, la asistente del Hub"><div class="neia-h"><span class="neia-av">N</span><div><b>NEIA</b><span>Asistente del Hub de Productos</span></div>
+  w.innerHTML = `<div class="neia-panel" role="dialog" aria-label="NEIA, la asistente del Hub"><div class="neia-h"><svg class="neia-av" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c.5 4.6 2.9 7 7.5 7.5-4.6.5-7 2.9-7.5 7.5-.5-4.6-2.9-7-7.5-7.5 4.6-.5 7-2.9 7.5-7.5z"/><path d="M19 15.5c.2 1.8 1.1 2.7 2.9 2.9-1.8.2-2.7 1.1-2.9 2.9-.2-1.8-1.1-2.7-2.9-2.9 1.8-.2 2.7-1.1 2.9-2.9z" opacity=".6"/></svg><div><b>NEIA</b><span>Asistente del Hub de Productos</span></div>
       <span class="btn-row"><button class="btn ghost icon" data-act="neiaNueva" title="Conversación nueva" aria-label="Conversación nueva">${ico("_plus")}</button><button class="btn ghost icon" data-act="neiaCerrar" aria-label="Cerrar">✕</button></span></div>
     <div class="neia-msgs" id="neiaMsgs">${v.length ? "" : `<div class="neia-m a"><p>Hola, soy NEIA. Preguntame por productos, instructivos, simuladores o fondos del Hub.</p><div class="neia-sug">${["¿Qué tenemos para una pyme que cobra con cheques?","Argumento para cauciones","Money market que más rindió en 3 meses","¿Dónde está el instructivo de apertura de cuenta?"].map(s => `<button class="chip" data-act="neiaSug" data-v="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`}
       ${v.map(m => `<div class="neia-m ${m.rol}">${m.rol === "a" ? neiaMd(m.t) : `<p>${esc(m.t)}</p>`}</div>`).join("")}
