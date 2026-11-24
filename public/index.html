@@ -235,7 +235,8 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .ed-bar #edDirty{color:#A3712A;font-weight:500}
 @media (max-width:1000px){.ed-grid{grid-template-columns:minmax(0,1fr)}.ed-prev{position:static;max-height:none}}
 @media (max-width:900px){.ed-bar{bottom:64px}.ed-tabs{top:56px}}
-.ges-tabs{display:flex;flex-wrap:wrap;margin:0 0 18px}.ges-tabs .pend-n{min-width:18px;height:18px;font-size:11px;padding:0 5px;margin-left:4px}
+.ges-tabs{display:flex;flex-wrap:nowrap;margin:0 0 18px}.ges-tabs button{flex:1 1 0;display:inline-flex;align-items:center;justify-content:center;gap:2px}
+@media (max-width:700px){.ges-tabs{overflow-x:auto;scrollbar-width:none}.ges-tabs button{flex:1 0 auto}}.ges-tabs .pend-n{min-width:18px;height:18px;font-size:11px;padding:0 5px;margin-left:4px}
 .ges-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
 .ges-tile{display:grid;gap:4px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;cursor:pointer;font:inherit;color:inherit;transition:border-color .15s,box-shadow .15s}
 .ges-tile b{font-size:26px;font-weight:400}.ges-tile .tiny{color:var(--ink-3)}.ges-tile:hover{border-color:var(--ink-3)}
