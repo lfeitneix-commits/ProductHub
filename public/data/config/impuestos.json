@@ -1226,6 +1226,156 @@
         ]
       ],
       "nombre": "Títulos públicos en dólares"
+    },
+    "adr": {
+      "nombre": "ADR (activo subyacente de emisor del país)",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Dividendos",
+          "No computable",
+          "No gravado",
+          "N/A",
+          "N/A",
+          "No gravado"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "Exento",
+          "N/A",
+          "N/A",
+          "No gravado"
+        ],
+        [
+          "Persona física",
+          "Dividendos",
+          "Gravado al 7%",
+          "No gravado",
+          "N/A",
+          "No computable",
+          "No gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Gravado al 15%",
+          "Exento",
+          "N/A",
+          "No computable",
+          "No gravado"
+        ],
+        [
+          "Beneficiario del exterior",
+          "Dividendos",
+          "Gravado al 7%",
+          "No gravado",
+          "N/A",
+          "No computable",
+          "No gravado"
+        ],
+        [
+          "Beneficiario del exterior",
+          "Venta",
+          "Exento",
+          "Exento",
+          "N/A",
+          "No computable",
+          "No gravado"
+        ]
+      ]
+    },
+    "tp_brasil_bolivia": {
+      "nombre": "Títulos públicos de Brasil y Bolivia",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta por intereses",
+          "No gravado (Brasil y Bolivia)",
+          "No gravado",
+          "N/A",
+          "N/A",
+          "No gravado"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "Gravado Brasil, no gravado Bolivia",
+          "No gravado",
+          "N/A",
+          "N/A",
+          "No gravado"
+        ],
+        [
+          "Persona física",
+          "Renta por intereses",
+          "No gravado (Brasil y Bolivia)",
+          "No gravado",
+          "N/A",
+          "Gravado Brasil, no gravado Bolivia",
+          "No gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Gravado Brasil, no gravado Bolivia",
+          "No gravado",
+          "N/A",
+          "Gravado Brasil, no gravado Bolivia",
+          "No gravado"
+        ],
+        [
+          "Beneficiario del exterior",
+          "Renta por intereses",
+          "Según legislación del país",
+          "No gravado",
+          "N/A",
+          "Según legislación del país",
+          "No gravado"
+        ],
+        [
+          "Beneficiario del exterior",
+          "Venta",
+          "Según legislación del país",
+          "No gravado",
+          "N/A",
+          "Según legislación del país",
+          "No gravado"
+        ]
+      ]
+    },
+    "cripto": {
+      "nombre": "Monedas digitales",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "No gravado",
+          "N/A",
+          "N/A",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Gravado al 15%",
+          "No gravado",
+          "N/A",
+          "Gravado",
+          "Habitualista: gravado"
+        ],
+        [
+          "Beneficiario del exterior",
+          "Venta",
+          "N/A",
+          "No gravado",
+          "N/A",
+          "Responsable sustituto",
+          "Habitualista: gravado"
+        ]
+      ]
     }
   }
 }

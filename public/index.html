@@ -256,6 +256,16 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .neia-m h5{margin:8px 0 2px;font-size:13.5px;font-weight:700}.neia-m h5:first-child{margin-top:0}.neia-m ol{padding-left:20px;margin:6px 0 0}.neia-m ol+p,.neia-m ul+p,.neia-tw+p{margin-top:6px}
 .neia-tw{overflow-x:auto;margin-top:6px}.neia-m table{border-collapse:collapse;font-size:12.5px;width:100%}.neia-m th,.neia-m td{border-bottom:1px solid var(--line);padding:5px 8px 5px 0;text-align:left;vertical-align:top}.neia-m th{font-weight:600;color:var(--ink-2)}
 .neia-fu{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--ink-3)}.neia-fu a{color:var(--ink-2);font-weight:400}
+.imp-s{scroll-margin-top:84px;margin-top:34px;padding-top:26px;border-top:1px solid var(--line)}.imp-s .imp-h{margin-bottom:14px}
+.imp-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.imp-h h3{margin:0}
+.imp-ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}.imp-ctl .input{flex:1;min-width:200px;max-width:340px}
+.imp-t td{vertical-align:middle}.imp-t td:first-child{min-width:150px}.imp-full td:first-child{min-width:240px}.imp-full td:first-child b{font-weight:500}
+.imp-g td{background:var(--surface-2);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding-top:7px;padding-bottom:7px}
+.imp-v{display:inline-block;font-size:12px;line-height:1.35;padding:2px 8px;border-radius:999px;white-space:normal}
+.imp-v.ok{background:#E5F0E8;color:#1F5A32}.imp-v.gv{background:#F6E9D9;color:#7A4A14}.imp-v.nt{background:var(--surface-2);color:var(--ink-2)}
+.imp-2{display:flex;align-items:center;gap:6px;margin:2px 0}.imp-2 em{font-style:normal;font-size:11px;color:var(--ink-3);min-width:52px}
+@media (max-width:700px){.imp-full td:first-child{min-width:150px}.imp-t td:first-child{min-width:120px}}
+.imp-i+.imp-i{margin-top:14px}.imp-det{margin-top:12px;background:var(--surface)}.imp-tit{display:block;font-size:13px;font-weight:600;margin-bottom:6px}.imp-nota{margin:10px 0 0}
 .neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
 .neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
 @keyframes neiaP{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
@@ -896,7 +906,7 @@ function render(anim){
   else if (r === "soluciones") html = vSoluciones();
   else if (r.startsWith("p-")) { html = vProducto(r.slice(2)); if (S._vista !== r) { S._vista = r; uso(r.slice(2), "v"); } }
   else if (r.startsWith("editar-")) html = vEditar(r.slice(7));
-  else if (r === "instructivos") html = vInstructivos();   // "cliente" queda guardado (vCliente) para cuando se conecten las tenencias
+  else if (r === "instructivos" || r === "impuestos") html = vInstructivos();   // "cliente" queda guardado (vCliente) para cuando se conecten las tenencias
   else if (r === "simuladores") html = vSimuladores();
   else if (r === "propuesta") html = vPropuesta();
   else if (r === "presentaciones") html = vPresentaciones();
@@ -908,6 +918,9 @@ function render(anim){
   if (r === "propuesta") refreshPreview();
   if (r === "presentaciones") { refreshDeck(); pzFiltrar(); }
   if (r === "gestion") gesFiltrar();
+  if (r === "instructivos" || r === "impuestos") impFiltrar();
+  if (r === "impuestos" && !S._impScroll && S.imp && $("#impuestos")) { S._impScroll = true; requestAnimationFrame(() => { const el = $("#impuestos"); if (el) el.scrollIntoView({block: "start"}); }); }
+  if (r !== "impuestos") S._impScroll = false;
   if (!r.startsWith("p-")) S._vista = "";
   neiaPintar();
   if ($("#fd_q")) { fondosFiltrar(); if (S.fdAbiertos) document.querySelectorAll(".fds-g").forEach(g => { if (S.fdAbiertos.includes(g.dataset.tipo)) g.open = true; }); }
@@ -953,8 +966,9 @@ function otrosResultadosHTML(){
   const pal = q.split(/\s+/), ok = txt => pal.every(w => sinAcento(txt).includes(w));
   const inst = (S.instructivos || []).map((x, i) => ({x, i, u: instUrl(x)})).filter(o => !o.x.oculto && o.u && ok(o.x.titulo || ""));
   const sims = SIM_BUSCA.filter(m => ok(m.t + " " + m.q));
+  if (/impuest|ganancia|bienes person|iibb|ingresos brutos|\biva\b|tribut|eficiencia|fiscal/.test(q)) sims.push({k: "", t: "Eficiencia impositiva", href: "#impuestos"});
   if (!inst.length && !sims.length) return "";
-  return `<div class="otros"><span class="tiny muted">También encontramos</span><div class="chips">${inst.map(o => `<a class="chip" href="${esc(o.u)}" ${esVideo(o.u) || esArchivoHub(o.u) ? `data-act="instVer" data-v="${o.i}"` : `target="_blank" rel="noopener"`}>${ico("_inst")}${esc(o.x.titulo)}</a>`).join("")}${sims.map(m => `<a class="chip" href="#simuladores" data-act="openSim" data-v="${m.k}">${ico("_sim")}Simulador: ${esc(m.t)}</a>`).join("")}</div></div>`;
+  return `<div class="otros"><span class="tiny muted">También encontramos</span><div class="chips">${inst.map(o => `<a class="chip" href="${esc(o.u)}" ${esVideo(o.u) || esArchivoHub(o.u) ? `data-act="instVer" data-v="${o.i}"` : `target="_blank" rel="noopener"`}>${ico("_inst")}${esc(o.x.titulo)}</a>`).join("")}${sims.map(m => m.href ? `<a class="chip" href="${m.href}">${ico("_doc")}${esc(m.t)}</a>` : `<a class="chip" href="#simuladores" data-act="openSim" data-v="${m.k}">${ico("_sim")}Simulador: ${esc(m.t)}</a>`).join("")}</div></div>`;
 }
 function vSoluciones(){
   const list = filtrar();
@@ -1137,11 +1151,11 @@ function playbook(p){
    <div class="panel"><h3>Por qué ofrecerlo</h3><div class="vent">${ventajas(p).map(b=>`<div><b>${esc(b[0])}</b>${b[1]?`<span>${esc(b[1])}</span>`:""}</div>`).join("")}</div>
     <div class="keyfacts">${[["Moneda",f.moneda],["Plazo",f.plazo],["Monto",f.minimo],["Liquidez",f.liquidez],["Opera en",f.mercado]].map(([k,v])=>`<span><b>${k}</b> ${esc(v)}</span>`).join("")}<span><b>Riesgo</b> ${risk(p.riesgoNivel)} ${esc(RISK_TXT[p.riesgoNivel])}</span></div></div>
    ${i.ingreso?`<div class="cobro"><span class="eyebrow">Cómo cobramos</span><p style="margin-top:4px">${esc(i.ingreso)}</p></div>`:""}
-   ${teoriaHTML(i)}${p.id === "fci" ? fondosHTML() : ""}
+   ${teoriaHTML(i)}${p.id === "fci" ? fondosHTML() : ""}${impProductoHTML(p)}
    <div class="pb3"><div class="panel"><h3>A quién</h3>${li(i.perfiles)}</div><div class="panel"><h3>Cuándo aparece</h3>${li(i.senales)}</div><div class="panel"><h3>Qué preguntar</h3>${li(i.preguntas)}</div></div>
    <div class="pb2"><div class="panel"><h3>Se combina con</h3><div class="rel">${i.relacionados.map(id=>S.byId[id]?`<a class="chip" href="#p-${id}">${esc(S.byId[id].nombre)}</a>`:"").join("")}</div></div>
     <div class="panel"><h3>Encaje</h3><dl class="kv"><dt>Clientes</dt><dd>${p.match.tipos.map(t=>TIPO[t]).join(", ")}</dd><dt>Objetivos</dt><dd>${p.match.objetivos.map(o=>OBJ[o]).join(", ")}</dd><dt>Mínimo</dt><dd>${p.match.minimoUSD?usd(p.match.minimoUSD):"Sin mínimo relevante"}</dd></dl></div></div>
-   ${p.impuestos.length&&S.imp?`<details class="fold" style="background:var(--surface)"><summary>Matriz impositiva completa</summary><div class="in">${p.impuestos.map(k=>taxTable(k,null,false)).join("")}<p class="tiny muted" style="margin-top:6px">Fuente: ${esc(S.imp.fuente)}.</p></div></details>`:""}
+
   </div>`;
 }
 function operativa(p){
@@ -2604,7 +2618,8 @@ function vInstructivos(){
   return `<div class="page-head"><div><div class="eyebrow">Instructivos</div><h1>Instructivos generales</h1>
    <p class="muted">Videos y guías para acompañar al cliente: abrir la cuenta, operar, ver su resumen y sus movimientos, recuperar la contraseña y dar de alta su empresa.</p></div></div>
    ${l.length ? `<div class="inst-grid">${l.map(tarjeta).join("")}</div>` : `<div class="empty">Todavía no hay instructivos cargados.${puedeGestionar() ? ` Cargalos desde <a href="#gestion">Gestión</a>.` : ""}</div>`}
-   ${puedeGestionar() ? `<p class="tiny muted" style="margin-top:14px">Los títulos, links y PDF se editan en <a href="#gestion">Gestión</a>.</p>` : ""}`;
+   ${puedeGestionar() ? `<p class="tiny muted" style="margin-top:14px">Los títulos, links y PDF se editan en <a href="#gestion">Gestión</a>.</p>` : ""}
+   ${impuestosHTML()}`;
 }
 const instUrl = x => x && x.oculto ? "" : (x && x.url) || INST_VIDEO[claveInst(x && x.titulo)] || "";
 function instructivosHTML(){
@@ -2760,6 +2775,8 @@ document.addEventListener("click", e => {
   else if (a==="validar") validar(id);
   else if (a==="notaMkt") notaMkt(id);
   else if (a==="save") save(id);
+  else if (a==="impP") { S.impP = v; render(); }
+  else if (a==="impPdf") { e.preventDefault(); verArchivo(IMP_PDF, "Eficiencia impositiva"); }
   else if (a==="neiaAbrir") { S.neia.open = true; neiaGuardar(); neiaPintar(); }
   else if (a==="neiaCerrar") { S.neia.open = false; neiaGuardar(); neiaPintar(); }
   else if (a==="neiaNueva") { S.neia.api = []; S.neia.error = ""; neiaGuardar(); neiaPintar(); }
@@ -2810,6 +2827,7 @@ document.addEventListener("input", e => {
   else if (t.dataset.s && t.type!=="checkbox" && t.tagName!=="SELECT") { S.simv[S.sim][t.dataset.s] = t.value; calcSim(); }
   else if (t.id === "pz_q") { S.pzQ = t.value; pzFiltrar(); }
   else if (t.id === "ges_q") { S.gesQ = t.value; gesFiltrar(); }
+  else if (t.id === "impQ") { S.impQ = t.value; impFiltrar(); }
   else if (t.dataset.inst !== undefined && S.instEd) { S.instEd[+t.dataset.inst][t.dataset.f] = t.value; }
   else if (t.dataset.pz) { S.pz[t.dataset.pz] = t.value;
     if (t.dataset.pz==="asesor") { const a = findAsesor(t.value); if (a && t.value !== a.nombre) { t.value = S.pz.asesor = a.nombre; } if (a) { S.pz.mail = a.mail || ""; S.pz.tel = a.tel || ""; const m = $("#pz_mail"), te = $("#pz_tel"); if (m) m.value = S.pz.mail; if (te) te.value = S.pz.tel; } if (a && AREAS[a.area]) { S.pz.area = a.area; const sel = $("#pz_area"); if (sel) sel.value = a.area; } }
@@ -2886,6 +2904,69 @@ function watchNotas(){
   }, ()=>{});
 }
 function softRender(){ const a = document.activeElement; if (a && (a.tagName==="TEXTAREA" || (a.tagName==="INPUT" && a.type!=="checkbox"))) return; render(); }
+/* ── Eficiencia impositiva (versión simplificada) ──
+   Usa el cuadro que ya carga el Hub (S.imp, data/config/impuestos.json) y lo resume por tipo de persona en
+   Ganancias, Bienes Personales, IVA e IIBB CABA. En la ficha (Para el asesor) y completo en Instructivos (#impuestos). */
+const IMP_PDF = "data/eficiencia-impositiva.pdf";
+const IMP_PER = [["Persona física", "Persona física"], ["Persona jurídica", "Persona jurídica"], ["Beneficiario del exterior", "Beneficiario del exterior"]];
+const IMP_GRUPOS = [["Títulos públicos", ["tp_pesos", "tp_pesos_ajuste", "tp_usd"]], ["Obligaciones negociables", ["on_pesos", "on_usd"]], ["Títulos del exterior", ["tp_ext", "tp_brasil_bolivia"]],
+  ["Renta variable", ["acciones", "cedears", "adr"]], ["Derivados", ["opc_fut"]], ["Caución", ["caucion_ars", "caucion_usd"]], ["Cheques y pagarés", ["cpd_pagare_ars", "pagare_usd"]],
+  ["Fondos", ["fci_tp_ars", "fci_tp_usd", "fci_abiertos", "fci_cerr_ars", "fci_cerr_usd", "fondos_ext"]], ["Fideicomisos", ["ff_deuda_ars", "ff_deuda_usd", "ff_cp_ars"]], ["Otros", ["cripto"]]];
+function impResumen(k, persona){   // [ganRenta, ganVenta, ivaRenta, ivaVenta, bienesPersonales, iibbRenta, iibbVenta] + etiqueta del ingreso
+  const t = S.imp && S.imp.tablas && S.imp.tablas[k]; if (!t) return null;
+  const rs = t.filas.filter(f => f[0] === persona || (persona === "Beneficiario del exterior" && /exterior/i.test(f[0])));
+  if (!rs.length) return null;
+  const venta = rs.find(f => /^venta/i.test(f[1])), renta = rs.find(f => !/^venta/i.test(f[1]));
+  const r = renta || ["", "", "N/A", "N/A", "N/A", "N/A", "N/A"], v = venta || ["", "", "N/A", "N/A", "N/A", "N/A", "N/A"];
+  const bp = r[5] === v[5] || v[5] === "N/A" ? r[5] : r[5] === "N/A" ? v[5] : r[5] + " / " + v[5];
+  return {f: [r[2], v[2], r[3], v[3], bp, r[6], v[6]], ing: renta ? renta[1].replace(/^Renta (por )?/i, "").replace(/^./, c => c.toUpperCase()) : ""};
+}
+const impClase = v => /^habitualista: no|^(exent|no gravado|no$|n\/a|no computable)/i.test(v) ? "ok" : /gravad|%|progresiva|^sí$/i.test(v) ? "gv" : "nt";
+const impVal = v => `<span class="imp-v ${impClase(v)}">${esc(v)}</span>`;
+function impCel(a, b, ing){   // junta renta y venta cuando dicen lo mismo
+  if (a === b) return impVal(a);
+  if (a === "N/A") return impVal(b);
+  if (b === "N/A") return impVal(a);
+  return `<span class="imp-2"><em>${esc(ing || "Renta")}</em>${impVal(a)}</span><span class="imp-2"><em>Venta</em>${impVal(b)}</span>`;
+}
+const IMP_COLS = ["Ganancias", "Bienes Personales", "IVA", "IIBB CABA"];
+const impCeldas = ({f, ing}) => [impCel(f[0], f[1], ing), impVal(f[4]), impCel(f[2], f[3], ing), impCel(f[5], f[6], ing)];
+function impTablaInstrumento(k){
+  const t = S.imp.tablas[k]; if (!t) return "";
+  return `<div class="imp-i"><b class="imp-tit">${esc(t.nombre)}</b><div class="tw"><table class="imp-t"><thead><tr><th>Quién invierte</th>${IMP_COLS.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>
+    ${IMP_PER.map(([k2, txt]) => { const r = impResumen(k, k2); return r ? `<tr><td>${esc(txt)}</td>${impCeldas(r).map(c => `<td>${c}</td>`).join("")}</tr>` : ""; }).join("")}</tbody></table></div></div>`;
+}
+const impNota = `<p class="tiny muted imp-nota">Resumen orientativo del cuadro de Eficiencia Impositiva de Neix. "Habitualista" en IIBB: depende de si el cliente opera en forma habitual. Ante un caso puntual, que lo confirme el contador del cliente.</p>`;
+function impProductoHTML(p){
+  const ks = (p.impuestos || []).filter(k => S.imp && S.imp.tablas && S.imp.tablas[k]);
+  if (!ks.length) return "";
+  return `<div class="panel imp-p"><div class="imp-h"><h3>Eficiencia impositiva</h3><a class="tiny" href="#impuestos">Ver el cuadro completo →</a></div>
+    <p class="small muted" style="margin:-4px 0 10px">${["cheques", "pagares", "on-emision", "facturas-fce"].includes(p.id) ? "Cómo tributa para quien invierte en el instrumento." : "Cómo tributa según quién invierte."}</p>
+    ${ks.map(impTablaInstrumento).join("")}${impNota}
+    <details class="fold imp-det"><summary>Detalle por tipo de ingreso (con regímenes de información)</summary><div class="in">${ks.map(k => taxTable(k, null, false)).join("")}</div></details></div>`;
+}
+function impFiltrar(){
+  const q = sinAcento(S.impQ || "").trim().split(/\s+/).filter(Boolean), t = $(".imp-full"); if (!t) return;
+  const vis = new Set(); let n = 0;
+  t.querySelectorAll("tr[data-q]").forEach(tr => { const ok = q.every(w => tr.dataset.q.includes(w)); tr.hidden = !ok; if (ok) { vis.add(tr.dataset.g); n++; } });
+  t.querySelectorAll("tr.imp-g").forEach(tr => tr.hidden = !vis.has(tr.dataset.g));
+  t.querySelector(".imp-nada").hidden = n > 0;
+}
+function impuestosHTML(){
+  const I = S.imp && S.imp.tablas;
+  const head = `<div class="imp-h"><div><h2 style="margin:0">Eficiencia impositiva</h2><p class="small muted" style="margin:4px 0 0">Cómo tributa cada instrumento en Ganancias, Bienes Personales, IVA e IIBB CABA, según quién invierte.</p></div>
+    <span class="btn-row"><a class="btn" href="${IMP_PDF}" data-act="impPdf">${ico("_doc")}Ver el cuadro oficial</a><a class="btn ghost" href="${IMP_PDF}" download="Eficiencia impositiva Neix.pdf">${ico("_dl")}PDF</a></span></div>`;
+  if (!I) return `<section class="imp-s" id="impuestos">${head}<p class="small muted">Cargando…</p></section>`;
+  const per = IMP_PER.some(x => x[0] === S.impP) ? S.impP : IMP_PER[0][0];
+  const vistos = new Set(IMP_GRUPOS.flatMap(g => g[1])), grupos = IMP_GRUPOS.concat([["Otros instrumentos", Object.keys(I).filter(k => !vistos.has(k))]]);
+  const filas = grupos.map(([g, ks]) => { ks = ks.filter(k => I[k]); if (!ks.length) return "";
+    return `<tr class="imp-g" data-g="${esc(g)}"><td colspan="5">${esc(g)}</td></tr>` + ks.map(k => { const r = impResumen(k, per); return r ? `<tr data-g="${esc(g)}" data-q="${esc(sinAcento(I[k].nombre + " " + g))}"><td><b>${esc(I[k].nombre)}</b></td>${impCeldas(r).map(c => `<td>${c}</td>`).join("")}</tr>` : ""; }).join(""); }).join("");
+  return `<section class="imp-s" id="impuestos">${head}
+    <div class="imp-ctl"><div class="seg" role="tablist" aria-label="Quién invierte">${IMP_PER.map(([k, t]) => `<button role="tab" data-act="impP" data-v="${esc(k)}" aria-pressed="${per === k}">${esc(t)}</button>`).join("")}</div>
+      <input class="input" id="impQ" type="search" placeholder="Buscar instrumento" value="${esc(S.impQ || "")}" aria-label="Buscar instrumento"></div>
+    <div class="tw"><table class="imp-t imp-full"><thead><tr><th>Instrumento</th>${IMP_COLS.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${filas}<tr class="imp-nada" hidden><td colspan="5" class="muted">Sin instrumentos con esa búsqueda.</td></tr></tbody></table></div>
+    ${impNota}</section>`;
+}
 /* ── NEIA en el Hub ──
    Chat con la asistente de Neix. Las herramientas se ejecutan acá y solo leen datos del Hub (fichas, instructivos, simuladores y fondos):
    NEIA no tiene acceso al centro de costos. El servidor (api/analisis.js, accion "neia") solo hace de puente con Claude. */
@@ -2926,6 +3007,13 @@ async function neiaPrecios(inp){
 async function neiaHerramienta(nombre, inp){
   inp = inp || {};
   if (nombre === "datos_mercado") return neiaMercado();
+  if (nombre === "eficiencia_impositiva") {
+    const T = (S.imp && S.imp.tablas) || {}, pal = sinAcento(inp.texto || "").split(/\s+/).filter(w => w.length > 1);
+    const ks = Object.keys(T).filter(k => !pal.length || pal.some(w => sinAcento(T[k].nombre + " " + k).includes(w)));
+    if (!ks.length) return {resultado: "Sin instrumentos con ese nombre", disponibles: Object.values(T).map(t => t.nombre)};
+    return {fuente: "Cuadro de Eficiencia Impositiva de Neix (orientativo)", columnas: ["Ganancias renta", "Ganancias venta", "IVA renta", "IVA venta", "Bienes Personales", "IIBB CABA renta", "IIBB CABA venta"],
+      instrumentos: ks.slice(0, 8).map(k => ({instrumento: T[k].nombre, porPersona: Object.fromEntries(IMP_PER.map(([pk]) => { const r = impResumen(k, pk); return [pk, r ? {ingreso: r.ing || "venta", valores: r.f} : null]; }))})), link: "#impuestos"};
+  }
   if (nombre === "precios_bonos") return neiaPrecios(inp);
   if (nombre === "buscar_productos") {
     const pal = sinAcento(inp.texto || "").split(/\s+/).filter(w => w.length > 1), area = AREA_NEIA[sinAcento(inp.area || "").trim()] || "", need = NEEDS.find(n => n.k === inp.necesidad);
@@ -3014,7 +3102,7 @@ function neiaPintar(){
   const ms = $("#neiaMsgs"); if (ms) ms.scrollTop = ms.scrollHeight;
   if (!N.pensando) { const t = $("#neiaTxt"); if (t && !esCelular()) t.focus(); }
 }
-const NEIA_ESTADO = {datos_mercado: "Mirando el mercado…", precios_bonos: "Trayendo precios de BYMA…", catalogo_productos: "Revisando el catálogo…", buscar_productos: "Buscando productos…", obtener_ficha: "Leyendo la ficha…", listar_instructivos: "Mirando los instructivos…", listar_simuladores: "Mirando los simuladores…", buscar_fondos: "Buscando fondos y rendimientos…"};
+const NEIA_ESTADO = {eficiencia_impositiva: "Mirando el cuadro impositivo…", datos_mercado: "Mirando el mercado…", precios_bonos: "Trayendo precios de BYMA…", catalogo_productos: "Revisando el catálogo…", buscar_productos: "Buscando productos…", obtener_ficha: "Leyendo la ficha…", listar_instructivos: "Mirando los instructivos…", listar_simuladores: "Mirando los simuladores…", buscar_fondos: "Buscando fondos y rendimientos…"};
 async function neiaLeer(r){   // lee la respuesta en vivo (una línea JSON por evento): va mostrando el texto y devuelve el mensaje completo
   if (!r.ok || !/ndjson/.test(r.headers.get("content-type") || "")) {
     const j = await r.json().catch(() => ({}));
