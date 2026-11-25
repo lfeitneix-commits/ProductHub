@@ -287,6 +287,10 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .btn.danger{background:#AB1930;color:#fff;border-color:#AB1930}.btn.danger:hover{background:#8E1427;border-color:#8E1427}
 @keyframes cfmIn{from{opacity:0}}@keyframes cfmUp{from{opacity:0;transform:translateY(10px) scale(.98)}}
 @media (max-width:480px){.cfm{align-items:flex-end;padding:0}.cfm-box{border-radius:20px 20px 0 0;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}.cfm-b{flex-direction:column-reverse}.cfm-b .btn{width:100%}}
+.fclear{display:inline-flex;align-items:center;gap:6px;border:1px solid #E3C3C8;background:#FBF1F2;color:#8E1427;border-radius:999px;padding:6px 12px 6px 10px;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.fclear:hover{background:#F6E2E5;border-color:#D9A9B0}.fclear .ico{width:14px;height:14px}.fclear .n{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#AB1930;color:#fff;font-size:11px;font-weight:600}
+.fclear[hidden]{display:none}
+.ges-sbar{display:flex;gap:10px;align-items:center;margin:0 0 12px}.ges-sbar .ges-search{flex:1;margin:0}
 .neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
 .neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
 @keyframes neiaP{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
@@ -735,6 +739,7 @@ const P_ = {
   _sim:"M6 3h12v18H6zM9 7h6M9 11h2M13 11h2M9 15h2M13 15h2",
   _send:"M4 12l16-8-6 16-2.5-6.5z",
   _doc:"M7 3h7l4 4v14H7zM14 3v4h4M9.5 12h6M9.5 15.5h6",
+  _x:"M6 6l12 12M18 6L6 18",
   _trash:"M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
   _link:"M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
   "Financiamiento":"M3 7h18v10H3zM12 9.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5M6 10v4M18 10v4",
@@ -1012,7 +1017,7 @@ function vSoluciones(){
    <div class="frow"><span class="lbl">Unidad</span><div class="chips scroll">${[["","Todas"]].concat(Object.keys(UNI).map(u=>[u, u==="Mercado de Capitales"?"Mesa · Mercado de Capitales":u])).map(([u,t])=>`<button class="chip${u?" uchip":""}" style="--u:${UNI_COLOR[u]||"#999"}" data-act="fUnidad" data-v="${esc(u)}" aria-pressed="${S.fUnidad===u}">${esc(t)}</button>`).join("")}<button class="chip favchip" data-act="fFav" aria-pressed="${!!S.fFav}" title="${S.fav.length ? "Ver solo tus favoritos" : "Marcá productos con la estrella para verlos acá"}">${ico("_star")}Favoritos${S.fav.length ? ` · ${S.fav.filter(id => S.byId[id]).length}` : ""}</button></div></div>
    <div class="rescount"><span>${list.length} ${list.length===1?"resultado":"resultados"}${S.q.trim() ? ` para <b>“${esc(S.q.trim())}”</b> <button class="qchip" data-act="qClear" aria-label="Borrar la búsqueda">✕ Borrar búsqueda</button>` : ""}</span><span class="btn-row">
 
-    ${any?`<button class="btn ghost" data-act="clearF">Limpiar</button>`:""}</span></div>
+    ${any?(() => { const n = (S.q.trim()?1:0) + (S.fUnidad?1:0) + (S.fCat?1:0) + (S.fEstado?1:0) + S.fNeeds.length + (S.fFav?1:0); return `<button class="fclear" data-act="clearF">${ico("_x")}Borrar filtros<span class="n">${n}</span></button>`; })():""}</span></div>
   </div>
   ${list.length ? cats.filter(c=>groups[c]).map(c => `<section class="group"><div class="group-h"><span class="ic">${ico(c)}</span><h2>${esc(c)}</h2><span>${groups[c].length}</span></div><div class="grid">${groups[c].map(card).join("")}</div></section>`).join("") : `<div class="empty" style="margin-top:20px">No hay productos con esos filtros. <button class="btn ghost" data-act="clearF">Limpiar filtros</button></div>`}`;
 }
@@ -2575,7 +2580,7 @@ function vGestion(){
     const tile = (k, l, v, sub, alerta) => `<button class="ges-tile${F === k ? " on" : ""}${alerta ? " alerta" : ""}" data-act="gesF" data-v="${k}" aria-pressed="${F === k}"><span class="eyebrow">${l}</span><b class="num">${v}</b><span class="tiny">${sub}</span></button>`;
     const ocultos = S.ocultos || [];
     cuerpo = `<div class="ges-tiles">${tile("validado","Validadas",n("validado"),"de " + rows.length + " fichas")}${tile("a_validar","A validar",n("a_validar"),"sin validación vigente", n("a_validar") > 0)}${tile("pronto","Vencen pronto",pronto,"vencidas o en 30 días", pronto > 0)}${tile("sinop","Sin one pager",sinOp,"usan el automático")}</div>
-    <div class="search ges-search">${ico("_search")}<input class="input" id="ges_q" type="search" placeholder="Buscá una ficha por nombre, tipo, área o quién la modificó" value="${esc(S.gesQ||"")}" aria-label="Buscar fichas" autocomplete="off"></div>
+    <div class="ges-sbar"><div class="search ges-search">${ico("_search")}<input class="input" id="ges_q" type="search" placeholder="Buscá una ficha por nombre, tipo, área o quién la modificó" value="${esc(S.gesQ||"")}" aria-label="Buscar fichas" autocomplete="off"></div><button class="fclear" data-act="gesClear" ${F || (S.gesQ||"").trim() ? "" : "hidden"}>${ico("_x")}Borrar filtros</button></div>
     <div class="panel" style="padding:0;overflow:hidden"><div class="tw"><table class="ges-tabla"><thead><tr><th>Ficha</th><th>Tipo</th><th>Áreas</th><th>Estado</th><th>One pager</th><th>Revisar antes</th><th>Última modificación</th></tr></thead><tbody>
     ${rows.map(({p,e})=>{ const c = ultimoCambio(p.id); return `<tr data-q="${esc(sinAcento([p.nombre, p.categoria, p.unidades.join(" "), p.unidades.map(u=>UNI[u]||"").join(" "), e.txt, c ? nombreDe(c) : ""].join(" ")))}" data-k="${e.k}" data-pronto="${e.d!==null && e.d<=30 ? 1 : 0}" data-op="${p.onePager || p.sinOnePager ? 1 : 0}" data-href="#editar-${p.id}"><td><a href="#editar-${p.id}"><b>${esc(p.nombre)}</b></a></td><td class="muted small">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">Oficial</span>`:p.sinOnePager?`<span class="tiny muted">No lleva</span>`:`<span class="tiny muted">Automático</span>`}</td><td class="num small">${fdate(e.vence)}</td><td>${c ? `<span class="small">${esc(nombreDe(c))}</span><br><span class="tiny muted">${fechaHora(c.fecha)}</span>` : `<span class="tiny muted">Sin cambios</span>`}</td></tr>`; }).join("")}
     <tr class="ges-nada" hidden><td colspan="7" class="muted small">No hay fichas con esa búsqueda o filtro.</td></tr></tbody></table></div></div>
@@ -2596,6 +2601,7 @@ function gesFiltrar(){
   const F = S.gesF || "", pasa = tr => !F || (F === "pronto" ? tr.dataset.pronto === "1" : F === "sinop" ? tr.dataset.op === "0" : tr.dataset.k === F);
   let vis = 0; t.querySelectorAll("tbody tr[data-q]").forEach(tr => { const ok = pasa(tr) && (!q || q.split(/\s+/).every(w => tr.dataset.q.includes(w))); tr.hidden = !ok; if (ok) vis++; });
   const n = t.querySelector(".ges-nada"); if (n) n.hidden = vis > 0;
+  const bc = $('[data-act="gesClear"]'); if (bc) bc.hidden = !(F || q);
 }
 
 /* ── Instructivos generales (se cargan desde Gestión; se ven en "Cómo se opera" de todas las fichas) ── */
@@ -2835,6 +2841,7 @@ document.addEventListener("click", e => {
   else if (a==="neiaSug") neiaEnviar(v);
   else if (a==="neiaEnviar") { const t = $("#neiaTxt"); if (t) neiaEnviar(t.value); }
   else if (a==="gesTab") { S.gesTab = v; render(); }
+  else if (a==="gesClear") { S.gesF = ""; S.gesQ = ""; const qi = $("#ges_q"); if (qi) qi.value = ""; document.querySelectorAll(".ges-tile").forEach(x => { x.classList.remove("on"); x.setAttribute("aria-pressed", "false"); }); gesFiltrar(); }
   else if (a==="gesF") { S.gesF = S.gesF === v ? "" : v; document.querySelectorAll(".ges-tile").forEach(x => { const on = x.dataset.v === S.gesF; x.classList.toggle("on", on); x.setAttribute("aria-pressed", String(on)); }); gesFiltrar(); }
   else if (a==="edSec") { S.ed.sec = v; render(); window.scrollTo({top: Math.min(window.scrollY, ($(".ed-tabs") || {offsetTop: 0}).offsetTop - 80)}); }
   else if (a==="edAdd") { const l = getP(S.ed.p, b.dataset.k) || []; l.push(v === "pairs" ? ["", ""] : ""); setP(S.ed.p, b.dataset.k, l); S.ed.dirty = true; render(); const ins = document.querySelectorAll(`[data-el="${b.dataset.k}"]`); const last = ins[v === "pairs" ? ins.length - 2 : ins.length - 1]; if (last) last.focus(); }
