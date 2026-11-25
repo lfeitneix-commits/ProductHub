@@ -2662,9 +2662,9 @@ function asesoresEdHTML(){
   return `<div class="panel"><div class="eq-h"><div><h3 style="margin:0">Asesores</h3><p class="small muted" style="margin:4px 0 0">Se usan en Propuesta y Presentaciones (al escribir el nombre se completan mail y celular) y en la firma de los mails que salen desde el Hub.</p></div>
     <button class="btn" data-act="asAdd">${ico("_plus")}Agregar asesor</button></div>
     <datalist id="eqAreas">${areas.map(a => `<option value="${esc(a)}">`).join("")}</datalist>
-    <div class="tw"><table class="eq-t"><thead><tr><th>Nombre</th><th>Cargo</th><th>Área</th><th>Mail</th><th>Celular</th><th></th></tr></thead><tbody>
-    ${l.map((a, i) => `<tr>${[["nombre","Nombre y apellido"],["cargo","Ej.: Asesor Senior"],["area","Área"],["mail","nombre@neix.com.ar"],["tel","+54 9 11 …"]].map(([f, ph]) => `<td data-l="${f}"><input class="input" data-as="${i}" data-f="${f}" value="${esc(a[f] || "")}" placeholder="${ph}" ${f === "area" ? 'list="eqAreas"' : ""} ${f === "mail" ? 'type="email"' : ""}></td>`).join("")}<td><button class="btn ghost icon" data-act="asDel" data-v="${i}" aria-label="Quitar a ${esc(a.nombre || "este asesor")}">${ico("_trash")}</button></td></tr>`).join("")}
-    ${l.length ? "" : `<tr><td colspan="6" class="muted small">Todavía no hay asesores cargados.</td></tr>`}</tbody></table></div>
+    <div class="tw"><table class="eq-t"><thead><tr><th>Nombre</th><th>Área</th><th>Mail</th><th>Celular</th><th></th></tr></thead><tbody>
+    ${l.map((a, i) => `<tr>${[["nombre","Nombre y apellido"],["area","Área"],["mail","nombre@neix.com.ar"],["tel","+54 9 11 …"]].map(([f, ph]) => `<td data-l="${f}"><input class="input" data-as="${i}" data-f="${f}" value="${esc(a[f] || "")}" placeholder="${ph}" ${f === "area" ? 'list="eqAreas"' : ""} ${f === "mail" ? 'type="email"' : ""}></td>`).join("")}<td><button class="btn ghost icon" data-act="asDel" data-v="${i}" aria-label="Quitar a ${esc(a.nombre || "este asesor")}">${ico("_trash")}</button></td></tr>`).join("")}
+    ${l.length ? "" : `<tr><td colspan="5" class="muted small">Todavía no hay asesores cargados.</td></tr>`}</tbody></table></div>
     <div class="eq-pie"><span class="tiny muted">${l.length} asesores. El celular lo ven solo quienes entran al Hub con su cuenta de Neix.</span><button class="btn primary" data-act="asSave">Guardar asesores</button></div></div>`;
 }
 async function asGuardar(b){
@@ -2966,7 +2966,7 @@ document.addEventListener("click", e => {
   else if (a==="neiaEnviar") { const t = $("#neiaTxt"); if (t) neiaEnviar(t.value); }
   else if (a==="gesTab") { S.gesTab = v; render(); }
   else if (a==="gesSub") { S.gesSub = v; render(); }
-  else if (a==="asAdd") { (S.asesEd = S.asesEd || []).push({nombre:"", cargo:"", area:"", mail:"", tel:""}); render(); setTimeout(() => { const l = document.querySelectorAll('[data-as][data-f="nombre"]'); if (l.length) l[l.length - 1].focus(); }, 30); }
+  else if (a==="asAdd") { (S.asesEd = S.asesEd || []).push({nombre:"", area:"", mail:"", tel:""}); render(); setTimeout(() => { const l = document.querySelectorAll('[data-as][data-f="nombre"]'); if (l.length) l[l.length - 1].focus(); }, 30); }
   else if (a==="asDel") { S.asesEd.splice(+v, 1); render(); }
   else if (a==="asSave") asGuardar(b);
   else if (a==="fdAdd") { (S.fondEd = S.fondEd || []).unshift({n:"", tipo:(S.fondos.tipos || [])[0] || "", mon:"ARS"}); S.fdEdQ = ""; render(); setTimeout(() => { const x = $('[data-fd="0"][data-f="n"]'); if (x) x.focus(); }, 30); }
