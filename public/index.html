@@ -277,6 +277,16 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 @media (max-width:412px){.tb-l{display:none}.tb-s{display:inline}}
 @media (max-width:374px){.tabbar a{font-size:9px}}
 .imp-i+.imp-i{margin-top:14px}.imp-det{margin-top:12px;background:var(--surface)}.imp-tit{display:block;font-size:13px;font-weight:600;margin-bottom:6px}.imp-nota{margin:10px 0 0}
+.cfm{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(20,19,18,.5);backdrop-filter:blur(3px);animation:cfmIn .16s ease-out}
+.cfm.out{opacity:0;transition:opacity .15s}
+.cfm-box{width:min(420px,100%);background:var(--surface);border-radius:18px;padding:26px 24px 20px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);animation:cfmUp .2s cubic-bezier(.2,.8,.2,1)}
+.cfm-box h3{margin:14px 0 6px;font-size:18px;font-weight:600;letter-spacing:-.01em}.cfm-box p{margin:0;color:var(--ink-2);font-size:14px;line-height:1.5}
+.cfm-ic{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;background:var(--surface-2);color:var(--ink-2)}.cfm-ic .ico{width:20px;height:20px}
+.cfm-ic.pel{background:#F7E6E8;color:#AB1930}
+.cfm-b{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}.cfm-b .btn{min-width:110px;justify-content:center}
+.btn.danger{background:#AB1930;color:#fff;border-color:#AB1930}.btn.danger:hover{background:#8E1427;border-color:#8E1427}
+@keyframes cfmIn{from{opacity:0}}@keyframes cfmUp{from{opacity:0;transform:translateY(10px) scale(.98)}}
+@media (max-width:480px){.cfm{align-items:flex-end;padding:0}.cfm-box{border-radius:20px 20px 0 0;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}.cfm-b{flex-direction:column-reverse}.cfm-b .btn{width:100%}}
 .neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
 .neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
 @keyframes neiaP{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
@@ -893,7 +903,9 @@ let rutaActual = null;
 window.addEventListener("beforeunload", e => { if (S.ed && S.ed.dirty) { e.preventDefault(); e.returnValue = ""; } });
 window.addEventListener("hashchange", () => {
   if (S.ed && !location.hash.startsWith("#editar-" + S.ed.id)) {   // salir de la edición con cambios sin guardar
-    if (S.ed.dirty && !confirm("Hay cambios sin guardar en la ficha. ¿Salir igual?")) { history.replaceState(null, "", "#editar-" + S.ed.id); return; }
+    if (S.ed.dirty) { const dest = location.hash; history.replaceState(null, "", "#editar-" + S.ed.id);
+      confirmar({titulo: "Hay cambios sin guardar", texto: "Si salís ahora, se pierden los cambios de la ficha.", si: "Salir sin guardar", no: "Seguir editando", peligro: true}).then(ok => { if (ok && S.ed) { S.ed.dirty = false; location.hash = dest; } });
+      return; }
     S.ed = null;
   }
   if (S.envio || $("#shm")) cerrarEnvio();
@@ -1264,9 +1276,23 @@ function opVer(id){
   div.innerHTML = `<div class="op-pop" role="dialog" aria-modal="true" aria-label="${esc(p.onePager.archivo||"One pager")}"><div class="op-pop-h"><b>${esc(p.onePager.archivo||"One pager")}</b><span class="btn-row"><a class="btn" href="${esc(url)}" download="${esc(p.onePager.archivo||"one-pager.pdf")}">${ico("_dl")}Descargar</a><button class="btn ghost" data-act="shClose">Cerrar</button></span></div><iframe src="${esc(url)}#view=FitH" title="One pager"></iframe></div>`;
   document.body.appendChild(div); S.envio = {ver:true};
 }
+/* Confirmación con el diseño del Hub (en lugar del cuadro del navegador). Devuelve una promesa: true si confirma. */
+function confirmar({titulo, texto = "", si = "Aceptar", no = "Cancelar", peligro = false}){
+  return new Promise(ok => {
+    const prev = document.activeElement, d = document.createElement("div");
+    d.className = "cfm"; d.innerHTML = `<div class="cfm-box" role="alertdialog" aria-modal="true" aria-labelledby="cfmT" aria-describedby="cfmD">
+      <span class="cfm-ic ${peligro ? "pel" : ""}">${ico(peligro ? "_trash" : "_doc")}</span><h3 id="cfmT">${esc(titulo)}</h3>${texto ? `<p id="cfmD">${esc(texto)}</p>` : ""}
+      <div class="cfm-b"><button class="btn" data-r="0">${esc(no)}</button><button class="btn ${peligro ? "danger" : "primary"}" data-r="1">${esc(si)}</button></div></div>`;
+    const fin = r => { document.removeEventListener("keydown", tecla, true); d.classList.add("out"); setTimeout(() => d.remove(), 160); if (prev && prev.focus) prev.focus(); ok(r); };
+    const tecla = e => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); fin(false); } else if (e.key === "Tab") { const bs = [...d.querySelectorAll("button")], i = bs.indexOf(document.activeElement); e.preventDefault(); bs[(i + (e.shiftKey ? bs.length - 1 : 1)) % bs.length].focus(); } };
+    d.addEventListener("click", e => { const b = e.target.closest("[data-r]"); if (b) fin(b.dataset.r === "1"); else if (e.target === d) fin(false); });
+    document.addEventListener("keydown", tecla, true);
+    document.body.appendChild(d); d.querySelector('[data-r="1"]').focus();
+  });
+}
 async function opQuitar(id){
   const p = S.byId[id]; if (!p || !p.onePager || !S.db) return;
-  if (!confirm(`¿Eliminar el one pager de ${p.nombre}? Después podés subir otro.`)) return;
+  if (!await confirmar({titulo: "¿Eliminar el one pager?", texto: `Se quita el one pager de ${p.nombre}. Después podés subir otro.`, si: "Eliminar", peligro: true})) return;
   try { window.neixQue = "eliminó el one pager"; await S.db.doc("productos/"+id).update({onePager: null, onePagerQuitado: true}); toast("One pager eliminado. Ya podés subir otro."); render(); }
   catch(e) { toast("No se pudo eliminar. Probá de nuevo."); }
 }
@@ -2726,7 +2752,7 @@ async function prodCrear(b){
 }
 async function prodOcultar(id, ocultar){
   const p = S.byId[id] || (S.ocultos || []).find(x => x.id === id); if (!p || !S.db) return;
-  if (ocultar && !confirm(`¿Eliminar ${p.nombre}? Deja de verse en el Hub. Lo podés restaurar desde Gestión.`)) return;
+  if (ocultar && !await confirmar({titulo: `¿Eliminar ${p.nombre}?`, texto: "Deja de verse en el Hub. Lo podés restaurar desde Gestión.", si: "Eliminar", peligro: true})) return;
   try { window.neixQue = ocultar ? "eliminó el producto" : "restauró el producto"; await S.db.doc("productos/" + id).update({oculto: !!ocultar}); toast(ocultar ? "Producto eliminado" : "Producto restaurado"); go("gestion"); render(); }
   catch(e) { toast("No se pudo: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); }
 }
@@ -2815,13 +2841,14 @@ document.addEventListener("click", e => {
   else if (a==="edDel") { const l = getP(S.ed.p, b.dataset.k) || []; l.splice(+b.dataset.i, 1); S.ed.dirty = true; render(); }
   else if (a==="edMov") { const l = getP(S.ed.p, b.dataset.k) || [], i = +b.dataset.i, j = i + (+v); if (j >= 0 && j < l.length) { [l[i], l[j]] = [l[j], l[i]]; S.ed.dirty = true; render(); } }
   else if (a==="edRiesgo") { S.ed.p.riesgoNivel = +v; S.ed.dirty = true; render(); }
-  else if (a==="edVolver") { e.preventDefault(); if (S.ed && S.ed.dirty && !confirm("Hay cambios sin guardar. ¿Salir igual?")) return; S.ed = null; go("gestion"); }
+  else if (a==="edVolver") { e.preventDefault(); const salir = () => { S.ed = null; go("gestion"); };
+    if (S.ed && S.ed.dirty) confirmar({titulo: "Hay cambios sin guardar", texto: "Si salís ahora, se pierden los cambios de la ficha.", si: "Salir sin guardar", no: "Seguir editando", peligro: true}).then(ok => { if (ok) salir(); }); else salir(); }
   else if (a==="enviarLink") enviarLink(b);
   else if (a==="ingOtra") { S.ing = {}; render(); }
   else if (a==="completarLink") completarLink(b);
   else if (a==="salir") { e.preventDefault(); borrarBorradores(); try { localStorage.removeItem(SID_KEY); } catch(_) {} location.href = "/api/auth/logout"; }
-  else if (a==="borrarProp") { if (confirm("¿Borrar la propuesta? Se van el cliente, tus datos, los productos elegidos, el mensaje y lo que conversaron.")) { borrarPropuesta(); render(); } }
-  else if (a==="borrarPz") { if (confirm("¿Borrar la presentación? Se van el cliente, tus datos, el título y los productos elegidos.")) { borrarPresentacion(); render(); } }
+  else if (a==="borrarProp") confirmar({titulo: "¿Borrar la propuesta?", texto: "Se borran el cliente, tus datos, los productos elegidos, el mensaje y lo que conversaron. No se puede deshacer.", si: "Borrar todo", peligro: true}).then(ok => { if (ok) { borrarPropuesta(); render(); toast("Propuesta borrada"); } });
+  else if (a==="borrarPz") confirmar({titulo: "¿Borrar la presentación?", texto: "Se borran el cliente, tus datos, el título y los productos elegidos. No se puede deshacer.", si: "Borrar todo", peligro: true}).then(ok => { if (ok) { borrarPresentacion(); render(); toast("Presentación borrada"); } });
   else if (a==="logout") { e.preventDefault(); window.neixRuntime.logout(); }
   else if (a==="cset") { S.cliente[b.dataset.k] = S.cliente[b.dataset.k]===v ? "" : v; persist(); render(); }
   else if (a==="cmulti") { const arr = S.cliente[b.dataset.k], i = arr.indexOf(v); i>=0 ? arr.splice(i,1) : arr.push(v); persist(); render(); }
