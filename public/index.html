@@ -295,6 +295,7 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .imp-pdf th:nth-child(1){width:27%}.imp-pdf th:nth-child(2){width:22%}.imp-pdf th:nth-child(3){width:18%}.imp-pdf th:nth-child(4){width:15%}.imp-pdf th:nth-child(5){width:18%}
 .imp-pdf .imp-v{font-size:10.5px;padding:2px 8px;border-radius:7px;line-height:1.3}.imp-pdf .imp-2{display:grid;grid-template-columns:auto;justify-items:start;gap:1px;margin:3px 0}.imp-pdf .imp-2 em{font-size:9px;min-width:0;letter-spacing:.02em}
 .imp-pdf .imp-g td{background:#F3EFE9;color:#6B6459;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:5px 8px}
+.imp-pie{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid var(--paper-line);font-size:12.5px}.imp-pie img{height:13px;width:auto}
 .imp-ley{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12px;color:#6B6459;padding-top:18px!important;padding-bottom:14px!important}.imp-ley span{display:inline-flex;align-items:center;gap:6px}
 .neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
 .neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
@@ -2282,7 +2283,7 @@ function linksDe(root){ const b = root.getBoundingClientRect(); return [...root.
 async function propPDFBlob(){ return docPDFBlob(propDoc()); }
 /* One pager sin PDF oficial: se arma en PDF con el mismo formato que la descarga. */
 function onePagerPDFBlob(p){ const head = EXPORT_HEAD(p.nombre+" · Neix"); return docPDFBlob(onePagerDoc(p).slice(head.length).replace("</body></html>","")); }
-async function docPDFBlob(html){
+async function docPDFBlob(html, pieHTML){
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
   try { await document.fonts.ready; } catch(_) {}
@@ -2300,7 +2301,14 @@ async function docPDFBlob(html){
       const g = pg.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, pg.width, pg.height); g.drawImage(cv, 0, y, cv.width, pg.height, 0, 0, cv.width, pg.height);
       if (i) pdf.addPage(); pdf.addImage(pg.toDataURL("image/jpeg", .92), "JPEG", 0, 0, W, pg.height / k);
       links.forEach(l => { const ly = l.y * SC; if (ly >= y && ly < fin) pdf.link(l.x*SC/k, (ly - y)/k, l.w*SC/k, l.h*SC/k, {url: l.url}); });
-      y = fin;
+      y = fin; S._ultAlto = pg.height / k;
+    }
+    if (pieHTML) {   // pie (contacto y leyenda) al borde inferior de la última página
+      host.innerHTML = pieHTML; const pr = host.firstElementChild, pl = linksDe(pr);
+      const pc = await window.html2canvas(pr, {scale:SC, backgroundColor:"#ffffff", useCORS:true, logging:false}), ph = pc.height / k;
+      if ((S._ultAlto || 0) + ph > H) pdf.addPage();
+      const py = H - ph; pdf.addImage(pc.toDataURL("image/jpeg", .92), "JPEG", 0, py, W, ph);
+      pl.forEach(l => pdf.link(l.x*SC/k, py + l.y*SC/k, l.w*SC/k, l.h*SC/k, {url: l.url}));
     }
     return pdf.output("blob");
   } finally { host.remove(); }
@@ -3032,14 +3040,15 @@ function impDoc(){
     <div class="pp-body"><div class="pp-sec imp-ley"><span>${impVal("Exento / No gravado")} sin impuesto</span><span>${impVal("Gravado")} paga impuesto</span><span>${impVal("Responsable sustituto")} otros casos</span></div>
     ${IMP_PER.map(([k, t]) => `<div class="pp-sec"><div class="ey">${esc(t)}</div>${tabla(k)}</div>`).join("")}
     <div class="pp-sec"><p style="font-size:12.5px;margin:0">Resumen orientativo. "Habitualista" en IIBB: depende de si se opera en forma habitual. Cada caso puntual conviene revisarlo con el contador.</p>
-    <div class="pp-contact"><div><div class="ey">En Neix</div><p style="margin-top:4px;max-width:52ch">Te ayudamos a armar la cartera más eficiente para tu situación impositiva.</p></div><div style="font-size:13px">${mailLink("info@neix.com.ar")}<br>${FIJO} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div>
-    <p class="pp-legal">${esc(LEYENDA)}</p></div></div></div>`;
+    </div></div></div>`;
 }
+const impPie = () => `<div class="pp"><div class="pp-body" style="padding-top:0;padding-bottom:26px"><div class="imp-pie"><img src="${LOGO_DARK}" alt="NEIX"><span>${mailLink("info@neix.com.ar")} · ${FIJO} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></span></div>
+    <p class="pp-legal">${esc(LEYENDA)}</p></div></div>`;
 async function dlImpPDF(b){
   if (!S.imp || !S.imp.tablas) return;
   if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
   const txt = b.innerHTML; b.disabled = true; b.textContent = "Armando PDF";
-  try { await S.dl.save({filename: "Eficiencia impositiva - Neix.pdf", data: await docPDFBlob(impDoc())}); toast("PDF listo"); }
+  try { await S.dl.save({filename: "Eficiencia impositiva - Neix.pdf", data: await docPDFBlob(impDoc(), impPie())}); toast("PDF listo"); }
   catch(e) { if (!(e && e.code === "declined")) toast("No pudimos armar el PDF. Probá de nuevo."); }
   b.disabled = false; b.innerHTML = txt;
 }
