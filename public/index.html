@@ -291,6 +291,11 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .fclear:hover{background:#F6E2E5;border-color:#D9A9B0}.fclear .ico{width:14px;height:14px}.fclear .n{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#AB1930;color:#fff;font-size:11px;font-weight:600}
 .fclear[hidden]{display:none}
 .ges-sbar{display:flex;gap:10px;align-items:center;margin:0 0 12px}.ges-sbar .ges-search{flex:1;margin:0}
+.imp-pdf{font-size:11.5px;table-layout:fixed}.imp-pdf td,.imp-pdf th{padding:7px 10px 7px 0;vertical-align:middle}
+.imp-pdf th:nth-child(1){width:27%}.imp-pdf th:nth-child(2){width:22%}.imp-pdf th:nth-child(3){width:18%}.imp-pdf th:nth-child(4){width:15%}.imp-pdf th:nth-child(5){width:18%}
+.imp-pdf .imp-v{font-size:10.5px;padding:2px 8px;border-radius:7px;line-height:1.3}.imp-pdf .imp-2{display:grid;grid-template-columns:auto;justify-items:start;gap:1px;margin:3px 0}.imp-pdf .imp-2 em{font-size:9px;min-width:0;letter-spacing:.02em}
+.imp-pdf .imp-g td{background:#F3EFE9;color:#6B6459;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:5px 8px}
+.imp-ley{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12px;color:#6B6459;padding-top:18px!important;padding-bottom:14px!important}.imp-ley span{display:inline-flex;align-items:center;gap:6px}
 .neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
 .neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
 @keyframes neiaP{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
@@ -2284,7 +2289,7 @@ async function docPDFBlob(html){
   const host = document.createElement("div"); host.style.cssText = "position:fixed;left:-20000px;top:0;width:820px;background:#fff"; host.innerHTML = html; document.body.appendChild(host);
   try {
     const root = host.firstElementChild, SC = 2, top0 = root.getBoundingClientRect().top;
-    const cortes = [...root.querySelectorAll(".pp-sec,.pp-item,.pp-body,.pp-h4,.pp-kpis,.pp-diag > div,.pp-tab tbody tr")].map(el => Math.round((el.getBoundingClientRect().top - top0) * SC)).sort((a,b)=>a-b);
+    const cortes = [...root.querySelectorAll(".pp-sec,.pp-item,.pp-body,.pp-h4,.pp-kpis,.pp-diag > div,.pp-tab tbody tr")].filter(el => !(el.previousElementSibling && el.previousElementSibling.classList.contains("imp-g"))).map(el => Math.round((el.getBoundingClientRect().top - top0) * SC)).sort((a,b)=>a-b);
     const links = linksDe(root);
     const cv = await window.html2canvas(root, {scale:SC, backgroundColor:"#ffffff", useCORS:true, logging:false});
     const pdf = new window.jspdf.jsPDF({unit:"pt", format:"a4"}), W = 595.28, H = 841.89, k = cv.width / W, alto = Math.floor(H * k);
@@ -2834,6 +2839,7 @@ document.addEventListener("click", e => {
   else if (a==="notaMkt") notaMkt(id);
   else if (a==="save") save(id);
   else if (a==="impP") { S.impP = v; render(); }
+  else if (a==="impDl") dlImpPDF(b);
   else if (a==="impPdf") { e.preventDefault(); verArchivo(IMP_PDF, "Eficiencia impositiva"); }
   else if (a==="neiaAbrir") { S.neia.open = true; neiaGuardar(); neiaPintar(); }
   else if (a==="neiaCerrar") { S.neia.open = false; neiaGuardar(); neiaPintar(); }
@@ -3015,11 +3021,33 @@ function impFiltrar(){
   t.querySelectorAll("tr.imp-g").forEach(tr => tr.hidden = !vis.has(tr.dataset.g));
   t.querySelector(".imp-nada").hidden = n > 0;
 }
+/* PDF de la pestaña con el formato de los one pagers: portada oscura con el logo y una tabla por tipo de persona. */
+function impDoc(){
+  const I = S.imp.tablas, vistos = new Set(IMP_GRUPOS.flatMap(g => g[1])), grupos = IMP_GRUPOS.concat([["Otros instrumentos", Object.keys(I).filter(k => !vistos.has(k))]]);
+  const fecha = new Date().toLocaleDateString("es-AR", {day: "numeric", month: "long", year: "numeric"});
+  const tabla = per => `<table class="pp-tab imp-pdf"><thead><tr><th>Instrumento</th>${IMP_COLS.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${grupos.map(([g, ks]) => { ks = ks.filter(k => I[k]); if (!ks.length) return "";
+    return `<tr class="imp-g"><td colspan="5">${esc(g)}</td></tr>` + ks.map(k => { const r = impResumen(k, per); return r ? `<tr><td>${esc(I[k].nombre)}</td>${impCeldas(r).map(c => `<td>${c}</td>`).join("")}</tr>` : ""; }).join(""); }).join("")}</tbody></table>`;
+  return `<div class="pp"><div class="pp-cover"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="ey">Eficiencia impositiva · ${esc(fecha)}</div><h1>Cómo tributa cada instrumento</h1>
+    <p style="color:#CFC6B8;max-width:60ch;margin-top:4px">Ganancias, Bienes Personales, IVA e Ingresos Brutos (CABA) según quién invierte: persona física, persona jurídica o beneficiario del exterior.</p></div>
+    <div class="pp-body"><div class="pp-sec imp-ley"><span>${impVal("Exento / No gravado")} sin impuesto</span><span>${impVal("Gravado")} paga impuesto</span><span>${impVal("Responsable sustituto")} otros casos</span></div>
+    ${IMP_PER.map(([k, t]) => `<div class="pp-sec"><div class="ey">${esc(t)}</div>${tabla(k)}</div>`).join("")}
+    <div class="pp-sec"><p style="font-size:12.5px;margin:0">Resumen orientativo. "Habitualista" en IIBB: depende de si se opera en forma habitual. Cada caso puntual conviene revisarlo con el contador.</p>
+    <div class="pp-contact"><div><div class="ey">En Neix</div><p style="margin-top:4px;max-width:52ch">Te ayudamos a armar la cartera más eficiente para tu situación impositiva.</p></div><div style="font-size:13px">${mailLink("info@neix.com.ar")}<br>${FIJO} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></div></div>
+    <p class="pp-legal">${esc(LEYENDA)}</p></div></div></div>`;
+}
+async function dlImpPDF(b){
+  if (!S.imp || !S.imp.tablas) return;
+  if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
+  const txt = b.innerHTML; b.disabled = true; b.textContent = "Armando PDF";
+  try { await S.dl.save({filename: "Eficiencia impositiva - Neix.pdf", data: await docPDFBlob(impDoc())}); toast("PDF listo"); }
+  catch(e) { if (!(e && e.code === "declined")) toast("No pudimos armar el PDF. Probá de nuevo."); }
+  b.disabled = false; b.innerHTML = txt;
+}
 function impuestosHTML(){
   const I = S.imp && S.imp.tablas;
   const head = `<div class="page-head"><div><div class="eyebrow">Eficiencia impositiva</div><h1>Cómo tributa cada instrumento</h1>
     <p class="muted">Ganancias, Bienes Personales, IVA e IIBB CABA según quién invierte: persona física, persona jurídica o beneficiario del exterior.</p></div>
-    <div class="btn-row"><a class="btn" href="${IMP_PDF}" data-act="impPdf">${ico("_doc")}Ver el cuadro oficial</a><a class="btn" href="${IMP_PDF}" download="Eficiencia impositiva Neix.pdf">${ico("_dl")}Descargar PDF</a></div></div>`;
+    <div class="btn-row"><a class="btn" href="${IMP_PDF}" data-act="impPdf">${ico("_doc")}Ver el cuadro oficial</a><button class="btn" data-act="impDl">${ico("_dl")}Descargar PDF</button></div></div>`;
   if (!I) return `${head}<p class="small muted">Cargando…</p>`;
   const per = IMP_PER.some(x => x[0] === S.impP) ? S.impP : IMP_PER[0][0];
   const vistos = new Set(IMP_GRUPOS.flatMap(g => g[1])), grupos = IMP_GRUPOS.concat([["Otros instrumentos", Object.keys(I).filter(k => !vistos.has(k))]]);
