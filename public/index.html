@@ -1930,7 +1930,7 @@ function vPropuesta(){
   P.items.forEach(it => { const p = S.byId[it.id]; if (!p) return; p.interno.relacionados.forEach(r => { if (!P.items.some(i=>i.id===r) && S.byId[r]) (sug[r] = sug[r] || []).push(p.nombre); }); });
   return `<div class="page-head"><div><div class="eyebrow">Propuesta</div><h1>Armá la propuesta</h1>
   <p class="muted">Sumá productos, contá por qué tienen sentido para este cliente y exportala lista para enviar.</p></div>
-  <div class="btn-row"><button class="btn ghost" data-act="borrarProp" ${P.items.length || P.cliente || P.mensaje || (P.conversamos || []).some(Boolean) ? "" : "disabled"}>${ico("_trash")}Borrar todo</button><button class="btn" data-act="share" data-v="wa" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
+  <div class="btn-row"><button class="btn ghost" data-act="borrarProp" ${P.items.length || P.cliente || P.mensaje || P.asesor || P.mail || P.tel || (P.conversamos || []).some(Boolean) ? "" : "disabled"}>${ico("_trash")}Borrar todo</button><button class="btn" data-act="share" data-v="wa" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
   <div class="pr-grid"><div class="stack">
    ${P.analisis ? `<div class="panel ia-prop" style="margin:0"><div><b>Incluye el análisis de cartera</b><span>Hecho el ${fdate(P.analisis.fecha)} desde Cliente. Va antes de los productos.</span></div><button class="btn ghost" data-act="iaPropQuitar">Quitar</button></div>` : ""}
    <div class="panel stack"><h3 style="margin:0">Para quién</h3>
@@ -2056,11 +2056,9 @@ function pzFiltrar(){
 }
 function pzSave(){ try { localStorage.setItem("neix-hub-pz", JSON.stringify(S.pz)); } catch(e) {} }
 /* Borradores: lo que el asesor escribió en Propuesta y Presentaciones. Se borran con "Borrar todo" y solos al cerrar
-   la sesión o cuando entra con una sesión nueva (vence todos los días). Se conservan sus datos de asesor (nombre, mail, celular). */
-const MIOS = ["asesor", "mail", "tel", "area"];
-const conMios = (base, act) => { const o = JSON.parse(base); MIOS.forEach(k => { if (act && act[k] && k in o) o[k] = act[k]; }); return o; };
-function borrarPropuesta(){ S.prop = conMios(PROP0, S.prop); S.cliente = blankCliente(); S.ia = null; persist(); }
-function borrarPresentacion(){ S.pz = conMios(PZ0, S.pz); pzSave(); }
+   la sesión o cuando entra con una sesión nueva (vence todos los días). También los datos del asesor (nombre, mail, celular). */
+function borrarPropuesta(){ S.prop = JSON.parse(PROP0); S.cliente = blankCliente(); S.ia = null; persist(); }
+function borrarPresentacion(){ S.pz = JSON.parse(PZ0); pzSave(); }
 function borrarBorradores(){ borrarPropuesta(); borrarPresentacion(); try { sessionStorage.removeItem(NEIA_KEY); } catch(_) {} S.neia = {api: [], open: false}; }
 const SID_KEY = "neix-hub-sid";
 function revisarSesion(sid){   // si es otra sesión (venció o entró de nuevo), arranca sin los borradores de la anterior
@@ -2075,7 +2073,7 @@ function vPresentaciones(){
   S.productos.forEach(p => (byCat[p.categoria] = byCat[p.categoria] || []).push(p));
   const cats = CAT_ORDER.filter(c=>byCat[c]).concat(Object.keys(byCat).filter(c=>!CAT_ORDER.includes(c)));
   return `<div class="page-head"><div><div class="eyebrow">Presentaciones</div><h1>Armá una presentación</h1><p>La presentación institucional de Neix más los productos que elijas, en el formato de marca. Se descarga en PDF.</p></div>
-  <div class="btn-row"><button class="btn ghost" data-act="borrarPz" ${P.items.length || P.cliente || P.titulo !== JSON.parse(PZ0).titulo ? "" : "disabled"}>${ico("_trash")}Borrar todo</button><button class="btn" data-act="share" data-v="wa" data-k="pz" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="pz" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="pzPDF" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
+  <div class="btn-row"><button class="btn ghost" data-act="borrarPz" ${P.items.length || P.cliente || P.asesor || P.mail || P.tel || P.titulo !== JSON.parse(PZ0).titulo ? "" : "disabled"}>${ico("_trash")}Borrar todo</button><button class="btn" data-act="share" data-v="wa" data-k="pz" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="pz" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="pzPDF" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
   <div class="pz-grid"><div class="stack">
    <div class="panel stack"><h3 style="margin:0">Portada</h3>
     <label class="f" for="pz_titulo">Título<input class="input" id="pz_titulo" data-pz="titulo" value="${esc(P.titulo)}"></label>
@@ -2820,8 +2818,8 @@ document.addEventListener("click", e => {
   else if (a==="ingOtra") { S.ing = {}; render(); }
   else if (a==="completarLink") completarLink(b);
   else if (a==="salir") { e.preventDefault(); borrarBorradores(); try { localStorage.removeItem(SID_KEY); } catch(_) {} location.href = "/api/auth/logout"; }
-  else if (a==="borrarProp") { if (confirm("¿Borrar la propuesta? Se van el cliente, los productos elegidos, el mensaje y lo que conversaron.")) { borrarPropuesta(); render(); } }
-  else if (a==="borrarPz") { if (confirm("¿Borrar la presentación? Se van el cliente, el título y los productos elegidos.")) { borrarPresentacion(); render(); } }
+  else if (a==="borrarProp") { if (confirm("¿Borrar la propuesta? Se van el cliente, tus datos, los productos elegidos, el mensaje y lo que conversaron.")) { borrarPropuesta(); render(); } }
+  else if (a==="borrarPz") { if (confirm("¿Borrar la presentación? Se van el cliente, tus datos, el título y los productos elegidos.")) { borrarPresentacion(); render(); } }
   else if (a==="logout") { e.preventDefault(); window.neixRuntime.logout(); }
   else if (a==="cset") { S.cliente[b.dataset.k] = S.cliente[b.dataset.k]===v ? "" : v; persist(); render(); }
   else if (a==="cmulti") { const arr = S.cliente[b.dataset.k], i = arr.indexOf(v); i>=0 ? arr.splice(i,1) : arr.push(v); persist(); render(); }
