@@ -2445,7 +2445,7 @@ const aBase64 = f => new Promise((ok, ko) => { const r = new FileReader(); r.onl
 function firmaMail(){
   const me = S.me || {}, a = findAsesor(me.nombre) || (S.asesores || []).find(x => String(x.mail || "").toLowerCase() === String(me.email || "").toLowerCase()) || {};
   const P = S.envio && S.envio.tipo === "pz" ? S.pz : S.prop;
-  return {nombre: a.nombre || me.nombre || "", cargo: a.cargo || a.area || "", cel: a.tel || (P && normNom(P.asesor) === normNom(a.nombre || me.nombre) ? P.tel : "") || ""};
+  return {nombre: a.nombre || me.nombre || "", cargo: a.area || "", cel: a.tel || (P && normNom(P.asesor) === normNom(a.nombre || me.nombre) ? P.tel : "") || ""};
 }
 let FIRMA_IMG = null;   // bloque oficial de la firma (barra bordó, logo y leyenda de la CNV): img/firma-neix.png
 const firmaImagen = () => FIRMA_IMG || (FIRMA_IMG = fetch("img/firma-neix.png").then(r => r.ok ? r.blob() : null).then(b => b ? new Promise(ok => { const f = new FileReader(); f.onload = () => ok(f.result); f.onerror = () => ok(""); f.readAsDataURL(b); }) : "").catch(() => ""));
