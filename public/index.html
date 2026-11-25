@@ -300,6 +300,26 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .imp-pie span{display:block;font-size:13px;line-height:1.9}.imp-pie a{color:#F3F0EB}
 .imp-pie p{margin:0;max-width:44ch;font-size:10px;line-height:1.55;color:#A9A196}
 .imp-ley{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12px;color:#6B6459;padding-top:18px!important;padding-bottom:14px!important}.imp-ley span{display:inline-flex;align-items:center;gap:6px}
+.panel.hc-sec{padding:0;margin-bottom:12px;overflow:hidden}.hc-head,.hc-sec>summary{display:flex;align-items:center;gap:12px;padding:16px 18px;list-style:none;cursor:default}.hc-sec>summary{cursor:pointer}.hc-sec>summary::-webkit-details-marker{display:none}
+.hc-h{flex:1;display:grid;gap:2px}.hc-h b{font-size:15px;font-weight:600}.hc-n{margin-left:auto}
+.hc-ic{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:var(--surface-2);color:var(--ink-2);flex:none}.hc-ic .ico{width:18px;height:18px}.hc-ic.ok{background:#E5F0E8;color:#1F5A32}
+.hc-list{border-top:1px solid var(--line)}.hc-it{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line)}.hc-it:last-child{border-bottom:0}.hc-tx{min-width:0;flex:1}
+.hc-it .btn-row{flex:none}.hc-it label.btn{cursor:pointer}
+.hc-ok{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.ges-est{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mini{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 9px;font:inherit;font-size:11.5px;color:var(--ink);cursor:pointer;white-space:nowrap}.mini:hover{border-color:var(--ink-3)}.mini .ico{width:12px;height:12px}
+.ges-sub{margin:0 0 14px}
+.eq-h{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.eq-t td{padding:6px 8px 6px 0!important;vertical-align:middle}.eq-t td:first-child{padding-left:12px!important}.eq-t .input{min-height:36px;padding:7px 10px;font-size:13px}.eq-t th{white-space:nowrap}
+.eq-pie{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+.ed-imp{display:flex;flex-wrap:wrap;gap:6px}.impchk{display:inline-flex}.impchk input{position:absolute;opacity:0;pointer-events:none}.impchk span{border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:12.5px;cursor:pointer;background:var(--surface);color:var(--ink-2)}
+.impchk input:checked+span{background:var(--sel);color:var(--sel-ink);border-color:var(--sel)}.impchk input:focus-visible+span{outline:2px solid var(--sel);outline-offset:2px}
+@media (max-width:700px){.hc-it{flex-direction:column;align-items:stretch}.hc-it .btn-row{justify-content:flex-end}
+  .eq-t thead{display:none}.eq-t,.eq-t tbody{display:block}.eq-t tr{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;border-bottom:1px solid var(--line)}.eq-t tr[hidden]{display:none}.eq-t td{display:block;padding:0!important}.eq-t td:last-child{grid-column:1/-1;text-align:right}.eq-t td:first-child{grid-column:1/-1}}
+.ie-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.ie-card{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);display:flex;flex-direction:column}
+.ie-img{position:relative;aspect-ratio:16/9;background:var(--surface-2);display:flex;align-items:center;justify-content:center;overflow:hidden}.ie-img img{width:100%;height:100%;object-fit:cover}.ie-img .inst-ph .ico{width:28px;height:28px;color:var(--ink-3)}
+.ie-in{padding:12px;display:grid;gap:8px}.ie-in .input{min-height:36px;padding:7px 10px;font-size:13px}.ie-acc{display:flex;flex-wrap:wrap;gap:6px}.ie-del{margin-left:auto;color:#8E1427}
 .neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
 .neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
 @keyframes neiaP{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
@@ -773,7 +793,9 @@ const P_ = {
   _dl:"M12 4v11M7 10l5 5 5-5M5 20h14",
   _wa:"M4 20l1.3-4A8 8 0 1 1 8 19z",
   _calc:"M6 3h12v18H6zM9 7h6M9 12h6M9 16h3",
-  _plus:"M12 5v14M5 12h14", _mail:"M3 6h18v12H3zM3 7l9 6 9-6", _check:"M5 12l5 5 9-10"
+  _plus:"M12 5v14M5 12h14", _mail:"M3 6h18v12H3zM3 7l9 6 9-6", _check:"M5 12l5 5 9-10",
+  _up:"M12 20V9M7 14l5-5 5 5M5 4h14", _chat:"M20 11.5c0 4.1-3.6 7.5-8 7.5-1.2 0-2.3-.2-3.3-.6L4 20l1.3-3.7C4.5 15 4 13.3 4 11.5 4 7.4 7.6 4 12 4s8 3.4 8 7.5z",
+  _clock:"M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 7v5l3 2", _shield:"M12 3l7 3v6c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6zM9 12l2 2 4-4"
 };
 const ico = (k, cls) => `<svg class="ico ${cls||""}" viewBox="0 0 24 24" aria-hidden="true"><path d="${P_[k]||P_._sol}"/></svg>`;
 
@@ -957,7 +979,7 @@ function render(anim){
   if (r === "simuladores") calcSim();
   if (r === "propuesta") refreshPreview();
   if (r === "presentaciones") { refreshDeck(); pzFiltrar(); }
-  if (r === "gestion") gesFiltrar();
+  if (r === "gestion") { gesFiltrar(); fdEdFiltrar(); }
   if (r === "impuestos") impFiltrar();
   if (!r.startsWith("p-")) S._vista = "";
   neiaPintar();
@@ -1209,7 +1231,7 @@ const ED_SECS = [["cab","Cabecera"],["cli","Para el cliente"],["dat","Datos"],["
 const ED = {
   cab: [["nombre","Nombre","text"],["categoria","Tipo de producto","cat"],["unidades","Áreas a las que corresponde","units"],["validador","Validador de negocio","text","mail de quien valida"],["vence","Revisar antes de","date"],["fuente","Fuente","text","de dónde sale la información"]],
   cli: [["cliente.titular","Titular","text","qué le resuelve al cliente, en una frase"],["cliente.bajada","Bajada","area"],["cliente.queEs","De qué se trata","area"],["cliente.paraQuien","Para quién es","area"],["cliente.beneficios","Beneficios","pairs"],["cliente.comoFunciona","Cómo funciona","list","Paso"],["cliente.aTener","Lo que tenés que saber","list","Aclaración"],["cliente.enNeix","En Neix","area"]],
-  dat: [["cliente.ficha.moneda","Moneda","text"],["cliente.ficha.plazo","Plazo","text"],["cliente.ficha.riesgo","Riesgo (texto)","text"],["riesgoNivel","Nivel de riesgo","riesgo"],["cliente.ficha.minimo","Monto mínimo","text"],["cliente.ficha.liquidez","Liquidez","text"],["cliente.ficha.mercado","Dónde opera","text"]],
+  dat: [["cliente.ficha.moneda","Moneda","text"],["cliente.ficha.plazo","Plazo","text"],["cliente.ficha.riesgo","Riesgo (texto)","text"],["riesgoNivel","Nivel de riesgo","riesgo"],["cliente.ficha.minimo","Monto mínimo","text"],["cliente.ficha.liquidez","Liquidez","text"],["cliente.ficha.mercado","Dónde opera","text"],["impuestos","Eficiencia impositiva","imp","instrumentos del cuadro impositivo que aplican a este producto"]],
   ase: [["interno.ventajas","Por qué ofrecerlo","pairs","si queda vacío, se muestran los beneficios del cliente"],["interno.ingreso","Cómo cobramos","area","opcional"],["interno.perfiles","A quién","list","Perfil"],["interno.senales","Cuándo aparece","list","Señal"],["interno.preguntas","Qué preguntar","list","Pregunta"],["interno.operativa","Paso a paso operativo","list","Paso"],["interno.video","Link a video o instructivo","text","https://…"],["observaciones","Pendientes internos","list","Pendiente"]],
 };
 function edEstado(id){
@@ -1219,6 +1241,8 @@ function edEstado(id){
 function edCampo([k, l, t, ayuda]){
   const p = S.ed.p, v = getP(p, k), fid = "ed_" + k.replace(/\./g, "_"), lab = `${esc(l)}${ayuda && t !== "list" ? ` <span class="ed-ayuda">${esc(ayuda)}</span>` : ""}`;
   if (t === "units") return `<div class="f ed-f"><span>${lab}</span><div class="ed-units">${Object.keys(UNI).map(u => `<label class="uchk" style="--u:${UNI_COLOR[u]}"><input type="checkbox" data-eu="${esc(u)}" ${(v || []).includes(u) ? "checked" : ""}><span><i></i>${esc(u === "Mercado de Capitales" ? "Mesa · Mercado de Capitales" : u)}</span></label>`).join("")}</div></div>`;
+  if (t === "imp") { const T = (S.imp && S.imp.tablas) || {}, ks = IMP_GRUPOS.flatMap(g => g[1]).filter(k => T[k]).concat(Object.keys(T).filter(k => !IMP_GRUPOS.some(g => g[1].includes(k))));
+    return `<div class="f ed-f"><span>${lab}</span><div class="ed-imp">${ks.map(k => `<label class="impchk"><input type="checkbox" data-eimp="${k}" ${(v || []).includes(k) ? "checked" : ""}><span>${esc(T[k].nombre)}</span></label>`).join("")}</div></div>`; }
   if (t === "cat") { const cats = CAT_ORDER.concat([...new Set(S.productos.map(x => x.categoria))].filter(c => !CAT_ORDER.includes(c)));
     return `<label class="f ed-f" for="${fid}">${lab}<select class="input" id="${fid}" data-ek="${k}">${cats.map(c => `<option ${c === v ? "selected" : ""}>${esc(c)}</option>`).join("")}${v && !cats.includes(v) ? `<option selected>${esc(v)}</option>` : ""}</select></label>`; }
   if (t === "riesgo") return `<div class="f ed-f"><span>${lab}</span><div class="seg ed-riesgo">${[1,2,3,4,5].map(n => `<button type="button" data-act="edRiesgo" data-v="${n}" aria-pressed="${+v === n}">${risk(n)}</button>`).join("")}</div></div>`;
@@ -1339,6 +1363,14 @@ async function enlazarPDF(file){
     if (!n) return file;
     return new File([await doc.save()], file.name, {type: "application/pdf"});
   } catch (e) { console.warn("No se pudieron agregar los links al PDF", e); return file; }
+}
+async function upOPArchivo(id, pdf){   // subir el one pager desde Para hacer o la tabla de Fichas
+  if (!pdf || !S.assets || !S.db) return;
+  if (!(pdf.type === "application/pdf" || /\.pdf$/i.test(pdf.name))) { toast("Tiene que ser un PDF"); return; }
+  const p = S.byId[id]; if (!p) return;
+  toast("Subiendo el one pager de " + p.nombre + "…");
+  try { const a = await S.assets.upload(await enlazarPDF(pdf), id); window.neixQue = "subió un one pager"; await S.db.doc("productos/"+id).update({onePager: {pdf:a.id, archivo: p.nombre+" - Neix.pdf", fecha: todayISO()}, onePagerQuitado: false}); toast("One pager de " + p.nombre + " cargado"); render(); }
+  catch(e) { toast(e && e.message && e.message !== "subir" ? e.message : "No se pudo subir. Revisá el archivo y probá de nuevo."); }
 }
 async function upOP(id){
   const pdf = ($("#up_pdf")||{}).files?.[0];
@@ -2536,7 +2568,7 @@ function pendientes(rows){
   return {notas, fichas, total: notas.length + fichas.length};
 }
 function pendBadge(){
-  const t = puedeGestionar() && S.productos.length ? pendientes().total : 0;
+  const t = puedeGestionar() && S.productos.length ? hacerItems().total : 0;
   document.querySelectorAll(".gcount").forEach(c => { c.textContent = t > 99 ? "99+" : t; c.hidden = !t; });
 }
 function pendientesHTML(rows){
@@ -2584,11 +2616,12 @@ function usoHTML(){
   }
   return `<details class="fold uso" style="margin-bottom:18px" ${S.usoAbierto ? "open" : ""}><summary>Uso del Hub <span class="tiny muted">qué fichas se miran y qué se envía</span></summary><div class="in">${cuerpo}</div></details>`;
 }
-/* Gestión: pestañas (Fichas · Pendientes · Instructivos · Uso del Hub · Historial). */
-const GES_TABS = [["fichas","Fichas"],["pend","Pendientes"],["inst","Instructivos"],["uso","Uso del Hub"],["hist","Historial"]];
+/* Gestión: pestañas (Para hacer · Fichas · Equipo y contenido · Actividad). */
+const GES_TABS = [["hacer","Para hacer"],["fichas","Fichas"],["equipo","Equipo y contenido"],["act","Actividad"]];
+const GES_VIEJAS = {pend: "hacer", inst: "equipo", uso: "act", hist: "act"};
 function vGestion(){
   const rows = S.productos.map(p=>({p, e:estadoDe(p)})).sort((a,b)=>(a.e.d??999)-(b.e.d??999));
-  const tab = S.gesTab || "fichas", nPend = pendientes(rows).total;
+  const tab = GES_VIEJAS[S.gesTab] || (GES_TABS.some(t => t[0] === S.gesTab) ? S.gesTab : "hacer"), nHacer = hacerItems(rows).total;
   const aviso = S.base === false ? `<div class="alert warn" style="margin-bottom:16px"><b>Sin base de datos</b>Los cambios de Gestión se ven solo en esta pantalla y se pierden al recargar.</div>` : "";
   let cuerpo = "";
   if (tab === "fichas") {
@@ -2598,18 +2631,111 @@ function vGestion(){
     cuerpo = `<div class="ges-tiles">${tile("validado","Validadas",n("validado"),"de " + rows.length + " fichas")}${tile("a_validar","A validar",n("a_validar"),"sin validación vigente", n("a_validar") > 0)}${tile("pronto","Vencen pronto",pronto,"vencidas o en 30 días", pronto > 0)}${tile("sinop","Sin one pager",sinOp,"usan el automático")}</div>
     <div class="ges-sbar"><div class="search ges-search">${ico("_search")}<input class="input" id="ges_q" type="search" placeholder="Buscá una ficha por nombre, tipo, área o quién la modificó" value="${esc(S.gesQ||"")}" aria-label="Buscar fichas" autocomplete="off"></div><button class="fclear" data-act="gesClear" ${F || (S.gesQ||"").trim() ? "" : "hidden"}>${ico("_x")}Borrar filtros</button></div>
     <div class="panel" style="padding:0;overflow:hidden"><div class="tw"><table class="ges-tabla"><thead><tr><th>Ficha</th><th>Tipo</th><th>Áreas</th><th>Estado</th><th>One pager</th><th>Revisar antes</th><th>Última modificación</th></tr></thead><tbody>
-    ${rows.map(({p,e})=>{ const c = ultimoCambio(p.id); return `<tr data-q="${esc(sinAcento([p.nombre, p.categoria, p.unidades.join(" "), p.unidades.map(u=>UNI[u]||"").join(" "), e.txt, c ? nombreDe(c) : ""].join(" ")))}" data-k="${e.k}" data-pronto="${e.d!==null && e.d<=30 ? 1 : 0}" data-op="${p.onePager || p.sinOnePager ? 1 : 0}" data-href="#editar-${p.id}"><td><a href="#editar-${p.id}"><b>${esc(p.nombre)}</b></a></td><td class="muted small">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="pill ${e.cls}">${e.txt}</span></td><td>${p.onePager?`<span class="optag">Oficial</span>`:p.sinOnePager?`<span class="tiny muted">No lleva</span>`:`<span class="tiny muted">Automático</span>`}</td><td class="num small">${fdate(e.vence)}</td><td>${c ? `<span class="small">${esc(nombreDe(c))}</span><br><span class="tiny muted">${fechaHora(c.fecha)}</span>` : `<span class="tiny muted">Sin cambios</span>`}</td></tr>`; }).join("")}
+    ${rows.map(({p,e})=>{ const c = ultimoCambio(p.id); return `<tr data-q="${esc(sinAcento([p.nombre, p.categoria, p.unidades.join(" "), p.unidades.map(u=>UNI[u]||"").join(" "), e.txt, c ? nombreDe(c) : ""].join(" ")))}" data-k="${e.k}" data-pronto="${e.d!==null && e.d<=30 ? 1 : 0}" data-op="${p.onePager || p.sinOnePager ? 1 : 0}" data-href="#editar-${p.id}"><td><a href="#editar-${p.id}"><b>${esc(p.nombre)}</b></a></td><td class="muted small">${esc(p.categoria)}</td><td><span class="units" style="display:flex;gap:3px;flex-wrap:wrap">${units(p)}</span></td><td><span class="ges-est"><span class="pill ${e.cls}">${e.txt}</span>${e.k !== "validado" || (e.d !== null && e.d <= 30) ? `<button class="mini" data-act="valRapido" data-id="${p.id}" title="Validar por 90 días">${ico("_check")}Validar</button>` : ""}</span></td><td>${p.onePager?`<span class="optag">Oficial</span>`:p.sinOnePager?`<span class="tiny muted">No lleva</span>`:`<span class="ges-est"><span class="tiny muted">Automático</span>${S.assets ? `<label class="mini">${ico("_up")}Subir<input type="file" accept="application/pdf" data-opq="${p.id}" hidden></label>` : ""}</span>`}</td><td class="num small">${fdate(e.vence)}</td><td>${c ? `<span class="small">${esc(nombreDe(c))}</span><br><span class="tiny muted">${fechaHora(c.fecha)}</span>` : `<span class="tiny muted">Sin cambios</span>`}</td></tr>`; }).join("")}
     <tr class="ges-nada" hidden><td colspan="7" class="muted small">No hay fichas con esa búsqueda o filtro.</td></tr></tbody></table></div></div>
     ${ocultos.length ? `<details class="fold" style="margin-top:16px"><summary>Productos eliminados <span class="tiny muted">(${ocultos.length})</span></summary><div class="in stack" style="gap:8px">${ocultos.map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span>${esc(p.nombre)} <span class="tiny muted">· ${esc(p.categoria)}</span></span><button class="btn ghost" data-act="prodRestaurar" data-id="${p.id}">Restaurar</button></div>`).join("")}</div></details>` : ""}`;
-  } else if (tab === "pend") cuerpo = pendientesHTML(rows);
-  else if (tab === "inst") cuerpo = instEditorHTML();
-  else if (tab === "uso") { S.usoAbierto = true; cuerpo = usoHTML(); }
-  else cuerpo = historialHTML(true) || `<div class="empty">Todavía no hay cambios registrados.</div>`;
+  } else if (tab === "hacer") cuerpo = hacerHTML(rows);
+  else if (tab === "equipo") cuerpo = equipoHTML();
+  else { S.usoAbierto = true; cuerpo = usoHTML() + (historialHTML(true) || `<div class="panel"><h3>Historial de cambios</h3><p class="small muted" style="margin:0">Todavía no hay cambios registrados.</p></div>`); }
   return `<div class="page-head"><div><div class="eyebrow">Gestión · Marketing y administradores</div><h1>Gestión del Hub</h1>
-  <p class="muted">Fichas, one pagers, instructivos y lo que piden los asesores.</p></div>
+  <p class="muted">Lo que hay que resolver, las fichas, el equipo y el contenido del Hub.</p></div>
   <div class="btn-row"><button class="btn primary" data-act="prodNuevo">${ico("_plus")}Nuevo producto</button></div></div>
-  ${aviso}<div class="seg ges-tabs" role="tablist">${GES_TABS.map(([k, l]) => `<button role="tab" data-act="gesTab" data-v="${k}" aria-pressed="${tab === k}">${l}${k === "pend" && nPend ? ` <span class="pend-n">${nPend}</span>` : ""}${k === "fichas" ? ` <span class="tiny muted">${rows.length}</span>` : ""}</button>`).join("")}</div>
+  ${aviso}<div class="seg ges-tabs" role="tablist">${GES_TABS.map(([k, l]) => `<button role="tab" data-act="gesTab" data-v="${k}" aria-pressed="${tab === k}">${l}${k === "hacer" && nHacer ? ` <span class="pend-n">${nHacer}</span>` : ""}${k === "fichas" ? ` <span class="tiny muted">${rows.length}</span>` : ""}</button>`).join("")}</div>
   <div class="ges-body">${cuerpo}</div>`;
+}
+/* ── Para hacer: todo lo que hay que resolver, con el botón para hacerlo ahí mismo ── */
+function hacerItems(rows){
+  rows = rows || S.productos.map(p=>({p, e:estadoDe(p)}));
+  const notas = (S.notas||[]).filter(n=>!n.resuelta);
+  const vencen = rows.filter(r=>r.e.d!==null && r.e.d<=30).sort((a,b)=>a.e.d-b.e.d);
+  const aval = rows.filter(r=>r.e.k==="a_validar" && !(r.e.d!==null && r.e.d<=30));
+  const sinOp = rows.filter(r=>!r.p.onePager && !r.p.sinOnePager);
+  return {notas, vencen, aval, sinOp, total: notas.length + vencen.length + aval.length};
+}
+function hacerHTML(rows){
+  const H = hacerItems(rows), quienN = n => esc(n.autorNombre || S.names[n.autor] || n.autor || "Asesor");
+  const cuando = f => new Date(f).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short",hour12:false,timeZone:"America/Argentina/Buenos_Aires"});
+  const btnVal = p => `<button class="btn primary" data-act="valRapido" data-id="${p.id}">${ico("_check")}Validar</button>`;
+  const btnEd = p => `<a class="btn ghost" href="#editar-${p.id}">Editar ficha</a>`;
+  const it = (izq, der) => `<div class="hc-it"><div class="hc-tx">${izq}</div><div class="btn-row">${der}</div></div>`;
+  const sec = (ic, tit, n, sub, cuerpo, plegada) => n ? (plegada
+    ? `<details class="panel hc-sec"><summary><span class="hc-ic">${ico(ic)}</span><span class="hc-h"><b>${tit}</b><span class="tiny muted">${sub}</span></span><span class="pend-n hc-n">${n}</span></summary><div class="hc-list">${cuerpo}</div></details>`
+    : `<section class="panel hc-sec"><div class="hc-head"><span class="hc-ic">${ico(ic)}</span><span class="hc-h"><b>${tit}</b><span class="tiny muted">${sub}</span></span><span class="pend-n hc-n">${n}</span></div><div class="hc-list">${cuerpo}</div></section>`) : "";
+  const venc = e => e.d<0 ? `Venció el ${fdate(e.vence)} (hace ${-e.d} ${-e.d===1?"día":"días"})` : e.d===0 ? "Vence hoy" : `Vence el ${fdate(e.vence)} (en ${e.d} ${e.d===1?"día":"días"})`;
+  const resueltas = (S.notas||[]).filter(n=>n.resuelta);
+  return `${H.total ? "" : `<div class="panel hc-ok"><span class="hc-ic ok">${ico("_check")}</span><div><b>Todo al día</b><p class="small muted" style="margin:2px 0 0">No hay notas sin resolver ni fichas para validar o renovar.</p></div></div>`}
+   ${sec("_chat", "Notas de los asesores", H.notas.length, "Lo que pidieron cambiar o corregir en las fichas", H.notas.map(n => it(`<div class="tiny muted"><a href="#p-${esc(n.producto)}">${esc(n.productoNombre||n.producto)}</a> · ${quienN(n)} · ${cuando(n.fecha)}</div><p class="small" style="margin:4px 0 0">${esc(n.texto)}</p>`,
+      `<a class="btn ghost" href="#editar-${esc(n.producto)}">Editar ficha</a><button class="btn primary" data-act="notaRes" data-id="${esc(n.id)}" data-v="1">${ico("_check")}Resuelta</button>`)).join(""))}
+   ${sec("_clock", "Fichas para renovar", H.vencen.length, "Vencidas o que vencen en los próximos 30 días", H.vencen.map(({p,e}) => it(`<b class="small">${esc(p.nombre)}</b><div class="tiny muted">${venc(e)}</div>`, btnEd(p) + btnVal(p))).join(""))}
+   ${sec("_shield", "Fichas a validar", H.aval.length, "Revisá el contenido y validala: queda vigente por 90 días", H.aval.map(({p}) => it(`<b class="small">${esc(p.nombre)}</b><div class="tiny muted">${esc(p.categoria)} · ${esc(p.unidades.join(", "))}</div>`, btnEd(p) + btnVal(p))).join(""))}
+   ${sec("_doc", "Fichas sin one pager oficial", H.sinOp.length, "Usan el one pager automático. Si tenés el PDF oficial, subilo acá", H.sinOp.map(({p}) => it(`<b class="small">${esc(p.nombre)}</b><div class="tiny muted">${esc(p.categoria)}</div>`, S.assets ? `<label class="btn">${ico("_up")}Subir PDF<input type="file" accept="application/pdf" data-opq="${p.id}" hidden></label>` : btnEd(p))).join(""), true)}
+   ${resueltas.length ? `<details class="fold" style="margin-top:12px"><summary>Notas resueltas <span class="tiny muted">(${resueltas.length})</span></summary><div class="in">${resueltas.slice(0,30).map(n=>`<div class="pend-it"><div class="pend-tx"><div class="tiny muted"><a href="#p-${esc(n.producto)}">${esc(n.productoNombre||n.producto)}</a> · ${quienN(n)} · ${cuando(n.fecha)}</div><p class="small">${esc(n.texto)}</p></div><button class="btn ghost" data-act="notaRes" data-id="${esc(n.id)}" data-v="0">Reabrir</button></div>`).join("")}</div></details>` : ""}`;
+}
+async function valRapido(id){
+  const p = S.byId[id]; if (!p || !S.db) return;
+  const d = new Date(); d.setDate(d.getDate() + 90); const vence = d.toISOString().slice(0, 10);
+  if (!await confirmar({titulo: `¿Validar ${p.nombre}?`, texto: `Confirmás que revisaste el contenido de la ficha. Queda validada hasta el ${fdate(vence)}.`, si: "Validar"})) return;
+  try { window.neixQue = "validó la ficha"; await S.db.doc("validaciones/" + id).set({estado: "validado", fecha: todayISO(), vence, por: S.uid || (S.me && S.me.email) || "", nota: ""}); S.vals[id] = {estado: "validado", fecha: todayISO(), vence}; toast("Ficha validada hasta el " + fdate(vence)); render(); }
+  catch(e) { toast("No pudimos registrar la validación: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); }
+}
+
+/* ── Equipo y contenido: asesores, instructivos y fondos ── */
+const GES_SUB = [["ases", "Asesores"], ["inst", "Instructivos"], ["fondos", "Fondos"]];
+function equipoHTML(){
+  const sub = GES_SUB.some(x => x[0] === S.gesSub) ? S.gesSub : "ases";
+  return `<div class="seg ges-sub" role="tablist">${GES_SUB.map(([k, t]) => `<button role="tab" data-act="gesSub" data-v="${k}" aria-pressed="${sub === k}">${t}</button>`).join("")}</div>
+    ${sub === "ases" ? asesoresEdHTML() : sub === "inst" ? instEditorHTML() : fondosEdHTML()}`;
+}
+function asesoresEdHTML(){
+  if (!S.asesEd) S.asesEd = JSON.parse(JSON.stringify(S.asesores || []));
+  const l = S.asesEd, areas = [...new Set(Object.keys(AREAS).concat(["Dirección general", "Marketing"]).concat(l.map(a => a.area).filter(Boolean)))];
+  return `<div class="panel"><div class="eq-h"><div><h3 style="margin:0">Asesores</h3><p class="small muted" style="margin:4px 0 0">Se usan en Propuesta y Presentaciones (al escribir el nombre se completan mail y celular) y en la firma de los mails que salen desde el Hub.</p></div>
+    <button class="btn" data-act="asAdd">${ico("_plus")}Agregar asesor</button></div>
+    <datalist id="eqAreas">${areas.map(a => `<option value="${esc(a)}">`).join("")}</datalist>
+    <div class="tw"><table class="eq-t"><thead><tr><th>Nombre</th><th>Cargo</th><th>Área</th><th>Mail</th><th>Celular</th><th></th></tr></thead><tbody>
+    ${l.map((a, i) => `<tr>${[["nombre","Nombre y apellido"],["cargo","Ej.: Asesor Senior"],["area","Área"],["mail","nombre@neix.com.ar"],["tel","+54 9 11 …"]].map(([f, ph]) => `<td data-l="${f}"><input class="input" data-as="${i}" data-f="${f}" value="${esc(a[f] || "")}" placeholder="${ph}" ${f === "area" ? 'list="eqAreas"' : ""} ${f === "mail" ? 'type="email"' : ""}></td>`).join("")}<td><button class="btn ghost icon" data-act="asDel" data-v="${i}" aria-label="Quitar a ${esc(a.nombre || "este asesor")}">${ico("_trash")}</button></td></tr>`).join("")}
+    ${l.length ? "" : `<tr><td colspan="6" class="muted small">Todavía no hay asesores cargados.</td></tr>`}</tbody></table></div>
+    <div class="eq-pie"><span class="tiny muted">${l.length} asesores. El celular lo ven solo quienes entran al Hub con su cuenta de Neix.</span><button class="btn primary" data-act="asSave">Guardar asesores</button></div></div>`;
+}
+async function asGuardar(b){
+  const lista = (S.asesEd || []).map(a => ({nombre: String(a.nombre || "").trim(), cargo: String(a.cargo || "").trim(), area: String(a.area || "").trim(), mail: String(a.mail || "").trim().toLowerCase(), tel: String(a.tel || "").trim()}))
+    .filter(a => a.nombre || a.mail).map(a => Object.fromEntries(Object.entries(a).filter(([, v]) => v)));
+  const sinNombre = lista.find(a => !a.nombre); if (sinNombre) { toast("Falta el nombre de " + (sinNombre.mail || "un asesor")); return; }
+  const mal = lista.find(a => a.mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a.mail)); if (mal) { toast("Revisá el mail de " + mal.nombre); return; }
+  if (!S.db) return;
+  b.disabled = true; b.textContent = "Guardando…";
+  try { window.neixQue = "editó los asesores"; await S.db.doc("config/asesores").set({lista}); S.asesores = lista; S.asesEd = null; toast("Asesores guardados"); render(); }
+  catch(e) { toast("No se pudieron guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); b.disabled = false; b.textContent = "Guardar asesores"; }
+}
+function fondosEdHTML(){
+  if (!S.fondos) { if (S.fondos === undefined) fondosHTML(); return `<div class="panel"><h3>Fondos</h3><p class="small muted" style="margin:0">Cargando…</p></div>`; }
+  if (!S.fondEd) S.fondEd = JSON.parse(JSON.stringify(S.fondos.lista || []));
+  const tipos = S.fondos.tipos || [], l = S.fondEd;
+  return `<div class="panel"><div class="eq-h"><div><h3 style="margin:0">Fondos que ofrecemos</h3><p class="small muted" style="margin:4px 0 0">Se muestran en la ficha de Fondos comunes de inversión, con su rendimiento. "Nombre en la CNV/CAFCI" es como figura el fondo en la Cámara: sirve para traer el rendimiento.</p></div>
+    <button class="btn" data-act="fdAdd">${ico("_plus")}Agregar fondo</button></div>
+    <div class="search ges-search" style="margin:12px 0">${ico("_search")}<input class="input" id="fdEdQ" type="search" placeholder="Buscar fondo por nombre, tipo o especie" value="${esc(S.fdEdQ || "")}" aria-label="Buscar fondo" autocomplete="off"></div>
+    <div class="tw" style="max-height:560px;overflow:auto"><table class="eq-t fd-t"><thead><tr><th>Fondo</th><th>Tipo</th><th>Especie</th><th>Moneda</th><th>Nombre en la CNV/CAFCI</th><th></th></tr></thead><tbody>
+    ${l.map((f, i) => `<tr data-q="${esc(sinAcento([f.n, f.tipo, f.esp].join(" ")))}"><td data-l="Fondo"><input class="input" data-fd="${i}" data-f="n" value="${esc(f.n || "")}" placeholder="Nombre del fondo"></td>
+      <td data-l="Tipo"><select class="input" data-fd="${i}" data-f="tipo">${tipos.map(t => `<option ${t === f.tipo ? "selected" : ""}>${esc(t)}</option>`).join("")}</select></td>
+      <td data-l="Especie"><input class="input" data-fd="${i}" data-f="esp" value="${esc(f.esp || "")}" placeholder="Ticker en BYMA"></td>
+      <td data-l="Moneda"><select class="input" data-fd="${i}" data-f="mon">${[["ARS","Pesos"],["USD","USD MEP"],["USD EXT","USD cable"]].map(([k, t]) => `<option value="${k}" ${k === (f.mon || "ARS") ? "selected" : ""}>${t}</option>`).join("")}</select></td>
+      <td data-l="CAFCI"><input class="input" data-fd="${i}" data-f="cafci" value="${esc(f.cafci || "")}" placeholder="Sin vincular"></td>
+      <td><button class="btn ghost icon" data-act="fdDel" data-v="${i}" aria-label="Quitar ${esc(f.n || "este fondo")}">${ico("_trash")}</button></td></tr>`).join("")}
+    <tr class="fd-nada" hidden><td colspan="6" class="muted small">Sin fondos con esa búsqueda.</td></tr></tbody></table></div>
+    <div class="eq-pie"><span class="tiny muted">${l.length} fondos · ${l.filter(f => f.cafci).length} con rendimiento vinculado.</span><button class="btn primary" data-act="fdSave">Guardar fondos</button></div></div>`;
+}
+function fdEdFiltrar(){
+  const q = sinAcento(S.fdEdQ || "").trim().split(/\s+/).filter(Boolean), t = $(".fd-t"); if (!t) return; let n = 0;
+  t.querySelectorAll("tbody tr[data-q]").forEach(tr => { const ok = q.every(w => tr.dataset.q.includes(w)); tr.hidden = !ok; if (ok) n++; });
+  const z = t.querySelector(".fd-nada"); if (z) z.hidden = n > 0;
+}
+async function fdGuardar(b){
+  const lista = (S.fondEd || []).map(f => Object.assign({}, f, {n: String(f.n || "").trim(), esp: String(f.esp || "").trim(), cafci: String(f.cafci || "").trim()})).filter(f => f.n)
+    .map(f => { ["esp", "cafci"].forEach(k => { if (!f[k]) delete f[k]; }); return f; });
+  if (!S.db) return;
+  b.disabled = true; b.textContent = "Guardando…";
+  try { window.neixQue = "editó los fondos"; const doc = Object.assign({}, S.fondos, {lista}); await S.db.doc("config/fondos").set(doc); S.fondos = doc; S.fondEd = null; S.rend = undefined; try { localStorage.removeItem(RD_KEY); } catch(_) {} toast("Fondos guardados"); render(); }
+  catch(e) { toast("No se pudieron guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); b.disabled = false; b.textContent = "Guardar fondos"; }
 }
 /* Buscador de Gestión: filtra la tabla sin volver a dibujarla (no se pierde el cursor). */
 function gesFiltrar(){
@@ -2716,12 +2842,23 @@ function verArchivo(url, titulo){
 function instEditorHTML(){
   if (!S.instEd) S.instEd = JSON.parse(JSON.stringify(S.instructivos || []));
   const l = S.instEd;
-  return `<div class="panel" style="margin-bottom:18px"><h3>Instructivos generales</h3><p class="small muted" style="margin:-4px 0 12px">Se muestran en la sección Instructivos del menú. Cada uno puede tener un link o un PDF. Los videos los suma quien mantiene el Hub.</p>
-   <div class="stack" style="gap:10px">${l.map((x, i) => x.oculto ? "" : esVideoHub(instUrl(x)) ? `<div class="inst-row"><input class="input" data-inst="${i}" data-f="titulo" value="${esc(x.titulo || "")}" placeholder="Título del instructivo" aria-label="Título"><input class="input" value="" placeholder="Video del Hub" aria-label="Video" disabled><span class="btn-row"><button class="btn ghost" type="button" data-act="instVer" data-v="${i}" data-ed="1">Ver video</button><button class="btn ghost" type="button" data-act="instDel" data-v="${i}" aria-label="Eliminar">Eliminar</button></span></div>` : `<div class="inst-row">
-     <input class="input" data-inst="${i}" data-f="titulo" value="${esc(x.titulo || "")}" placeholder="Título del instructivo" aria-label="Título">
-     <input class="input" data-inst="${i}" data-f="url" value="${esc(esArchivoHub(x.url) ? "" : (x.url || ""))}" placeholder="${esArchivoHub(x.url) ? "PDF cargado" : "https://… (link al instructivo)"}" aria-label="Link" ${esArchivoHub(x.url) ? "disabled" : ""}>
-     <span class="btn-row">${esArchivoHub(x.url) ? `<button class="btn ghost" type="button" data-act="instVer" data-v="${i}" data-ed="1">Ver PDF</button><button class="btn ghost" type="button" data-act="instSinPdf" data-v="${i}">Quitar PDF</button>` : `<label class="btn ghost" style="cursor:pointer">Subir PDF<input type="file" accept="application/pdf" data-instpdf="${i}" hidden></label>`}<button class="btn ghost" type="button" data-act="instDel" data-v="${i}" aria-label="Eliminar">Eliminar</button></span></div>`).join("")}</div>
-   <div class="btn-row" style="margin-top:12px"><button class="btn" type="button" data-act="instAdd">${ico("_plus")}Agregar instructivo</button><button class="btn primary" type="button" data-act="instSave">Guardar instructivos</button></div></div>`;
+  const tarjeta = (x, i) => {
+    const u = instUrl(x), vid = esVideoHub(u), pdf = esArchivoHub(x.url), m = INST_META[u] || {};
+    const img = m.poster ? `<img src="${esc(m.poster)}" alt="" loading="lazy">` : `<span class="inst-ph">${ico(pdf ? "_doc" : u ? "_link" : "_inst")}</span>`;
+    const tipo = vid ? "Video del Hub" + (m.dur ? " · " + m.dur : "") : pdf ? "PDF cargado" : u ? "Link" : "Sin contenido todavía";
+    return `<div class="ie-card"><div class="ie-img">${img}${vid ? `<span class="inst-play" aria-hidden="true"></span>` : ""}</div><div class="ie-in">
+      <input class="input" data-inst="${i}" data-f="titulo" value="${esc(x.titulo || "")}" placeholder="Título del instructivo" aria-label="Título">
+      <span class="tiny muted">${tipo}</span>
+      ${vid || pdf ? "" : `<input class="input" data-inst="${i}" data-f="url" value="${esc(x.url || "")}" placeholder="https://… (link al instructivo)" aria-label="Link">`}
+      <div class="ie-acc">${vid ? `<button class="mini" type="button" data-act="instVer" data-v="${i}" data-ed="1">Ver video</button>`
+        : pdf ? `<button class="mini" type="button" data-act="instVer" data-v="${i}" data-ed="1">Ver PDF</button><button class="mini" type="button" data-act="instSinPdf" data-v="${i}">Quitar PDF</button>`
+        : `<label class="mini">${ico("_up")}Subir PDF<input type="file" accept="application/pdf" data-instpdf="${i}" hidden></label>`}
+        <button class="mini ie-del" type="button" data-act="instDel" data-v="${i}" aria-label="Eliminar ${esc(x.titulo || "instructivo")}">${ico("_trash")}Eliminar</button></div></div></div>`;
+  };
+  return `<div class="panel"><div class="eq-h"><div><h3 style="margin:0">Instructivos generales</h3><p class="small muted" style="margin:4px 0 0">Se muestran en la sección Instructivos del menú. Cada uno puede tener un link o un PDF. Los videos los suma quien mantiene el Hub.</p></div>
+    <button class="btn" type="button" data-act="instAdd">${ico("_plus")}Agregar instructivo</button></div>
+    <div class="ie-grid">${l.map((x, i) => x.oculto ? "" : tarjeta(x, i)).join("")}</div>
+    <div class="eq-pie"><span class="tiny muted">Los cambios se ven en Instructivos cuando tocás Guardar.</span><button class="btn primary" type="button" data-act="instSave">Guardar instructivos</button></div></div>`;
 }
 async function instGuardar(b){
   const lista = (S.instEd || []).map(x => x.oculto ? {titulo: String(x.titulo || "").trim(), url: "", oculto: true} : {titulo: String(x.titulo || "").trim(), url: String(x.url || "").trim()}).filter(x => x.titulo || x.url);
@@ -2858,6 +2995,14 @@ document.addEventListener("click", e => {
   else if (a==="neiaSug") neiaEnviar(v);
   else if (a==="neiaEnviar") { const t = $("#neiaTxt"); if (t) neiaEnviar(t.value); }
   else if (a==="gesTab") { S.gesTab = v; render(); }
+  else if (a==="gesSub") { S.gesSub = v; render(); }
+  else if (a==="valRapido") valRapido(b.dataset.id);
+  else if (a==="asAdd") { (S.asesEd = S.asesEd || []).push({nombre:"", cargo:"", area:"", mail:"", tel:""}); render(); setTimeout(() => { const l = document.querySelectorAll('[data-as][data-f="nombre"]'); if (l.length) l[l.length - 1].focus(); }, 30); }
+  else if (a==="asDel") { S.asesEd.splice(+v, 1); render(); }
+  else if (a==="asSave") asGuardar(b);
+  else if (a==="fdAdd") { (S.fondEd = S.fondEd || []).unshift({n:"", tipo:(S.fondos.tipos || [])[0] || "", mon:"ARS"}); S.fdEdQ = ""; render(); setTimeout(() => { const x = $('[data-fd="0"][data-f="n"]'); if (x) x.focus(); }, 30); }
+  else if (a==="fdDel") { S.fondEd.splice(+v, 1); render(); }
+  else if (a==="fdSave") fdGuardar(b);
   else if (a==="gesClear") { S.gesF = ""; S.gesQ = ""; const qi = $("#ges_q"); if (qi) qi.value = ""; document.querySelectorAll(".ges-tile").forEach(x => { x.classList.remove("on"); x.setAttribute("aria-pressed", "false"); }); gesFiltrar(); }
   else if (a==="gesF") { S.gesF = S.gesF === v ? "" : v; document.querySelectorAll(".ges-tile").forEach(x => { const on = x.dataset.v === S.gesF; x.classList.toggle("on", on); x.setAttribute("aria-pressed", String(on)); }); gesFiltrar(); }
   else if (a==="edSec") { S.ed.sec = v; render(); window.scrollTo({top: Math.min(window.scrollY, ($(".ed-tabs") || {offsetTop: 0}).offsetTop - 80)}); }
@@ -2909,6 +3054,9 @@ document.addEventListener("input", e => {
   else if (t.id === "ges_q") { S.gesQ = t.value; gesFiltrar(); }
   else if (t.id === "impQ") { S.impQ = t.value; impFiltrar(); }
   else if (t.dataset.inst !== undefined && S.instEd) { S.instEd[+t.dataset.inst][t.dataset.f] = t.value; }
+  else if (t.dataset.as !== undefined && S.asesEd) { S.asesEd[+t.dataset.as][t.dataset.f] = t.value; }
+  else if (t.dataset.fd !== undefined && S.fondEd) { S.fondEd[+t.dataset.fd][t.dataset.f] = t.value; }
+  else if (t.id === "fdEdQ") { S.fdEdQ = t.value; fdEdFiltrar(); }
   else if (t.dataset.pz) { S.pz[t.dataset.pz] = t.value;
     if (t.dataset.pz==="asesor") { const a = findAsesor(t.value); if (a && t.value !== a.nombre) { t.value = S.pz.asesor = a.nombre; } if (a) { S.pz.mail = a.mail || ""; S.pz.tel = a.tel || ""; const m = $("#pz_mail"), te = $("#pz_tel"); if (m) m.value = S.pz.mail; if (te) te.value = S.pz.tel; } if (a && AREAS[a.area]) { S.pz.area = a.area; const sel = $("#pz_area"); if (sel) sel.value = a.area; } }
     pzSave(); refreshDeck(); }
@@ -2936,6 +3084,9 @@ document.addEventListener("change", e => {
   if (t.dataset && t.dataset.eu && S.ed) { const u = new Set(S.ed.p.unidades || []); t.checked ? u.add(t.dataset.eu) : u.delete(t.dataset.eu); S.ed.p.unidades = Object.keys(UNI).filter(x => u.has(x)); S.ed.dirty = true; edRefrescar(); return; }
   if ((t.id === "shDoc" || t.id === "shPres") && S.envio && S.envio.tipo === "prop") { S.envio.sel[t.id === "shDoc" ? "doc" : "pres"] = t.checked; propListo(); return; }
   if (t.dataset.instpdf !== undefined) { instSubirPdf(+t.dataset.instpdf, t.files[0]); return; }
+  if (t.dataset.opq) { upOPArchivo(t.dataset.opq, t.files[0]); t.value = ""; return; }
+  if (t.dataset.fd !== undefined && S.fondEd && t.tagName === "SELECT") { S.fondEd[+t.dataset.fd][t.dataset.f] = t.value; return; }
+  if (t.dataset && t.dataset.eimp && S.ed) { const u = new Set(S.ed.p.impuestos || []); t.checked ? u.add(t.dataset.eimp) : u.delete(t.dataset.eimp); S.ed.p.impuestos = Object.keys((S.imp && S.imp.tablas) || {}).filter(x => u.has(x)); S.ed.dirty = true; edRefrescar(); return; }
   if (t.id==="fEstado") { S.fEstado = t.value; render(); }
   else if (t.dataset.pzp) { const i = S.pz.items.indexOf(t.dataset.pzp); if (t.checked && i<0) { S.pz.items.push(t.dataset.pzp); uso(t.dataset.pzp, "p"); } if (!t.checked && i>=0) S.pz.items.splice(i,1); pzSave(); render(); }
   else if (t.id==="pz_inst") { S.pz.inst = t.checked; pzSave(); refreshDeck(); }
@@ -3298,7 +3449,8 @@ async function boot(){
     softRender();
   }, () => { if (src === db && usarRespaldo()) return; clearTimeout(timer); S.loading = false; if (!S.productos.length) S.dbMissing = true; render(); });
   src.collection("validaciones").onSnapshot(snap => { const v = {}; snap.docs.forEach(d=>v[d.id]=d.data()); S.vals = v; if (S.productos.length) softRender(); }, ()=>{});
-  src.doc("config/asesores").onSnapshot(d => { S.asesores = d.exists ? (d.data().lista||[]) : []; const r = route(); if (r==="propuesta"||r==="presentaciones") softRender(); }, ()=>{});
+  src.doc("config/asesores").onSnapshot(d => { S.asesores = d.exists ? (d.data().lista||[]) : []; S.asesEd = null; const r = route(); if (r==="propuesta"||r==="presentaciones") softRender(); }, ()=>{});
+  src.doc("config/fondos").onSnapshot(d => { if (d.exists) { S.fondos = d.data(); S.fondEd = null; const r = route(); if (r.startsWith("p-fci") || r === "gestion") softRender(); } }, ()=>{});
   src.doc("config/instructivos").onSnapshot(d => { S.instructivos = instMezcla(d.exists ? (d.data().lista || []) : []); S.instEd = null; softRender(); }, ()=>{});
   src.doc("config/impuestos").onSnapshot(d => { S.imp = d.exists ? d.data() : null; if (S.productos.length) softRender(); }, ()=>{});
   src.doc("config/onepagers").onSnapshot(d => { S.onepagers = d.exists ? (d.data().map||{}) : {}; if (S.raw) { setProductos(S.raw); softRender(); } }, ()=>{});

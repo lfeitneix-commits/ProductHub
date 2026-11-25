@@ -66,6 +66,7 @@
     impuestos: "data/config/impuestos.json",
     onepagers: "data/config/onepagers.local.json",
     instructivos: "data/config/instructivos.json",
+    fondos: "data/config/fondos.json",
   };
   /* ── Base de datos de Gestión (Vercel: /api/datos) ──
      Lo guardado ahí (fichas editadas, validaciones, notas) se superpone a los archivos del repo.
