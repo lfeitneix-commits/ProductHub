@@ -1163,8 +1163,7 @@ function playbook(p){
    ${i.ingreso?`<div class="cobro"><span class="eyebrow">Cómo cobramos</span><p style="margin-top:4px">${esc(i.ingreso)}</p></div>`:""}
    ${teoriaHTML(i)}${p.id === "fci" ? fondosHTML() : ""}${impProductoHTML(p)}
    <div class="pb3"><div class="panel"><h3>A quién</h3>${li(i.perfiles)}</div><div class="panel"><h3>Cuándo aparece</h3>${li(i.senales)}</div><div class="panel"><h3>Qué preguntar</h3>${li(i.preguntas)}</div></div>
-   <div class="pb2"><div class="panel"><h3>Se combina con</h3><div class="rel">${i.relacionados.map(id=>S.byId[id]?`<a class="chip" href="#p-${id}">${esc(S.byId[id].nombre)}</a>`:"").join("")}</div></div>
-    <div class="panel"><h3>Encaje</h3><dl class="kv"><dt>Clientes</dt><dd>${p.match.tipos.map(t=>TIPO[t]).join(", ")}</dd><dt>Objetivos</dt><dd>${p.match.objetivos.map(o=>OBJ[o]).join(", ")}</dd><dt>Mínimo</dt><dd>${p.match.minimoUSD?usd(p.match.minimoUSD):"Sin mínimo relevante"}</dd></dl></div></div>
+   <div><div class="panel"><h3>Encaje</h3><dl class="kv"><dt>Clientes</dt><dd>${p.match.tipos.map(t=>TIPO[t]).join(", ")}</dd><dt>Objetivos</dt><dd>${p.match.objetivos.map(o=>OBJ[o]).join(", ")}</dd><dt>Mínimo</dt><dd>${p.match.minimoUSD?usd(p.match.minimoUSD):"Sin mínimo relevante"}</dd></dl></div></div>
 
   </div>`;
 }
