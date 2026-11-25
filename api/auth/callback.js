@@ -1,6 +1,6 @@
 // GET /api/auth/callback  <-  vuelta de Microsoft: valida la cuenta y deja la sesión abierta por 90 días
 import { enviarPagina } from "../../lib/pagina.js";
-import { CFG, SESION, ESTADO, MAIL, SCOPE_MAIL, DIAS_SESION, firmar, verificar, leerCookie, decodificarJWT, cookie, origen, habilitado, cifrar } from "../../lib/auth.js";
+import { CFG, SESION, ESTADO, MAIL, SCOPE_MAIL, DIAS_SESION, segundosHastaFinDelDia, azar, firmar, verificar, leerCookie, decodificarJWT, cookie, origen, habilitado, cifrar } from "../../lib/auth.js";
 
 const pagina = (res, status, titulo, texto) => enviarPagina(res, status, {
   eyebrow: "Acceso", titulo, texto,
@@ -35,8 +35,9 @@ export default async function handler(req, res) {
   const email = String(id.preferred_username || id.email || id.upn || "").toLowerCase();
   if (!habilitado(email)) return pagina(res, 403, "Tu cuenta no tiene acceso", `Ingresaste como ${(email || "una cuenta sin mail").replace(/[<>&"]/g, "")}. Si necesitás usar el Hub, pedile acceso a Marketing.`);
 
-  const sesion = await firmar({ email, nombre: id.name || "", exp: Math.floor(ahora + DIAS_SESION * 86400) });
-  const cookies = [cookie(SESION, sesion, DIAS_SESION * 86400), cookie(ESTADO, "", 0)];
+  const dura = segundosHastaFinDelDia();
+  const sesion = await firmar({ email, nombre: id.name || "", sid: azar().slice(0, 12), exp: Math.floor(ahora + dura) });   // sid: cada ingreso es una sesión nueva (el navegador borra los borradores de la anterior)
+  const cookies = [cookie(SESION, sesion, dura), cookie(ESTADO, "", 0)];
   if (estado.mail && tok.refresh_token) cookies.push(cookie(MAIL, await cifrar({ rt: tok.refresh_token, email }), DIAS_SESION * 86400));   // para enviar mails desde su casilla
   res.setHeader("Set-Cookie", cookies);
   res.writeHead(302, { Location: estado.destino || "/" });

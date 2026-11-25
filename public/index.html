@@ -725,6 +725,7 @@ const P_ = {
   _sim:"M6 3h12v18H6zM9 7h6M9 11h2M13 11h2M9 15h2M13 15h2",
   _send:"M4 12l16-8-6 16-2.5-6.5z",
   _doc:"M7 3h7l4 4v14H7zM14 3v4h4M9.5 12h6M9.5 15.5h6",
+  _trash:"M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
   _link:"M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
   "Financiamiento":"M3 7h18v10H3zM12 9.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5M6 10v4M18 10v4",
   "Liquidez y tesorería":"M12 3.5s6 6.4 6 10.8a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5z",
@@ -803,6 +804,7 @@ const S = {
   }
 };
 const LS = "neix-hub-v2";
+const PROP0 = JSON.stringify(S.prop);   // propuesta vacía (para "Borrar todo" y al cambiar de sesión)
 try { const sv = JSON.parse(localStorage.getItem(LS) || "null"); if (sv) { if (sv.prop) S.prop = Object.assign(S.prop, sv.prop); if (sv.cliente) S.cliente = Object.assign(blankCliente(), sv.cliente, {consultando:false}); if (sv.persona) S.persona = sv.persona === "Persona humana" ? "Persona física" : sv.persona; } } catch(e) {}
 try { S.propFmt = localStorage.getItem("neix-hub-propfmt") === "pres" ? "pres" : "doc"; } catch(_) { S.propFmt = "doc"; }
 function persist(){ try { localStorage.setItem(LS, JSON.stringify({prop:S.prop, cliente:S.cliente, persona:S.persona})); } catch(e) {} }
@@ -943,7 +945,7 @@ function footer(r){
 }
 /* Acceso de editores: al pie de cada página (solo con Firebase). */
 function sesionLink(){
-  if (S.me) return `Ingresaste como ${esc(S.me.nombre || S.me.email)}${S.me.editor ? " · editor" : ""} · <a href="/api/auth/logout" style="color:inherit">Salir</a>`;
+  if (S.me) return `Ingresaste como ${esc(S.me.nombre || S.me.email)}${S.me.editor ? " · editor" : ""} · <a href="/api/auth/logout" data-act="salir" style="color:inherit">Salir</a>`;
   const ses = S.ses; if (!ses) return "";
   return ses.editor ? `Editando como ${esc(ses.editor.email)} · <a href="#" data-act="logout" style="color:inherit">Salir</a>` : `<a href="#ingresar" style="color:inherit">Acceso editores</a>`;
 }
@@ -1928,7 +1930,7 @@ function vPropuesta(){
   P.items.forEach(it => { const p = S.byId[it.id]; if (!p) return; p.interno.relacionados.forEach(r => { if (!P.items.some(i=>i.id===r) && S.byId[r]) (sug[r] = sug[r] || []).push(p.nombre); }); });
   return `<div class="page-head"><div><div class="eyebrow">Propuesta</div><h1>Armá la propuesta</h1>
   <p class="muted">Sumá productos, contá por qué tienen sentido para este cliente y exportala lista para enviar.</p></div>
-  <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
+  <div class="btn-row"><button class="btn ghost" data-act="borrarProp" ${P.items.length || P.cliente || P.mensaje || (P.conversamos || []).some(Boolean) ? "" : "disabled"}>${ico("_trash")}Borrar todo</button><button class="btn" data-act="share" data-v="wa" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="prop" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="dlProp" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
   <div class="pr-grid"><div class="stack">
    ${P.analisis ? `<div class="panel ia-prop" style="margin:0"><div><b>Incluye el análisis de cartera</b><span>Hecho el ${fdate(P.analisis.fecha)} desde Cliente. Va antes de los productos.</span></div><button class="btn ghost" data-act="iaPropQuitar">Quitar</button></div>` : ""}
    <div class="panel stack"><h3 style="margin:0">Para quién</h3>
@@ -2038,6 +2040,7 @@ const asesoresList = () => `<datalist id="asesoresList">${(S.asesores||[]).map(a
 const AREAS = {"Banca Privada":"bancaprivada@neix.com.ar","Banca Corporativa":"bancacorporativa@neix.com.ar","Financial Advisors":"fas@neix.com.ar","Mesa · Mercado de Capitales":"info@neix.com.ar","Estrategia":"info@neix.com.ar"};
 const PZ_SUG = [["Tesorería corporativa",["cauciones","fci","fondo-dedicado"]],["Financiamiento pyme",["cheques","pagares","avales-sgr","facturas-fce"]],["Cobertura cambiaria",["futuros-dolar","bonos-cer-dl","pricing-fx"]],["Dolarizar e invertir afuera",["t-bills","cedears","cuentas-offshore","operatoria-internacional"]]];
 S.pz = {titulo:"Soluciones de inversión y financiamiento", bajada:"Banca Corporativa · Banca Privada · Financial Advisors · Mercado de Capitales", cliente:"", inst:true, asesor:"", mail:"", tel:"", area:"", items:[]};
+const PZ0 = JSON.stringify(S.pz);
 try { const sv = JSON.parse(localStorage.getItem("neix-hub-pz")||"null"); if (sv) { if (sv.bajada === "Banca Corporativa · Banca Privada · Financial Advisors") delete sv.bajada; Object.assign(S.pz, sv); } } catch(e) {}
 /* Buscador de productos en Presentaciones: oculta los que no coinciden y las categorías vacías. */
 function pzFiltrar(){
@@ -2052,12 +2055,27 @@ function pzFiltrar(){
   cerrar(); const n = list.querySelector(".pz-nada"); if (n) n.hidden = vis > 0;
 }
 function pzSave(){ try { localStorage.setItem("neix-hub-pz", JSON.stringify(S.pz)); } catch(e) {} }
+/* Borradores: lo que el asesor escribió en Propuesta y Presentaciones. Se borran con "Borrar todo" y solos al cerrar
+   la sesión o cuando entra con una sesión nueva (vence todos los días). Se conservan sus datos de asesor (nombre, mail, celular). */
+const MIOS = ["asesor", "mail", "tel", "area"];
+const conMios = (base, act) => { const o = JSON.parse(base); MIOS.forEach(k => { if (act && act[k] && k in o) o[k] = act[k]; }); return o; };
+function borrarPropuesta(){ S.prop = conMios(PROP0, S.prop); S.cliente = blankCliente(); S.ia = null; persist(); }
+function borrarPresentacion(){ S.pz = conMios(PZ0, S.pz); pzSave(); }
+function borrarBorradores(){ borrarPropuesta(); borrarPresentacion(); try { sessionStorage.removeItem(NEIA_KEY); } catch(_) {} S.neia = {api: [], open: false}; }
+const SID_KEY = "neix-hub-sid";
+function revisarSesion(sid){   // si es otra sesión (venció o entró de nuevo), arranca sin los borradores de la anterior
+  if (!sid) return;
+  let ant = null; try { ant = localStorage.getItem(SID_KEY); } catch(_) {}
+  if (ant === sid) return;
+  borrarBorradores();
+  try { localStorage.setItem(SID_KEY, sid); } catch(_) {}
+}
 function vPresentaciones(){
   const P = S.pz, byCat = {};
   S.productos.forEach(p => (byCat[p.categoria] = byCat[p.categoria] || []).push(p));
   const cats = CAT_ORDER.filter(c=>byCat[c]).concat(Object.keys(byCat).filter(c=>!CAT_ORDER.includes(c)));
   return `<div class="page-head"><div><div class="eyebrow">Presentaciones</div><h1>Armá una presentación</h1><p>La presentación institucional de Neix más los productos que elijas, en el formato de marca. Se descarga en PDF.</p></div>
-  <div class="btn-row"><button class="btn" data-act="share" data-v="wa" data-k="pz" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="pz" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="pzPDF" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
+  <div class="btn-row"><button class="btn ghost" data-act="borrarPz" ${P.items.length || P.cliente || P.titulo !== JSON.parse(PZ0).titulo ? "" : "disabled"}>${ico("_trash")}Borrar todo</button><button class="btn" data-act="share" data-v="wa" data-k="pz" ${P.items.length?"":"disabled"}>${ico("_wa")}WhatsApp</button><button class="btn" data-act="share" data-v="mail" data-k="pz" ${P.items.length?"":"disabled"}>${ico("_mail")}Mail</button><button class="btn primary" data-act="pzPDF" ${P.items.length?"":"disabled"}>${ico("_dl")}Descargar PDF</button></div></div>
   <div class="pz-grid"><div class="stack">
    <div class="panel stack"><h3 style="margin:0">Portada</h3>
     <label class="f" for="pz_titulo">Título<input class="input" id="pz_titulo" data-pz="titulo" value="${esc(P.titulo)}"></label>
@@ -2801,6 +2819,9 @@ document.addEventListener("click", e => {
   else if (a==="enviarLink") enviarLink(b);
   else if (a==="ingOtra") { S.ing = {}; render(); }
   else if (a==="completarLink") completarLink(b);
+  else if (a==="salir") { e.preventDefault(); borrarBorradores(); try { localStorage.removeItem(SID_KEY); } catch(_) {} location.href = "/api/auth/logout"; }
+  else if (a==="borrarProp") { if (confirm("¿Borrar la propuesta? Se van el cliente, los productos elegidos, el mensaje y lo que conversaron.")) { borrarPropuesta(); render(); } }
+  else if (a==="borrarPz") { if (confirm("¿Borrar la presentación? Se van el cliente, el título y los productos elegidos.")) { borrarPresentacion(); render(); } }
   else if (a==="logout") { e.preventDefault(); window.neixRuntime.logout(); }
   else if (a==="cset") { S.cliente[b.dataset.k] = S.cliente[b.dataset.k]===v ? "" : v; persist(); render(); }
   else if (a==="cmulti") { const arr = S.cliente[b.dataset.k], i = arr.indexOf(v); i>=0 ? arr.splice(i,1) : arr.push(v); persist(); render(); }
@@ -3176,7 +3197,7 @@ async function boot(){
   // Quién está usando el Hub (ingreso con Microsoft en Vercel). En local no existe y se ignora.
   if (window.neixBase) window.neixBase().then(b => { S.base = b; if (route() === "gestion") softRender(); });
   if (window.neixCambios) window.neixCambios().then(c => { S.cambios = (c || []).concat(S.cambios.filter(x => !(c || []).some(y => y.fecha === x.fecha && y.id === x.id))).sort((a,b) => String(b.fecha).localeCompare(String(a.fecha))); if (route() === "gestion") softRender(); });
-  fetch("api/datos?me=1", {cache:"no-store", credentials:"same-origin"}).then(r => r.ok ? r.json() : null).then(me => { if (me && me.email) { S.me = me; render(); } }).catch(()=>{});
+  fetch("api/datos?me=1", {cache:"no-store", credentials:"same-origin"}).then(r => r.ok ? r.json() : null).then(me => { if (me && me.email) { S.me = me; revisarSesion(me.sid); render(); } }).catch(()=>{});
   setTimeout(usoEnviar, 4000);
   const c = window.neixRuntime;
   if (!c || !c.use) { S.loading = false; S.dbMissing = true; render(); return; }
