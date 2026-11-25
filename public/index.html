@@ -295,7 +295,9 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .imp-pdf th:nth-child(1){width:27%}.imp-pdf th:nth-child(2){width:22%}.imp-pdf th:nth-child(3){width:18%}.imp-pdf th:nth-child(4){width:15%}.imp-pdf th:nth-child(5){width:18%}
 .imp-pdf .imp-v{font-size:10.5px;padding:2px 8px;border-radius:7px;line-height:1.3}.imp-pdf .imp-2{display:grid;grid-template-columns:auto;justify-items:start;gap:1px;margin:3px 0}.imp-pdf .imp-2 em{font-size:9px;min-width:0;letter-spacing:.02em}
 .imp-pdf .imp-g td{background:#F3EFE9;color:#6B6459;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:5px 8px}
-.imp-pie{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid var(--paper-line);font-size:12.5px}.imp-pie img{height:13px;width:auto}
+.imp-pie{background:radial-gradient(70% 160% at 50% 160%, rgba(196,178,148,.45), transparent 62%) var(--paper-dark);color:#F4F1ED;padding:22px 40px 20px}
+.imp-pie-r{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:12.5px}.imp-pie img{height:14px;width:auto}.imp-pie a{color:#F4F1ED}
+.imp-pie p{margin:12px 0 0;font-size:10.5px;line-height:1.5;color:#CFC6B8}
 .imp-ley{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12px;color:#6B6459;padding-top:18px!important;padding-bottom:14px!important}.imp-ley span{display:inline-flex;align-items:center;gap:6px}
 .neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
 .neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
@@ -3042,8 +3044,8 @@ function impDoc(){
     <div class="pp-sec"><p style="font-size:12.5px;margin:0">Resumen orientativo. "Habitualista" en IIBB: depende de si se opera en forma habitual. Cada caso puntual conviene revisarlo con el contador.</p>
     </div></div></div>`;
 }
-const impPie = () => `<div class="pp"><div class="pp-body" style="padding-top:0;padding-bottom:26px"><div class="imp-pie"><img src="${LOGO_DARK}" alt="NEIX"><span>${mailLink("info@neix.com.ar")} · ${FIJO} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></span></div>
-    <p class="pp-legal">${esc(LEYENDA)}</p></div></div>`;
+const impPie = () => `<div class="pp" style="border-radius:0"><div class="imp-pie"><div class="imp-pie-r"><img src="${LOGO_LIGHT}" alt="NEIX"><span>${mailLink("info@neix.com.ar")} · ${FIJO} · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></span></div>
+    <p>${esc(LEYENDA)}</p></div></div>`;
 async function dlImpPDF(b){
   if (!S.imp || !S.imp.tablas) return;
   if (!S.dl) { toast("La descarga no está disponible en esta vista"); return; }
