@@ -2366,6 +2366,8 @@ function firmaMail(){
   const P = S.envio && S.envio.tipo === "pz" ? S.pz : S.prop;
   return {nombre: a.nombre || me.nombre || "", cargo: a.cargo || a.area || "", cel: a.tel || (P && normNom(P.asesor) === normNom(a.nombre || me.nombre) ? P.tel : "") || ""};
 }
+let FIRMA_IMG = null;   // bloque oficial de la firma (barra bordó, logo y leyenda de la CNV): img/firma-neix.png
+const firmaImagen = () => FIRMA_IMG || (FIRMA_IMG = fetch("img/firma-neix.png").then(r => r.ok ? r.blob() : null).then(b => b ? new Promise(ok => { const f = new FileReader(); f.onload = () => ok(f.result); f.onerror = () => ok(""); f.readAsDataURL(b); }) : "").catch(() => ""));
 async function enviarDirecto(b){
   const E = S.envio, para = (($("#shTo") || {}).value || "").split(/[,;\s]+/).map(x => x.trim()).filter(Boolean);
   if (!para.length) { toast("Escribí el mail del destinatario"); $("#shTo") && $("#shTo").focus(); return; }
@@ -2375,7 +2377,7 @@ async function enviarDirecto(b){
   const txt = b.innerHTML; b.disabled = true; b.textContent = "Enviando…";
   try {
     const r = await fetch("api/datos", {method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({accion:"mail", para, asunto: ($("#shAsunto") || {}).value || E.asunto, texto: ($("#shMsg") || {}).value || "", firma: firmaMail(), logo: LOGO_DARK, archivos: await Promise.all(archivos.map(async f => ({nombre: f.name, datos: await aBase64(f)})))})});
+      body: JSON.stringify({accion:"mail", para, asunto: ($("#shAsunto") || {}).value || E.asunto, texto: ($("#shMsg") || {}).value || "", firma: firmaMail(), logo: LOGO_DARK, firmaImg: await firmaImagen(), archivos: await Promise.all(archivos.map(async f => ({nombre: f.name, datos: await aBase64(f)})))})});
     const j = await r.json().catch(() => ({}));
     if (r.ok) { cerrarEnvio(); toast(`Mail enviado a ${para.join(", ")}`); return; }
     if (j.habilitar && S.me) { S.me.mail = false; cerrarEnvio(); toast(j.error || "Hay que habilitar el envío desde tu Outlook"); abrirEnvio(E.canal, E.tipo, E.id); return; }

@@ -95,6 +95,7 @@ async function enviarMail(req, res, u) {
   const nombre = String(f.nombre || u.nombre || "").slice(0, 80), cargo = String(f.cargo || "").slice(0, 80), cel = String(f.cel || "").slice(0, 30);
   const d = cel.replace(/\D/g, "").replace(/^0/, ""), wa = d ? (d.length === 10 ? "549" + d : d.length === 11 && d[0] === "9" ? "54" + d : d) : "";
   const logo = /^data:image\/png;base64,[A-Za-z0-9+/=]{100,60000}$/.test(String(body.logo || "")) ? String(body.logo).split(",")[1] : "";
+  const bloque = /^data:image\/png;base64,[A-Za-z0-9+/=]{100,200000}$/.test(String(body.firmaImg || "")) ? String(body.firmaImg).split(",")[1] : "";   // imagen oficial: barra, logo y leyenda CNV
   const a = 'style="color:#3D3D3D;text-decoration:none"';
   // Firma oficial de Neix: nombre, cargo en bordó, teléfono, dirección y el bloque con barra bordó, logo y leyenda.
   const html = `<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.5;color:#222">${escHTML(texto).replace(/\r?\n/g, "<br>")}</div>
@@ -104,12 +105,12 @@ ${cargo ? `<div style="font-weight:bold;color:#AB1930">${escHTML(cargo)}</div>` 
 <div>Tel. <a href="tel:+541148591552" ${a}>4859-1552</a></div>
 ${cel ? `<div>Cel. ${wa ? `<a href="https://wa.me/${wa}" ${a}>${escHTML(cel)}</a>` : escHTML(cel)}</div>` : ""}
 <div>P8 Buenavista - Don Francisco 3345, Piso 5, San Fernando</div>
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:10px"><tr><td style="border-left:3px solid #AB1930;padding:6px 0 4px 16px">
+${bloque ? `<img src="cid:firma-neix" alt="NEIX Inteligencia Financiera" width="341" style="display:block;width:341px;height:auto;border:0;margin-top:8px">` : `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:10px"><tr><td style="border-left:3px solid #AB1930;padding:6px 0 4px 16px">
 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
 ${logo ? `<td style="vertical-align:middle"><img src="cid:logo-neix" alt="NEIX" width="150" style="display:block;width:150px;height:auto;border:0"></td>` : `<td style="vertical-align:middle;font-size:24pt;font-weight:bold;letter-spacing:6px;color:#3D3D3D">NEIX</td>`}
 <td style="vertical-align:middle;padding-left:10px;font-family:Georgia,'Times New Roman',serif;font-size:9pt;line-height:1.15;color:#6B6B6B">Inteligencia<br>&nbsp;&nbsp;&nbsp;&nbsp;Financiera</td></tr></table>
 <div style="font-size:7pt;font-style:italic;line-height:1.4;color:#444;margin-top:10px;max-width:340px">NEIX S.A. Agente de Liquidación y Compensación y Agente de Negociación Propio, Registrado bajo el N° 145 de la CNV y Agente de Colocación y Distribución Integral de Fondos Comunes de Inversión Registrado bajo el N° 14 de la CNV.</div>
-</td></tr></table>
+</td></tr></table>`}
 </td></tr></table>`;
   const g = await fetch("https://graph.microsoft.com/v1.0/me/sendMail", {
     method: "POST", headers: { Authorization: "Bearer " + tok.access_token, "Content-Type": "application/json" },
@@ -117,7 +118,8 @@ ${logo ? `<td style="vertical-align:middle"><img src="cid:logo-neix" alt="NEIX" 
       subject: asunto, body: { contentType: "HTML", content: html },
       toRecipients: para.map((address) => ({ emailAddress: { address } })),
       attachments: archivos.map((x) => ({ "@odata.type": "#microsoft.graph.fileAttachment", name: x.nombre, contentType: "application/pdf", contentBytes: x.datos }))
-        .concat(logo ? [{ "@odata.type": "#microsoft.graph.fileAttachment", name: "neix.png", contentType: "image/png", contentBytes: logo, isInline: true, contentId: "logo-neix" }] : []),
+        .concat(bloque ? [{ "@odata.type": "#microsoft.graph.fileAttachment", name: "firma-neix.png", contentType: "image/png", contentBytes: bloque, isInline: true, contentId: "firma-neix" }]
+          : logo ? [{ "@odata.type": "#microsoft.graph.fileAttachment", name: "neix.png", contentType: "image/png", contentBytes: logo, isInline: true, contentId: "logo-neix" }] : []),
     } }),
   });
   if (g.status !== 202) {
