@@ -322,6 +322,11 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .ie-in{padding:12px;display:grid;gap:8px}.ie-in .input{min-height:36px;padding:7px 10px;font-size:13px}.ie-acc{display:flex;flex-wrap:wrap;gap:6px}.ie-del{margin-left:auto;color:#8E1427}
 .ges-tiles3{grid-template-columns:repeat(3,minmax(0,1fr))}.ges-tile.fija{cursor:default}
 @media (max-width:700px){.ges-tiles3{grid-template-columns:1fr 1fr}.ges-tiles3 .fija{grid-column:1/-1}}
+.cfm.ancho .cfm-box{width:min(560px,100%)}
+.cfm-cambios{margin-top:14px;max-height:min(46vh,380px);overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.cmb{list-style:none;margin:0;padding:4px 0}.cmb li{padding:9px 14px;border-bottom:1px solid var(--line);display:grid;gap:3px;font-size:13px}.cmb li:last-child{border-bottom:0}
+.cmb b{font-weight:600}.cmb-n{font-size:12px;color:var(--ink-2)}.cmb-ad{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;font-size:12.5px}.cmb-ad s{color:var(--ink-3)}.cmb-ad i{font-style:normal;color:var(--ink-3)}
+.cmb-mas{font-size:12.5px;color:#1F5A32}.cmb-menos{font-size:12.5px;color:#8E1427}
 .neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
 .neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
 @keyframes neiaP{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
@@ -1295,6 +1300,7 @@ async function save(id){
   if (!(p.unidades || []).length) { toast("Elegí al menos un área"); S.ed.sec = "cab"; render(); return; }
   ["cliente.comoFunciona","cliente.aTener","interno.perfiles","interno.senales","interno.preguntas","interno.operativa","observaciones"].forEach(k => setP(p, k, (getP(p, k) || []).map(x => String(x || "").trim()).filter(Boolean)));
   ["cliente.beneficios","interno.ventajas"].forEach(k => setP(p, k, (getP(p, k) || []).map(x => [String(x[0] || "").trim(), String(x[1] || "").trim()]).filter(x => x[0] || x[1])));
+  if (!await confirmarCambios(fichaCambios(base, p), "de " + p.nombre)) return;
   p.ultimaRevision = todayISO(); p.editadoEl = new Date().toISOString();
   const b = document.querySelector('.ed-bar [data-act="save"]'); if (b) { b.disabled = true; b.textContent = "Guardando"; }
   try { window.neixQue = "editó la ficha"; await S.db.doc("productos/"+id).set(p); S.ed = null; toast("Ficha guardada"); go("gestion"); }
@@ -1317,11 +1323,50 @@ function opVer(id){
   document.body.appendChild(div); S.envio = {ver:true};
 }
 /* Confirmación con el diseño del Hub (en lugar del cuadro del navegador). Devuelve una promesa: true si confirma. */
-function confirmar({titulo, texto = "", si = "Aceptar", no = "Cancelar", peligro = false}){
+/* ── Cambios antes de guardar: qué se va a guardar, para revisarlo en la confirmación ── */
+const recorte = (v, n = 90) => { v = String(v ?? "").replace(/\s+/g, " ").trim(); return v.length > n ? v.slice(0, n - 1) + "…" : v; };
+function cambiosHTML(l){   // l: [{tit, antes?, despues?, mas?:[], menos?:[], nota?}]
+  const max = 14, extra = l.length - max;
+  return `<ul class="cmb">${l.slice(0, max).map(c => `<li><b>${esc(c.tit)}</b>${c.nota ? `<span class="cmb-n">${esc(c.nota)}</span>` : ""}
+    ${"antes" in c ? `<span class="cmb-ad"><s>${esc(recorte(c.antes) || "vacío")}</s><i>→</i><span>${esc(recorte(c.despues) || "vacío")}</span></span>` : ""}
+    ${(c.mas || []).slice(0, 4).map(x => `<span class="cmb-mas">+ ${esc(recorte(x))}</span>`).join("")}${(c.mas || []).length > 4 ? `<span class="cmb-n">y ${c.mas.length - 4} más</span>` : ""}
+    ${(c.menos || []).slice(0, 4).map(x => `<span class="cmb-menos">− ${esc(recorte(x))}</span>`).join("")}${(c.menos || []).length > 4 ? `<span class="cmb-n">y ${c.menos.length - 4} más</span>` : ""}</li>`).join("")}
+    ${extra > 0 ? `<li class="cmb-n">y ${extra} ${extra === 1 ? "cambio" : "cambios"} más</li>` : ""}</ul>`;
+}
+function fichaCambios(base, p){
+  const out = [], sec = Object.fromEntries(ED_SECS);
+  Object.entries(ED).forEach(([s, campos]) => campos.forEach(([k, l, t]) => {
+    const a = getP(base, k), b = getP(p, k), tit = `${sec[s]} · ${l}`;
+    if (JSON.stringify(a ?? (t === "list" || t === "pairs" || t === "units" || t === "imp" ? [] : "")) === JSON.stringify(b ?? (t === "list" || t === "pairs" || t === "units" || t === "imp" ? [] : ""))) return;
+    if (t === "list") { const A = a || [], B = b || []; const mas = B.filter(x => !A.includes(x)), menos = A.filter(x => !B.includes(x)); out.push(mas.length || menos.length ? {tit, mas, menos} : {tit, nota: "cambió el orden"}); return; }
+    if (t === "pairs") { const A = (a || []).map(x => x.join(" — ")), B = (b || []).map(x => x.join(" — ")); const mas = B.filter(x => !A.includes(x)), menos = A.filter(x => !B.includes(x)); out.push(mas.length || menos.length ? {tit, mas, menos} : {tit, nota: "cambió el orden"}); return; }
+    if (t === "units") { const A = a || [], B = b || []; out.push({tit, mas: B.filter(x => !A.includes(x)), menos: A.filter(x => !B.includes(x))}); return; }
+    if (t === "imp") { const T = (S.imp && S.imp.tablas) || {}, nom = k2 => (T[k2] || {}).nombre || k2, A = a || [], B = b || []; out.push({tit, mas: B.filter(x => !A.includes(x)).map(nom), menos: A.filter(x => !B.includes(x)).map(nom)}); return; }
+    if (t === "riesgo") { out.push({tit, antes: RISK_TXT[a] || "", despues: RISK_TXT[b] || ""}); return; }
+    out.push({tit, antes: a, despues: b});
+  }));
+  return out;
+}
+function listaCambios(orig, nueva, nombreDe, campos){   // filas con _o = índice en la lista original
+  const out = [], vistos = new Set();
+  nueva.forEach(x => {
+    if (x._o === undefined || !orig[x._o]) { out.push({tit: "Nuevo: " + (nombreDe(x) || "sin nombre")}); return; }
+    vistos.add(x._o); const o = orig[x._o];
+    const dif = campos.filter(([k]) => String(o[k] ?? "").trim() !== String(x[k] ?? "").trim());
+    if (dif.length) out.push({tit: nombreDe(o) || nombreDe(x), nota: dif.map(([k, l]) => `${l}: ${recorte(o[k], 40) || "vacío"} → ${recorte(x[k], 40) || "vacío"}`).join(" · ")});
+  });
+  orig.forEach((o, i) => { if (!vistos.has(i) && !o.oculto) out.push({tit: "Se quita: " + (nombreDe(o) || "sin nombre")}); });
+  return out;
+}
+async function confirmarCambios(cambios, que){
+  if (!cambios.length) { toast("No hay cambios para guardar"); return false; }
+  return confirmar({titulo: `¿Guardar los cambios ${que}?`, texto: `${cambios.length === 1 ? "Este es el cambio" : `Estos son los ${cambios.length} cambios`} que se van a guardar. Se ven en el Hub apenas confirmes.`, html: cambiosHTML(cambios), si: "Guardar cambios", no: "Seguir editando"});
+}
+function confirmar({titulo, texto = "", html = "", si = "Aceptar", no = "Cancelar", peligro = false}){
   return new Promise(ok => {
     const prev = document.activeElement, d = document.createElement("div");
-    d.className = "cfm"; d.innerHTML = `<div class="cfm-box" role="alertdialog" aria-modal="true" aria-labelledby="cfmT" aria-describedby="cfmD">
-      <span class="cfm-ic ${peligro ? "pel" : ""}">${ico(peligro ? "_trash" : "_doc")}</span><h3 id="cfmT">${esc(titulo)}</h3>${texto ? `<p id="cfmD">${esc(texto)}</p>` : ""}
+    d.className = "cfm" + (html ? " ancho" : ""); d.innerHTML = `<div class="cfm-box" role="alertdialog" aria-modal="true" aria-labelledby="cfmT" aria-describedby="cfmD">
+      <span class="cfm-ic ${peligro ? "pel" : ""}">${ico(peligro ? "_trash" : "_doc")}</span><h3 id="cfmT">${esc(titulo)}</h3>${texto ? `<p id="cfmD">${esc(texto)}</p>` : ""}${html ? `<div class="cfm-cambios">${html}</div>` : ""}
       <div class="cfm-b"><button class="btn" data-r="0">${esc(no)}</button><button class="btn ${peligro ? "danger" : "primary"}" data-r="1">${esc(si)}</button></div></div>`;
     const fin = r => { document.removeEventListener("keydown", tecla, true); d.classList.add("out"); setTimeout(() => d.remove(), 160); if (prev && prev.focus) prev.focus(); ok(r); };
     const tecla = e => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); fin(false); } else if (e.key === "Tab") { const bs = [...d.querySelectorAll("button")], i = bs.indexOf(document.activeElement); e.preventDefault(); bs[(i + (e.shiftKey ? bs.length - 1 : 1)) % bs.length].focus(); } };
@@ -2657,7 +2702,7 @@ function equipoHTML(){
     ${sub === "ases" ? asesoresEdHTML() : sub === "inst" ? instEditorHTML() : fondosEdHTML()}`;
 }
 function asesoresEdHTML(){
-  if (!S.asesEd) S.asesEd = JSON.parse(JSON.stringify(S.asesores || []));
+  if (!S.asesEd) S.asesEd = JSON.parse(JSON.stringify(S.asesores || [])).map((a, i) => Object.assign(a, {_o: i}));
   const l = S.asesEd, areas = [...new Set(Object.keys(AREAS).concat(["Dirección general", "Marketing"]).concat(l.map(a => a.area).filter(Boolean)))];
   return `<div class="panel"><div class="eq-h"><div><h3 style="margin:0">Asesores</h3><p class="small muted" style="margin:4px 0 0">Se usan en Propuesta y Presentaciones (al escribir el nombre se completan mail y celular) y en la firma de los mails que salen desde el Hub.</p></div>
     <button class="btn" data-act="asAdd">${ico("_plus")}Agregar asesor</button></div>
@@ -2673,13 +2718,15 @@ async function asGuardar(b){
   const sinNombre = lista.find(a => !a.nombre); if (sinNombre) { toast("Falta el nombre de " + (sinNombre.mail || "un asesor")); return; }
   const mal = lista.find(a => a.mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a.mail)); if (mal) { toast("Revisá el mail de " + mal.nombre); return; }
   if (!S.db) return;
+  const nuevos = (S.asesEd || []).filter(a => String(a.nombre || "").trim() || String(a.mail || "").trim());
+  if (!await confirmarCambios(listaCambios(S.asesores || [], nuevos, a => String(a.nombre || "").trim(), [["nombre","Nombre"],["area","Área"],["mail","Mail"],["tel","Celular"]]), "de los asesores")) return;
   b.disabled = true; b.textContent = "Guardando…";
   try { window.neixQue = "editó los asesores"; await S.db.doc("config/asesores").set({lista}); S.asesores = lista; S.asesEd = null; toast("Asesores guardados"); render(); }
   catch(e) { toast("No se pudieron guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); b.disabled = false; b.textContent = "Guardar asesores"; }
 }
 function fondosEdHTML(){
   if (!S.fondos) { if (S.fondos === undefined) fondosHTML(); return `<div class="panel"><h3>Fondos</h3><p class="small muted" style="margin:0">Cargando…</p></div>`; }
-  if (!S.fondEd) S.fondEd = JSON.parse(JSON.stringify(S.fondos.lista || []));
+  if (!S.fondEd) S.fondEd = JSON.parse(JSON.stringify(S.fondos.lista || [])).map((f, i) => Object.assign(f, {_o: i}));
   const tipos = S.fondos.tipos || [], l = S.fondEd;
   return `<div class="panel"><div class="eq-h"><div><h3 style="margin:0">Fondos que ofrecemos</h3><p class="small muted" style="margin:4px 0 0">Se muestran en la ficha de Fondos comunes de inversión, con su rendimiento. "Nombre en la CNV/CAFCI" es como figura el fondo en la Cámara: sirve para traer el rendimiento.</p></div>
     <button class="btn" data-act="fdAdd">${ico("_plus")}Agregar fondo</button></div>
@@ -2703,6 +2750,8 @@ async function fdGuardar(b){
   const lista = (S.fondEd || []).map(f => Object.assign({}, f, {n: String(f.n || "").trim(), esp: String(f.esp || "").trim(), cafci: String(f.cafci || "").trim()})).filter(f => f.n)
     .map(f => { ["esp", "cafci"].forEach(k => { if (!f[k]) delete f[k]; }); return f; });
   if (!S.db) return;
+  if (!await confirmarCambios(listaCambios(S.fondos.lista || [], lista, f => f.n, [["n","Nombre"],["tipo","Tipo"],["esp","Especie"],["mon","Moneda"],["cafci","Nombre en CAFCI"]]), "de los fondos")) return;
+  lista.forEach(f => delete f._o);
   b.disabled = true; b.textContent = "Guardando…";
   try { window.neixQue = "editó los fondos"; const doc = Object.assign({}, S.fondos, {lista}); await S.db.doc("config/fondos").set(doc); S.fondos = doc; S.fondEd = null; S.rend = undefined; try { localStorage.removeItem(RD_KEY); } catch(_) {} toast("Fondos guardados"); render(); }
   catch(e) { toast("No se pudieron guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); b.disabled = false; b.textContent = "Guardar fondos"; }
@@ -2735,8 +2784,8 @@ const claveInst = t => sinAcento(String(t || "").trim());
 const INST_VIDEO = Object.fromEntries(INST_BASE.map(x => [claveInst(x.titulo), x.url]));
 const esVideoHub = u => /^instructivos\/[\w.-]+\.(mp4|webm|mov)$/.test(String(u || ""));
 function instMezcla(lista){
-  const l = (lista || []).slice(), ya = new Set(l.map(x => claveInst(x.titulo)));
-  INST_BASE.forEach(b => { if (!ya.has(claveInst(b.titulo))) l.push({titulo: b.titulo, url: b.url}); });
+  const l = (lista || []).slice(), ya = new Set(l.map(x => claveInst(x.titulo))), urls = new Set(l.map(x => x.url).filter(Boolean));
+  INST_BASE.forEach(b => { if (!ya.has(claveInst(b.titulo)) && !urls.has(b.url)) l.push({titulo: b.titulo, url: b.url}); });   // un video renombrado no se vuelve a sumar
   return l;
 }
 const INST_META = Object.fromEntries(INST_BASE.map(x => [x.url, {poster: x.url.replace(/\.mp4$/, ".jpg"), dur: x.dur}]));
@@ -2810,7 +2859,7 @@ function verArchivo(url, titulo){
 }
 /* Editor de Gestión */
 function instEditorHTML(){
-  if (!S.instEd) S.instEd = JSON.parse(JSON.stringify(S.instructivos || []));
+  if (!S.instEd) S.instEd = JSON.parse(JSON.stringify(S.instructivos || [])).map((x, i) => Object.assign(x, {_o: i}));
   const l = S.instEd;
   const tarjeta = (x, i) => {
     const u = instUrl(x), vid = esVideoHub(u), pdf = esArchivoHub(x.url), m = INST_META[u] || {};
@@ -2835,6 +2884,9 @@ async function instGuardar(b){
   const mala = lista.find(x => x.url && !esArchivoHub(x.url) && !esVideoHub(x.url) && !/^https?:\/\//i.test(x.url));
   if (mala) { toast(`El link de "${mala.titulo || "un instructivo"}" tiene que empezar con https://`); return; }
   if (!S.db) return;
+  const vivos = (S.instEd || []).filter(x => !x.oculto && (String(x.titulo || "").trim() || String(x.url || "").trim()));
+  const cInst = listaCambios(S.instructivos || [], vivos, x => String(x.titulo || "").trim(), [["titulo","Título"],["url","Link o PDF"]]).map(c => Object.assign(c, {nota: c.nota && c.nota.replace(/api\/archivo[^ ·]*/g, "PDF cargado")}));
+  if (!await confirmarCambios(cInst, "de los instructivos")) return;
   b.disabled = true; b.textContent = "Guardando…";
   try { window.neixQue = "editó los instructivos"; await S.db.doc("config/instructivos").set({lista}); S.instructivos = instMezcla(lista); S.instEd = null; toast("Instructivos guardados"); render(); }
   catch(e) { toast("No se pudieron guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); b.disabled = false; b.textContent = "Guardar instructivos"; }
