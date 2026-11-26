@@ -1269,7 +1269,7 @@ function edOnePager(p, id){
      ? `<div class="op-file"><button type="button" class="op-file-n" data-act="opVer" data-id="${id}"><span class="op-ic">PDF</span><span><b>${esc(p.onePager.archivo||"One pager.pdf")}</b><small>Cargado el ${fdate(p.onePager.fecha)} · tocá para verlo</small></span></button>
         <span class="btn-row"><button type="button" class="btn" data-act="opVer" data-id="${id}">Ver</button>${S.assets?`<button type="button" class="btn ghost" data-act="opQuitar" data-id="${id}">Eliminar</button>`:""}</span></div>`
      : (S.assets ? `<p class="small muted" style="margin-bottom:10px">Todavía no tiene el PDF oficial. Mientras tanto, el Hub arma uno con el contenido de la ficha.</p><div class="upl" style="border:0;padding:0"><label class="drop" for="up_pdf" id="dropPdf"><input id="up_pdf" type="file" accept="application/pdf"><span class="op-ic">PDF</span><span class="drop-t"><b id="dropNom">Elegí el PDF del one pager</b><small id="dropSub">o arrastralo acá</small></span><span class="btn drop-b">Buscar archivo</span></label><button class="btn primary" type="button" data-act="upOP" data-id="${id}" id="upBtn" disabled>Subir one pager</button></div>` : `<p class="small muted">Todavía no tiene el PDF oficial.</p>`)}
-    <p class="tiny muted" style="margin:12px 0 0">El one pager se sube y se elimina al momento: no hace falta tocar Guardar cambios.</p></div>`;
+    <p class="tiny muted" style="margin:12px 0 0">Los cambios del one pager se guardan solos: cuando subís un PDF nuevo o eliminás el actual, no hace falta tocar "Guardar cambios".</p></div>`;
 }
 function edPreview(){
   const E = S.ed, p = Object.assign({}, S.byId[E.id], E.p);
