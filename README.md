@@ -124,6 +124,15 @@ Si alguien sale de `HABILITADOS`, pierde el acceso en la próxima publicación a
 si Sistemas da de baja su cuenta de Microsoft, ya no puede volver a iniciar sesión.
 El secreto de Microsoft vence: anotá la fecha y renovalo antes (paso 1).
 
+### FAs (sin cuenta de Neix)
+Los FAs entran con su propio mail si están en Gestión › Equipo y contenido › FAs (la lista se guarda en la base, no en el repo).
+Ven todo el Hub menos Gestión, no ven los celulares del equipo y no mandan mails desde Outlook. Al sacarlos de la lista dejan de entrar al día siguiente (la sesión vence a las 4 de la mañana).
+- **Con Google** (Gmail o mail de empresa en Google): en Google Cloud Console › APIs y servicios › Credenciales, crear un "ID de cliente de OAuth" de tipo *Aplicación web*,
+  con URI de redireccionamiento `https://producthubneix.vercel.app/api/auth/callback`, y cargar en Vercel `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`.
+  En la pantalla de consentimiento, tipo de usuario *Externo* y publicada (no en modo prueba). Sin estas variables, el botón "Entrar con Google" no aparece.
+- **Con Microsoft** (Hotmail, Outlook o mail de empresa en Microsoft): en Entra, la app "Hub de Productos Neix" › Autenticación › tipos de cuenta admitidos:
+  *cuentas de cualquier directorio organizativo y cuentas personales de Microsoft*, y en Vercel `AZURE_LOGIN_TENANT=common`. Sin esto, por Microsoft solo entran cuentas de Neix.
+
 ## Notas de las fichas en Teams
 "¿Algo para corregir o sumar?" publica la nota en un canal de Teams, con el nombre y mail de quien la escribió
 (sale de su sesión de Microsoft), el producto y un botón para editar la ficha en Gestión. Función: `api/nota.js`.

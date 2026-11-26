@@ -3,7 +3,7 @@
 // /api/auth/* queda afuera para poder iniciar y cerrar sesión.
 // En local (npm run dev) no corre: el Hub queda abierto para probar.
 import { next } from "@vercel/functions";
-import { CFG, SESION, verificar, leerCookie, habilitado } from "./lib/auth.js";
+import { CFG, SESION, verificar, leerCookie, puedeEntrar } from "./lib/auth.js";
 
 export default async function middleware(request) {
   const url = new URL(request.url);
@@ -11,7 +11,7 @@ export default async function middleware(request) {
     return new Response("Falta configurar el acceso (AZURE_CLIENT_SECRET y SESSION_SECRET en Vercel).", { status: 503, headers: { "content-type": "text/plain; charset=utf-8" } });
   }
   const sesion = await verificar(leerCookie(request.headers.get("cookie"), SESION));
-  if (sesion && habilitado(sesion.email)) return next();
+  if (puedeEntrar(sesion)) return next();
 
   const pideHTML = (request.headers.get("accept") || "").includes("text/html");
   if (request.method === "GET" && pideHTML) {

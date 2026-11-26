@@ -29,8 +29,10 @@ export default async function handler(req, res) {
       return res.status(200).json({ base: true, uso: hayArchivos() ? await leerUso() : {} });
     }
     if (req.method === "GET") {
-      const t = await leerTodo(u.editor);
-      return res.status(200).json({ base: true, fichas: t.fichas, validaciones: t.validaciones, config: t.config || {}, notas: u.editor ? t.notas : [], cambios: u.editor ? t.cambios : [], editor: u.editor });
+      const t = await leerTodo(u.editor), config = Object.assign({}, t.config || {});
+      if (!u.editor) delete config.fas;   // la lista de FAs (mails) solo la ve Gestión
+      if (u.rol === "fa" && config.asesores && Array.isArray(config.asesores.lista)) config.asesores = { lista: config.asesores.lista.map(({ tel, ...a }) => a) };   // los FAs no ven los celulares del equipo
+      return res.status(200).json({ base: true, fichas: t.fichas, validaciones: t.validaciones, config, notas: u.editor ? t.notas : [], cambios: u.editor ? t.cambios : [], editor: u.editor });
     }
     if (req.method === "POST") {
       const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
