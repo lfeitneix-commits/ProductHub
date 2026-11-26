@@ -3219,8 +3219,8 @@ function softRender(){ const a = document.activeElement; if (a && (a.tagName==="
    Ganancias, Bienes Personales, IVA e IIBB CABA. En la ficha (Para el asesor) y completo en Instructivos (#impuestos). */
 const IMP_PDF = "data/eficiencia-impositiva.pdf";
 const IMP_PER = [["Persona física", "Persona física"], ["Persona jurídica", "Persona jurídica"], ["Beneficiario del exterior", "Beneficiario del exterior"]];
-const IMP_GRUPOS = [["Títulos públicos", ["tp_pesos", "tp_pesos_ajuste", "tp_usd"]], ["Obligaciones negociables", ["on_pesos", "on_usd"]], ["Títulos del exterior", ["tp_ext", "tp_brasil_bolivia"]],
-  ["Renta variable", ["acciones", "cedears", "adr"]], ["Derivados", ["opc_fut"]], ["Caución", ["caucion_ars", "caucion_usd"]], ["Cheques y pagarés", ["cpd_pagare_ars", "pagare_usd"]],
+const IMP_GRUPOS = [["Títulos públicos", ["tp_pesos", "tp_pesos_ajuste", "tp_usd"]], ["Obligaciones negociables", ["on_pesos", "on_usd", "on_ext"]], ["Títulos del exterior", ["tp_ext", "tp_brasil", "bonos_bolivia"]],
+  ["Renta variable", ["acciones", "acciones_no_cot", "cedears", "adr", "adr_ext", "acciones_ext"]], ["Derivados", ["opc_fut"]], ["Caución y pases", ["caucion_ars", "caucion_usd", "pases"]], ["Cheques y pagarés", ["cpd_pagare_ars", "pagare_usd"]],
   ["Fondos", ["fci_tp_ars", "fci_tp_usd", "fci_abiertos", "fci_cerr_ars", "fci_cerr_usd", "fondos_ext"]], ["Fideicomisos", ["ff_deuda_ars", "ff_deuda_usd", "ff_cp_ars"]], ["Otros", ["cripto"]]];
 function impResumen(k, persona){   // [ganRenta, ganVenta, ivaRenta, ivaVenta, bienesPersonales, iibbRenta, iibbVenta] + etiqueta del ingreso
   const t = S.imp && S.imp.tablas && S.imp.tablas[k]; if (!t) return null;
@@ -3246,7 +3246,7 @@ function impTablaInstrumento(k){
   return `<div class="imp-i"><b class="imp-tit">${esc(t.nombre)}</b><div class="tw"><table class="imp-t"><thead><tr><th>Quién invierte</th>${IMP_COLS.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>
     ${IMP_PER.map(([k2, txt]) => { const r = impResumen(k, k2); return r ? `<tr><td>${esc(txt)}</td>${impCeldas(r).map(c => `<td>${c}</td>`).join("")}</tr>` : ""; }).join("")}</tbody></table></div></div>`;
 }
-const impNota = `<p class="tiny muted imp-nota">Resumen orientativo del cuadro de Eficiencia Impositiva de Neix. "Habitualista" en IIBB: depende de si el cliente opera en forma habitual. Ante un caso puntual, que lo confirme el contador del cliente.</p>`;
+const impNota = `<p class="tiny muted imp-nota">Resumen orientativo: Ganancias y Bienes Personales según el encuadre fiscal del mercado de capitales vigente 2024; IVA, IIBB y beneficiario del exterior según el cuadro de Eficiencia Impositiva de Neix. "Sin dato": no figura en esas fuentes. "Habitualista" en IIBB: depende de si el cliente opera en forma habitual. Ante un caso puntual, que lo confirme el contador del cliente.</p>`;
 function impProductoHTML(p){
   const ks = (p.impuestos || []).filter(k => S.imp && S.imp.tablas && S.imp.tablas[k]);
   if (!ks.length) return "";

@@ -8,7 +8,7 @@
     "Bienes Personales",
     "IIBB CABA"
   ],
-  "fuente": "Deck Eficiencia Impositiva Neix (transcripto nov 2026)",
+  "fuente": "Encuadre fiscal del mercado de capitales vigente 2024 (Ganancias y Bienes Personales) y deck de Eficiencia Impositiva Neix (IVA, IIBB y beneficiario del exterior)",
   "tablas": {
     "acciones": {
       "filas": [
@@ -83,7 +83,7 @@
         [
           "Persona física",
           "Renta por interés",
-          "Tasa progresiva",
+          "Escala progresiva 5% a 35%",
           "Exenta",
           "SITER",
           "Gravado",
@@ -115,7 +115,7 @@
         [
           "Persona física",
           "Renta por interés",
-          "Tasa progresiva",
+          "Escala progresiva 5% a 35%",
           "Exenta",
           "SITER",
           "Gravado",
@@ -197,7 +197,7 @@
         [
           "Persona jurídica",
           "Renta financiera",
-          "25%, 30% o 35%",
+          "N/A",
           "Gravado (RG 1603 para CPD)",
           "N/A",
           "N/A",
@@ -215,19 +215,19 @@
         [
           "Persona física",
           "Renta financiera",
-          "Exento",
+          "N/A",
           "Gravado (RG 1603 para CPD)",
           "N/A",
-          "Gravado",
+          "N/A",
           "Habitualista: gravado"
         ],
         [
           "Persona física",
           "Venta",
-          "Exento",
+          "Escala progresiva 5% a 35%",
           "Gravado (RG 1603 para CPD)",
           "N/A",
-          "Gravado",
+          "N/A",
           "Habitualista: gravado"
         ],
         [
@@ -274,10 +274,10 @@
         [
           "Persona física",
           "Dividendos",
-          "Gravado al 7%",
+          "Exenta",
           "No gravado",
           "N/A",
-          "Gravado",
+          "Gravado (no cumple Ley 27.638)",
           "Habitualista: gravado"
         ],
         [
@@ -286,7 +286,7 @@
           "Exento",
           "Exento",
           "SITER",
-          "Gravado",
+          "Gravado (no cumple Ley 27.638)",
           "Habitualista: gravado"
         ],
         [
@@ -333,10 +333,10 @@
         [
           "Persona física",
           "Dividendos",
-          "Gravado al 7% y transparencia fiscal",
+          "Según los activos del fondo (transparencia fiscal)",
           "No gravado",
           "N/A",
-          "Gravado, salvo FCI con más de 75% en títulos o depósitos exentos",
+          "Gravado",
           "Gravado (opinable)"
         ],
         [
@@ -345,7 +345,7 @@
           "Exento",
           "Exento",
           "SITER",
-          "Gravado, salvo FCI con más de 75% en títulos o depósitos exentos",
+          "Gravado",
           "Habitualista: gravado"
         ],
         [
@@ -392,10 +392,10 @@
         [
           "Persona física",
           "Dividendos",
-          "Gravado al 7% y transparencia fiscal",
+          "Según los activos del fondo (transparencia fiscal)",
           "No gravado",
           "N/A",
-          "Gravado, salvo FCI con más de 75% en títulos o depósitos exentos",
+          "Gravado",
           "Gravado (opinable)"
         ],
         [
@@ -404,7 +404,7 @@
           "Exento",
           "Exento",
           "SITER",
-          "Gravado, salvo FCI con más de 75% en títulos o depósitos exentos",
+          "Gravado",
           "Habitualista: gravado"
         ],
         [
@@ -454,7 +454,7 @@
           "Exento",
           "Exento",
           "N/A",
-          "Exento",
+          "Exento (cumple Ley 27.638)",
           "Habitualista: gravado"
         ],
         [
@@ -463,7 +463,7 @@
           "Exento",
           "Exento",
           "SITER",
-          "Exento",
+          "Exento (cumple Ley 27.638)",
           "Habitualista: gravado"
         ],
         [
@@ -513,7 +513,7 @@
           "Exento",
           "Exento",
           "N/A",
-          "Exento",
+          "Exento (cumple Ley 27.638)",
           "Habitualista: gravado"
         ],
         [
@@ -522,7 +522,7 @@
           "Exento",
           "Exento",
           "SITER",
-          "Exento",
+          "Exento (cumple Ley 27.638)",
           "Habitualista: gravado"
         ],
         [
@@ -569,10 +569,10 @@
         [
           "Persona física",
           "Dividendos",
-          "Gravado al 7% y transparencia fiscal",
+          "Según los activos del fideicomiso (transparencia fiscal)",
           "No gravado",
           "N/A",
-          "Gravado, salvo FF con más de 75% en títulos o depósitos exentos",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
           "Gravado (opinable)"
         ],
         [
@@ -581,7 +581,7 @@
           "Exento",
           "Exento",
           "SITER",
-          "Gravado, salvo FF con más de 75% en títulos o depósitos exentos",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
           "Habitualista: gravado"
         ],
         [
@@ -631,7 +631,7 @@
           "Exento",
           "Exento",
           "N/A",
-          "Gravado, salvo FF con más de 75% en títulos o depósitos exentos",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
           "Habitualista: gravado"
         ],
         [
@@ -640,7 +640,7 @@
           "Exento",
           "Exento",
           "SITER",
-          "Gravado, salvo FF con más de 75% en títulos o depósitos exentos",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
           "Habitualista: gravado"
         ],
         [
@@ -690,7 +690,7 @@
           "Exento",
           "Exento",
           "N/A",
-          "Gravado, salvo FF con más de 75% en títulos o depósitos exentos",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
           "Habitualista: gravado"
         ],
         [
@@ -699,7 +699,7 @@
           "Exento",
           "Exento",
           "SITER",
-          "Gravado, salvo FF con más de 75% en títulos o depósitos exentos",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
           "Habitualista: gravado"
         ],
         [
@@ -808,7 +808,7 @@
           "Exento",
           "Exento",
           "N/A",
-          "Exento",
+          "Exento (emitidas en pesos)",
           "Exento"
         ],
         [
@@ -817,7 +817,7 @@
           "Exento",
           "Exento",
           "SITER",
-          "Exento",
+          "Exento (emitidas en pesos)",
           "Exento"
         ],
         [
@@ -867,7 +867,7 @@
           "Exento",
           "Exento",
           "N/A",
-          "Exento",
+          "Gravado (emitidas en moneda extranjera)",
           "Exento"
         ],
         [
@@ -876,7 +876,7 @@
           "Exento",
           "Exento",
           "SITER",
-          "Exento",
+          "Gravado (emitidas en moneda extranjera)",
           "Exento"
         ],
         [
@@ -917,7 +917,7 @@
           "Escala progresiva 5% a 35%",
           "No gravado",
           "N/A",
-          "Gravado",
+          "N/A",
           "Habitualista: gravado"
         ],
         [
@@ -937,7 +937,7 @@
         [
           "Persona jurídica",
           "Renta financiera",
-          "25%, 30% o 35%",
+          "N/A",
           "Gravado",
           "N/A",
           "N/A",
@@ -955,19 +955,19 @@
         [
           "Persona física",
           "Renta financiera",
-          "Exento",
-          "Gravado",
           "N/A",
           "Gravado",
+          "N/A",
+          "N/A",
           "Habitualista: gravado"
         ],
         [
           "Persona física",
           "Venta",
-          "Exento",
+          "Escala progresiva 5% a 35%",
           "Gravado",
           "N/A",
-          "Gravado",
+          "N/A",
           "Habitualista: gravado"
         ],
         [
@@ -1017,7 +1017,7 @@
           "Escala progresiva 5% a 35%",
           "No gravado",
           "N/A",
-          "Sí",
+          "Gravado",
           "No gravado"
         ],
         [
@@ -1026,7 +1026,7 @@
           "Gravado 15%",
           "No gravado",
           "N/A",
-          "Sí",
+          "Gravado",
           "No gravado"
         ],
         [
@@ -1228,12 +1228,12 @@
       "nombre": "Títulos públicos en dólares"
     },
     "adr": {
-      "nombre": "ADR (activo subyacente de emisor del país)",
+      "nombre": "ADR de emisores argentinos",
       "filas": [
         [
           "Persona jurídica",
           "Dividendos",
-          "No computable",
+          "25%, 30% o 35%",
           "No gravado",
           "N/A",
           "N/A",
@@ -1282,65 +1282,6 @@
           "Exento",
           "N/A",
           "No computable",
-          "No gravado"
-        ]
-      ]
-    },
-    "tp_brasil_bolivia": {
-      "nombre": "Títulos públicos de Brasil y Bolivia",
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "No gravado (Brasil y Bolivia)",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "Gravado Brasil, no gravado Bolivia",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "No gravado (Brasil y Bolivia)",
-          "No gravado",
-          "N/A",
-          "Gravado Brasil, no gravado Bolivia",
-          "No gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Gravado Brasil, no gravado Bolivia",
-          "No gravado",
-          "N/A",
-          "Gravado Brasil, no gravado Bolivia",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "Según legislación del país",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "Según legislación del país",
           "No gravado"
         ]
       ]
@@ -1374,6 +1315,311 @@
           "N/A",
           "Responsable sustituto",
           "Habitualista: gravado"
+        ]
+      ]
+    },
+    "tp_brasil": {
+      "nombre": "Títulos públicos de Brasil",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta por intereses",
+          "Exento",
+          "No gravado",
+          "N/A",
+          "N/A",
+          "No gravado"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "No gravado",
+          "N/A",
+          "N/A",
+          "No gravado"
+        ],
+        [
+          "Persona física",
+          "Renta por intereses",
+          "Exento",
+          "No gravado",
+          "N/A",
+          "Gravado",
+          "No gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Gravado al 15%",
+          "No gravado",
+          "N/A",
+          "Gravado",
+          "No gravado"
+        ],
+        [
+          "Beneficiario del exterior",
+          "Renta por intereses",
+          "Según legislación del país",
+          "No gravado",
+          "N/A",
+          "Según legislación del país",
+          "No gravado"
+        ],
+        [
+          "Beneficiario del exterior",
+          "Venta",
+          "Según legislación del país",
+          "No gravado",
+          "N/A",
+          "Según legislación del país",
+          "No gravado"
+        ]
+      ]
+    },
+    "bonos_bolivia": {
+      "nombre": "Bonos soberanos y corporativos de Bolivia",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta por intereses",
+          "Exento (convenio de doble imposición)",
+          "No gravado",
+          "N/A",
+          "N/A",
+          "No gravado"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "Exento (convenio de doble imposición)",
+          "No gravado",
+          "N/A",
+          "N/A",
+          "No gravado"
+        ],
+        [
+          "Persona física",
+          "Renta por intereses",
+          "Exento (convenio de doble imposición)",
+          "No gravado",
+          "N/A",
+          "Exento",
+          "No gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Exento (convenio de doble imposición)",
+          "No gravado",
+          "N/A",
+          "Exento",
+          "No gravado"
+        ],
+        [
+          "Beneficiario del exterior",
+          "Renta por intereses",
+          "Según legislación del país",
+          "No gravado",
+          "N/A",
+          "Según legislación del país",
+          "No gravado"
+        ],
+        [
+          "Beneficiario del exterior",
+          "Venta",
+          "Según legislación del país",
+          "No gravado",
+          "N/A",
+          "Según legislación del país",
+          "No gravado"
+        ]
+      ]
+    },
+    "adr_ext": {
+      "nombre": "ADR de emisores del exterior",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Dividendos",
+          "25%, 30% o 35%",
+          "Sin dato",
+          "N/A",
+          "N/A",
+          "Sin dato"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "Sin dato",
+          "N/A",
+          "N/A",
+          "Sin dato"
+        ],
+        [
+          "Persona física",
+          "Dividendos",
+          "Escala progresiva 5% a 35%",
+          "Sin dato",
+          "N/A",
+          "Gravado",
+          "Sin dato"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Gravado al 15%",
+          "Sin dato",
+          "N/A",
+          "Gravado",
+          "Sin dato"
+        ]
+      ]
+    },
+    "acciones_ext": {
+      "nombre": "Acciones de emisores del exterior",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Dividendos",
+          "25%, 30% o 35%",
+          "Sin dato",
+          "N/A",
+          "N/A",
+          "Sin dato"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "Sin dato",
+          "N/A",
+          "N/A",
+          "Sin dato"
+        ],
+        [
+          "Persona física",
+          "Dividendos",
+          "Escala progresiva 5% a 35%",
+          "Sin dato",
+          "N/A",
+          "Gravado",
+          "Sin dato"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Gravado al 15%",
+          "Sin dato",
+          "N/A",
+          "Gravado",
+          "Sin dato"
+        ]
+      ]
+    },
+    "acciones_no_cot": {
+      "nombre": "Acciones argentinas sin cotización en la CNV",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Dividendos",
+          "No computable",
+          "Sin dato",
+          "N/A",
+          "N/A",
+          "Sin dato"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "Sin dato",
+          "N/A",
+          "N/A",
+          "Sin dato"
+        ],
+        [
+          "Persona física",
+          "Dividendos",
+          "Gravado al 7%",
+          "Sin dato",
+          "N/A",
+          "No computable",
+          "Sin dato"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Gravado al 15%",
+          "Sin dato",
+          "N/A",
+          "No computable",
+          "Sin dato"
+        ]
+      ]
+    },
+    "on_ext": {
+      "nombre": "Obligaciones negociables de emisores del exterior",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta por intereses",
+          "25%, 30% o 35%",
+          "Sin dato",
+          "N/A",
+          "N/A",
+          "Sin dato"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "Sin dato",
+          "N/A",
+          "N/A",
+          "Sin dato"
+        ],
+        [
+          "Persona física",
+          "Renta por intereses",
+          "Escala progresiva 5% a 35%",
+          "Sin dato",
+          "N/A",
+          "Gravado",
+          "Sin dato"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Gravado al 15%",
+          "Sin dato",
+          "N/A",
+          "Gravado",
+          "Sin dato"
+        ]
+      ]
+    },
+    "pases": {
+      "nombre": "Pases de títulos, acciones o divisas",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta por interés",
+          "25%, 30% o 35%",
+          "Sin dato",
+          "N/A",
+          "N/A",
+          "Sin dato"
+        ],
+        [
+          "Persona física",
+          "Renta por interés",
+          "Escala progresiva 5% a 35% (como plazo fijo)",
+          "Sin dato",
+          "N/A",
+          "Depende del activo",
+          "Sin dato"
         ]
       ]
     }
