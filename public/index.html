@@ -327,7 +327,7 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .cmb{list-style:none;margin:0;padding:4px 0}.cmb li{padding:9px 14px;border-bottom:1px solid var(--line);display:grid;gap:3px;font-size:13px}.cmb li:last-child{border-bottom:0}
 .cmb b{font-weight:600}.cmb-n{font-size:12px;color:var(--ink-2)}.cmb-ad{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;font-size:12.5px}.cmb-ad s{color:var(--ink-3)}.cmb-ad i{font-style:normal;color:var(--ink-3)}
 .cmb-mas{font-size:12.5px;color:#1F5A32}.cmb-menos{font-size:12.5px;color:#8E1427}
-.fa-pegar{margin:0 0 4px;background:var(--surface)}.fa-t td:nth-child(1){width:42%}
+.fa-pegar{margin:0 0 4px;background:var(--surface)}.fa-t td:nth-child(1){width:34%}
 .neia-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.neia-sug .chip{font-size:12px;text-align:left;white-space:normal;max-width:100%;height:auto}
 .neia-pens{display:flex;align-items:center;gap:4px}.neia-pens span{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:neiaP 1s infinite ease-in-out}.neia-pens span:nth-child(2){animation-delay:.15s}.neia-pens span:nth-child(3){animation-delay:.3s}.neia-pens em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:6px}
 @keyframes neiaP{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
@@ -2155,8 +2155,12 @@ function carteraHTML(c){
 /* ── Presentaciones ── */
 /* Asesores (config/asesores): al escribir el nombre se completan mail, celular y área. */
 const normNom = t => String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();
-const findAsesor = n => { const k = normNom(n); return k ? (S.asesores||[]).find(a=>normNom(a.nombre)===k) || null : null; };
-const asesoresList = () => `<datalist id="asesoresList">${(S.asesores||[]).map(a=>`<option value="${esc(a.nombre)}">${esc(a.area||"")}</option>`).join("")}</datalist>`;
+/* Para completar datos de asesor: el equipo de Neix más los FAs (el FA que entra se ve a sí mismo; Neix ve la lista). */
+const asesoresTodos = () => { const fa = a => ({nombre: a.nombre || a.mail, mail: a.mail, tel: a.tel || "", area: "Financial Advisors"});
+  const yo = S.me && S.me.rol === "fa" ? [fa({nombre: S.me.nombre, mail: S.me.email, tel: S.me.tel})] : [];
+  return (S.asesores || []).concat((S.fas || []).filter(a => a.nombre).map(fa), yo); };
+const findAsesor = n => { const k = normNom(n); return k ? asesoresTodos().find(a=>normNom(a.nombre)===k) || null : null; };
+const asesoresList = () => `<datalist id="asesoresList">${asesoresTodos().map(a=>`<option value="${esc(a.nombre)}">${esc(a.area||"")}</option>`).join("")}</datalist>`;
 const AREAS = {"Banca Privada":"bancaprivada@neix.com.ar","Banca Corporativa":"bancacorporativa@neix.com.ar","Financial Advisors":"fas@neix.com.ar","Mesa · Mercado de Capitales":"info@neix.com.ar","Estrategia":"info@neix.com.ar"};
 const PZ_SUG = [["Tesorería corporativa",["cauciones","fci","fondo-dedicado"]],["Financiamiento pyme",["cheques","pagares","avales-sgr","facturas-fce"]],["Cobertura cambiaria",["futuros-dolar","bonos-cer-dl","pricing-fx"]],["Dolarizar e invertir afuera",["t-bills","cedears","cuentas-offshore","operatoria-internacional"]]];
 S.pz = {titulo:"Soluciones de inversión y financiamiento", bajada:"Banca Corporativa · Banca Privada · Financial Advisors · Mercado de Capitales", cliente:"", inst:true, asesor:"", mail:"", tel:"", area:"", items:[]};
@@ -2731,13 +2735,13 @@ function fasEdHTML(){
   const l = S.fasEd;
   return `<div class="panel"><div class="eq-h"><div><h3 style="margin:0">FAs con acceso al Hub</h3><p class="small muted" style="margin:4px 0 0">Entran con su mail en "Entrar con Google" (Gmail o mail de empresa en Google) o "Entrar con Microsoft" (Hotmail, Outlook o mail de empresa en Microsoft). Ven todo el Hub menos Gestión. Si sacás a alguien, deja de poder entrar desde el día siguiente.</p></div>
     <button class="btn" data-act="faAdd">${ico("_plus")}Agregar FA</button></div>
-    <details class="fold fa-pegar" ${l.length ? "" : "open"}><summary>Pegar una lista de mails</summary><div class="in"><p class="tiny muted" style="margin:0 0 8px">Uno por línea: <b>Nombre &lt;mail&gt;</b>, <b>Nombre, mail</b> o solo el mail. Los repetidos y los @neix.com.ar no se suman.</p>
-      <textarea class="input" id="faPegar" rows="5" placeholder="Juan Pérez <juan@gmail.com>&#10;maria@empresa.com"></textarea><div class="btn-row" style="margin-top:8px"><button class="btn" data-act="faImportar">Sumar a la lista</button></div></div></details>
+    <details class="fold fa-pegar" ${l.length ? "" : "open"}><summary>Pegar una lista de mails</summary><div class="in"><p class="tiny muted" style="margin:0 0 8px">Uno por línea: <b>Nombre &lt;mail&gt; celular</b>, <b>Nombre, mail</b> o solo el mail (el celular es opcional). Si el mail ya está, se le completa el celular. Los @neix.com.ar no se suman.</p>
+      <textarea class="input" id="faPegar" rows="5" placeholder="Juan Pérez <juan@gmail.com> +54 9 11 5555-5555&#10;maria@empresa.com"></textarea><div class="btn-row" style="margin-top:8px"><button class="btn" data-act="faImportar">Sumar a la lista</button></div></div></details>
     <div class="search ges-search" style="margin:12px 0">${ico("_search")}<input class="input" id="faQ" type="search" placeholder="Buscar FA por nombre o mail" value="${esc(S.faQ || "")}" aria-label="Buscar FA" autocomplete="off"></div>
-    <div class="tw" style="max-height:520px;overflow:auto"><table class="eq-t fa-t"><thead><tr><th>Nombre</th><th>Mail con el que entra</th><th></th></tr></thead><tbody>
-    ${l.map((a, i) => `<tr data-q="${esc(sinAcento((a.nombre || "") + " " + (a.mail || "")))}"><td data-l="Nombre"><input class="input" data-fa="${i}" data-f="nombre" value="${esc(a.nombre || "")}" placeholder="Nombre y apellido"></td><td data-l="Mail"><input class="input" type="email" data-fa="${i}" data-f="mail" value="${esc(a.mail || "")}" placeholder="nombre@gmail.com"></td><td><button class="btn ghost icon" data-act="faDel" data-v="${i}" aria-label="Quitar a ${esc(a.nombre || a.mail || "este FA")}">${ico("_trash")}</button></td></tr>`).join("")}
-    <tr class="fa-nada" ${l.length ? "hidden" : ""}><td colspan="3" class="muted small">${l.length ? "Sin FAs con esa búsqueda." : "Todavía no hay FAs cargados."}</td></tr></tbody></table></div>
-    <div class="eq-pie"><span class="tiny muted">${l.length} FAs. La lista solo la ve Gestión.</span><button class="btn primary" data-act="faSave">Guardar FAs</button></div></div>`;
+    <div class="tw" style="max-height:520px;overflow:auto"><table class="eq-t fa-t"><thead><tr><th>Nombre</th><th>Mail con el que entra</th><th>Celular</th><th></th></tr></thead><tbody>
+    ${l.map((a, i) => `<tr data-q="${esc(sinAcento((a.nombre || "") + " " + (a.mail || "")))}"><td data-l="Nombre"><input class="input" data-fa="${i}" data-f="nombre" value="${esc(a.nombre || "")}" placeholder="Nombre y apellido"></td><td data-l="Mail"><input class="input" type="email" data-fa="${i}" data-f="mail" value="${esc(a.mail || "")}" placeholder="nombre@gmail.com"></td><td data-l="Celular"><input class="input" data-fa="${i}" data-f="tel" value="${esc(a.tel || "")}" placeholder="+54 9 11 …"></td><td><button class="btn ghost icon" data-act="faDel" data-v="${i}" aria-label="Quitar a ${esc(a.nombre || a.mail || "este FA")}">${ico("_trash")}</button></td></tr>`).join("")}
+    <tr class="fa-nada" ${l.length ? "hidden" : ""}><td colspan="4" class="muted small">${l.length ? "Sin FAs con esa búsqueda." : "Todavía no hay FAs cargados."}</td></tr></tbody></table></div>
+    <div class="eq-pie"><span class="tiny muted">${l.length} FAs. Al escribir su nombre en Propuesta o Presentaciones se completan su mail y celular.</span><button class="btn primary" data-act="faSave">Guardar FAs</button></div></div>`;
 }
 function faFiltrar(){
   const q = sinAcento(S.faQ || "").trim().split(/\s+/).filter(Boolean), t = $(".fa-t"); if (!t) return; let n = 0;
@@ -2745,24 +2749,29 @@ function faFiltrar(){
   const z = t.querySelector(".fa-nada"); if (z && S.fasEd && S.fasEd.length) z.hidden = n > 0;
 }
 function faImportar(){
-  const txt = ($("#faPegar") || {}).value || "", ya = new Set((S.fasEd || []).map(a => String(a.mail || "").trim().toLowerCase()));
-  let n = 0, neix = 0;
+  const txt = ($("#faPegar") || {}).value || "", porMail = new Map((S.fasEd || []).map(a => [String(a.mail || "").trim().toLowerCase(), a]));
+  let n = 0, act = 0, neix = 0;
   txt.split(/\n|;/).forEach(l => {
     const m = l.match(/[^\s<>,;"']+@[^\s<>,;"']+\.[^\s<>,;"']+/); if (!m) return;
-    const mail = m[0].toLowerCase(); if (mail.endsWith("@neix.com.ar")) { neix++; return; } if (ya.has(mail)) return;
-    const nombre = l.replace(m[0], "").replace(/[<>,;"()]/g, " ").replace(/\s+/g, " ").trim();
-    S.fasEd.push({nombre, mail}); ya.add(mail); n++;
+    const mail = m[0].toLowerCase(); if (mail.endsWith("@neix.com.ar")) { neix++; return; }
+    let resto = l.replace(m[0], " ");
+    const t = resto.match(/\+?\d[\d\s().-]{7,}\d/), tel = t ? t[0].replace(/\s+/g, " ").trim() : "";
+    if (t) resto = resto.replace(t[0], " ");
+    const nombre = resto.replace(/[<>,;"()]/g, " ").replace(/\s+/g, " ").trim();
+    const ex = porMail.get(mail);
+    if (ex) { let c = false; if (tel && !ex.tel) { ex.tel = tel; c = true; } if (nombre && !ex.nombre) { ex.nombre = nombre; c = true; } if (c) act++; return; }
+    const nuevo = {nombre, mail, tel}; S.fasEd.push(nuevo); porMail.set(mail, nuevo); n++;
   });
-  toast(n ? `Se sumaron ${n} FAs. Revisá y tocá Guardar FAs.` : neix ? "Los @neix.com.ar entran con su cuenta de Neix: no hace falta sumarlos" : "No encontramos mails nuevos para sumar");
-  if (n) render();
+  toast(n || act ? [n ? `Se sumaron ${n} FAs` : "", act ? `se completaron datos de ${act}` : ""].filter(Boolean).join(" y ") + ". Revisá y tocá Guardar FAs." : neix ? "Los @neix.com.ar entran con su cuenta de Neix: no hace falta sumarlos" : "No encontramos mails nuevos para sumar");
+  if (n || act) render();
 }
 async function faGuardar(b){
-  const filas = (S.fasEd || []).map(a => Object.assign(a, {nombre: String(a.nombre || "").trim(), mail: String(a.mail || "").trim().toLowerCase()})).filter(a => a.nombre || a.mail);
+  const filas = (S.fasEd || []).map(a => Object.assign(a, {nombre: String(a.nombre || "").trim(), mail: String(a.mail || "").trim().toLowerCase(), tel: String(a.tel || "").trim()})).filter(a => a.nombre || a.mail);
   const mal = filas.find(a => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a.mail)); if (mal) { toast("Revisá el mail de " + (mal.nombre || "un FA")); return; }
   const rep = filas.find((a, i) => filas.findIndex(x => x.mail === a.mail) !== i); if (rep) { toast("El mail " + rep.mail + " está dos veces"); return; }
   if (!S.db) return;
-  if (!await confirmarCambios(listaCambios(S.fas || [], filas, a => a.nombre || a.mail, [["nombre","Nombre"],["mail","Mail"]]), "de los FAs")) return;
-  const lista = filas.map(a => a.nombre ? {nombre: a.nombre, mail: a.mail} : {mail: a.mail});
+  if (!await confirmarCambios(listaCambios(S.fas || [], filas, a => a.nombre || a.mail, [["nombre","Nombre"],["mail","Mail"],["tel","Celular"]]), "de los FAs")) return;
+  const lista = filas.map(a => Object.fromEntries([["nombre", a.nombre], ["mail", a.mail], ["tel", a.tel]].filter(([, v]) => v)));
   b.disabled = true; b.textContent = "Guardando…";
   try { window.neixQue = "editó los FAs"; await S.db.doc("config/fas").set({lista}); S.fas = lista; S.fasEd = null; toast("FAs guardados"); render(); }
   catch(e) { toast("No se pudieron guardar: " + (e && e.message && e.message !== "guardar" ? e.message : "probá de nuevo.")); b.disabled = false; b.textContent = "Guardar FAs"; }

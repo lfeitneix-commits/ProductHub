@@ -11,7 +11,7 @@
 //   (Van en esta función porque el plan Hobby de Vercel permite hasta 12 funciones, y el middleware cuenta como una.)
 // Lo que no está guardado acá sale de los archivos del repo (public/data). Almacenamiento: lib/datos.js.
 import { CFG, MAIL, SCOPE_MAIL, leerCookie, cifrar, descifrar, cookie } from "../lib/auth.js";
-import { hayBase, hayArchivos, leerTodo, guardarDoc, colValida, quien, idValido, CONFIG_EDITABLE, resolverNota, leerUso, sumarUso } from "../lib/datos.js";
+import { hayBase, hayArchivos, leerTodo, guardarDoc, colValida, quien, idValido, CONFIG_EDITABLE, buscarFA, resolverNota, leerUso, sumarUso } from "../lib/datos.js";
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
@@ -19,7 +19,8 @@ export default async function handler(req, res) {
   if (!u) return res.status(401).json({ error: "Iniciá sesión con tu cuenta de Neix" });
   if (req.method === "GET" && req.query && req.query.me) {   // quién está usando el Hub (antes api/me)
     const m = await descifrar(leerCookie(req.headers.cookie, MAIL));
-    return res.status(200).json(Object.assign({}, u, { mail: !!(m && m.email === u.email) }));
+    const fa = u.rol === "fa" ? await buscarFA(u.email).catch(() => null) : null;   // el FA ve sus propios datos (para completar Propuesta y Presentaciones)
+    return res.status(200).json(Object.assign({}, u, { mail: !!(m && m.email === u.email) }, fa ? { nombre: fa.nombre || u.nombre, tel: fa.tel || "" } : {}));
   }
   if (req.method === "POST" && req.body && (req.body.accion === "mail" || (typeof req.body === "string" && req.body.includes('"accion":"mail"')))) return enviarMail(req, res, u);
   if (!hayBase()) return res.status(200).json({ base: false });
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
     }
     if (req.method === "GET") {
       const t = await leerTodo(u.editor), config = Object.assign({}, t.config || {});
-      if (!u.editor) delete config.fas;   // la lista de FAs (mails) solo la ve Gestión
+      if (u.rol === "fa") delete config.fas;   // la lista de FAs la ve el equipo de Neix (para completar datos), no los FAs
       if (u.rol === "fa" && config.asesores && Array.isArray(config.asesores.lista)) config.asesores = { lista: config.asesores.lista.map(({ tel, ...a }) => a) };   // los FAs no ven los celulares del equipo
       return res.status(200).json({ base: true, fichas: t.fichas, validaciones: t.validaciones, config, notas: u.editor ? t.notas : [], cambios: u.editor ? t.cambios : [], editor: u.editor });
     }
