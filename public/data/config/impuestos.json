@@ -1,1320 +1,67 @@
 {
+  "fuente": "Encuadre fiscal del mercado de capitales vigente 2024 (Ganancias y Bienes Personales, con la reforma de la Ley 27.638)",
   "columnas": [
     "Persona",
     "Ingreso",
     "Ganancias",
-    "IVA",
-    "Regímenes de información",
-    "Bienes Personales",
-    "IIBB CABA"
+    "Bienes Personales"
   ],
-  "fuente": "Encuadre fiscal del mercado de capitales vigente 2024 (Ganancias y Bienes Personales) y deck de Eficiencia Impositiva Neix (IVA, IIBB y beneficiario del exterior)",
   "tablas": {
-    "acciones": {
+    "tp_arg": {
+      "nombre": "Títulos públicos argentinos (Nación, provincias y municipios, en pesos o en moneda extranjera)",
       "filas": [
         [
           "Persona jurídica",
-          "Dividendos",
-          "No computable",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "Exento"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
+          "Renta",
           "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Exento"
+          "N/A"
         ],
-        [
-          "Persona física",
-          "Dividendos",
-          "Gravado al 7%",
-          "No gravado",
-          "N/A",
-          "No computable",
-          "Exento"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No computable",
-          "Exento"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Dividendos",
-          "Gravado al 7%",
-          "No gravado",
-          "N/A",
-          "No",
-          "Exento"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "Exento"
-        ]
-      ],
-      "nombre": "Acciones con oferta pública"
-    },
-    "caucion_ars": {
-      "filas": [
         [
           "Persona jurídica",
-          "Renta por interés",
+          "Venta o amortización",
           "25%, 30% o 35%",
-          "Exenta",
-          "SITER",
-          "N/A",
-          "Gravado"
+          "N/A"
         ],
         [
           "Persona física",
-          "Renta por interés",
-          "Escala progresiva 5% a 35%",
-          "Exenta",
-          "SITER",
-          "Gravado",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por interés",
-          "15,05%",
-          "Exenta",
-          "SITER",
-          "Responsable sustituto",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Caución en pesos (colocadora)"
-    },
-    "caucion_usd": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por interés",
-          "25%, 30% o 35%",
-          "Exenta",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Renta por interés",
-          "Escala progresiva 5% a 35%",
-          "Exenta",
-          "SITER",
-          "Gravado",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por interés",
-          "15,05%",
-          "Exenta",
-          "SITER",
-          "Responsable sustituto",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Caución en dólares (colocadora)"
-    },
-    "cedears": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Dividendos",
-          "25%, 30% o 35%",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "Gravado (opinable)"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "No gravado",
-          "SITER",
-          "N/A",
-          "Gravado (opinable)"
-        ],
-        [
-          "Persona física",
-          "Dividendos",
-          "Escala progresiva 5% a 35%",
-          "No gravado",
-          "N/A",
-          "Gravado",
-          "Gravado (opinable)"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "No gravado",
-          "SITER",
-          "Gravado",
-          "Gravado (opinable)"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Dividendos",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "Responsable sustituto",
-          "No gravado (opinable)"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Según legislación del país",
-          "No gravado",
-          "SITER",
-          "Responsable sustituto",
-          "No gravado (opinable)"
-        ]
-      ],
-      "nombre": "CEDEARs"
-    },
-    "cpd_pagare_ars": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta financiera",
-          "N/A",
-          "Gravado (RG 1603 para CPD)",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Gravado (RG 1603 para CPD)",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Renta financiera",
-          "N/A",
-          "Gravado (RG 1603 para CPD)",
-          "N/A",
-          "N/A",
-          "Habitualista: gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Escala progresiva 5% a 35%",
-          "Gravado (RG 1603 para CPD)",
-          "N/A",
-          "N/A",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta financiera",
-          "Exento",
-          "Gravado (RG 1603 para CPD)",
-          "N/A",
-          "Responsable sustituto",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Gravado (RG 1603 para CPD)",
-          "N/A",
-          "Responsable sustituto",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Cheques de pago diferido y pagarés en pesos"
-    },
-    "fci_abiertos": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Dividendos",
-          "No computable",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Dividendos",
-          "Exenta",
-          "No gravado",
-          "N/A",
-          "Gravado (no cumple Ley 27.638)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Gravado (no cumple Ley 27.638)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Dividendos",
-          "Gravado al 7%",
-          "No gravado",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "FCI abiertos de acciones argentinas (75% o más de la cartera)"
-    },
-    "fci_cerr_ars": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Dividendos",
-          "Gravado al 7% y transparencia fiscal",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "Gravado (opinable)"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Dividendos",
-          "Según los activos del fondo (transparencia fiscal)",
-          "No gravado",
-          "N/A",
-          "Gravado",
-          "Gravado (opinable)"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Gravado",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Dividendos",
-          "Gravado al 7% y transparencia fiscal",
-          "No gravado",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "FCI cerrados en pesos (cuotapartes de condominio)"
-    },
-    "fci_cerr_usd": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Dividendos",
-          "Gravado al 7% y transparencia fiscal",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "Gravado (opinable)"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Dividendos",
-          "Según los activos del fondo (transparencia fiscal)",
-          "No gravado",
-          "N/A",
-          "Gravado",
-          "Gravado (opinable)"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Gravado",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Dividendos",
-          "Gravado al 7% y transparencia fiscal",
-          "No gravado",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "FCI cerrados en dólares (cuotapartes de condominio)"
-    },
-    "fci_tp_ars": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "25%, 30% o 35%",
-          "Exento",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "Exento (cumple Ley 27.638)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Exento (cumple Ley 27.638)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "FCI de títulos públicos en pesos (75% o más de la cartera)"
-    },
-    "fci_tp_usd": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "25%, 30% o 35%",
-          "Exento",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "Exento (cumple Ley 27.638)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Exento (cumple Ley 27.638)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "FCI de títulos públicos en dólares (75% o más de la cartera)"
-    },
-    "ff_cp_ars": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Dividendos",
-          "No computable / transparencia fiscal",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "Gravado (opinable)"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Dividendos",
-          "Según los activos del fideicomiso (transparencia fiscal)",
-          "No gravado",
-          "N/A",
-          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
-          "Gravado (opinable)"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Dividendos",
-          "Gravado al 7% y transparencia fiscal",
-          "No gravado",
-          "N/A",
-          "Responsable sustituto",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Responsable sustituto",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Fideicomisos financieros con oferta pública en pesos (certificados de participación)"
-    },
-    "ff_deuda_ars": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por interés",
-          "25%, 30% o 35%",
-          "Exento",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Renta por interés",
-          "Exento",
-          "Exento",
-          "N/A",
-          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por interés",
-          "Exento",
-          "Exento",
-          "N/A",
-          "Responsable sustituto",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Responsable sustituto",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Títulos de deuda de fideicomisos financieros en pesos"
-    },
-    "ff_deuda_usd": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por interés",
-          "25%, 30% o 35%",
-          "Exento",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Renta por interés",
-          "Exento",
-          "Exento",
-          "N/A",
-          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por interés",
-          "Exento",
-          "Exento",
-          "N/A",
-          "Responsable sustituto",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Responsable sustituto",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Títulos de deuda de fideicomisos financieros en moneda extranjera"
-    },
-    "fondos_ext": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "25%, 30% o 35%",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado (opinable)"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado (opinable)"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "Escala progresiva 5% a 35%",
-          "No gravado",
-          "N/A",
-          "Gravado",
-          "Habitualista: no gravado (opinable)"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Gravado 15%",
-          "No gravado",
-          "N/A",
-          "Gravado",
-          "Habitualista: no gravado (opinable)"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Fondos de inversión del exterior"
-    },
-    "on_pesos": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "25%, 30% o 35%",
-          "Exento",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "Exento (emitidas en pesos)",
-          "Exento"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Exento (emitidas en pesos)",
-          "Exento"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Obligaciones negociables en pesos"
-    },
-    "on_usd": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "25%, 30% o 35%",
-          "Exento",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "Gravado (emitidas en moneda extranjera)",
-          "Exento"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Gravado (emitidas en moneda extranjera)",
-          "Exento"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Obligaciones negociables en dólares"
-    },
-    "opc_fut": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Escala progresiva 5% a 35%",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "No gravado",
-          "No gravado",
-          "N/A",
-          "Responsable sustituto",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Opciones y futuros"
-    },
-    "pagare_usd": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta financiera",
-          "N/A",
-          "Gravado",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Gravado",
-          "N/A",
-          "N/A",
-          "Gravado"
-        ],
-        [
-          "Persona física",
-          "Renta financiera",
-          "N/A",
-          "Gravado",
-          "N/A",
-          "N/A",
-          "Habitualista: gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Escala progresiva 5% a 35%",
-          "Gravado",
-          "N/A",
-          "N/A",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta financiera",
-          "Exento",
-          "Gravado",
-          "N/A",
-          "Responsable sustituto",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Gravado",
-          "N/A",
-          "Responsable sustituto",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Pagarés en dólares"
-    },
-    "tp_ext": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "25%, 30% o 35%",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "Escala progresiva 5% a 35%",
-          "No gravado",
-          "N/A",
-          "Gravado",
-          "No gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Gravado 15%",
-          "No gravado",
-          "N/A",
-          "Gravado",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "Según legislación del país",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "Según legislación del país",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Títulos públicos extranjeros, soberanos y corporativos"
-    },
-    "tp_pesos": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "25%, 30% o 35%",
-          "Exento",
-          "N/A",
-          "N/A",
-          "Exento"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Exento"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
+          "Renta",
           "Exento",
           "Exento"
         ],
         [
           "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
+          "Venta o amortización",
           "Exento",
           "Exento"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Títulos públicos en pesos sin cláusula de ajuste"
-    },
-    "tp_pesos_ajuste": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "25%, 30% o 35%",
-          "Exento",
-          "N/A",
-          "N/A",
-          "Exento"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Exento"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "Exento",
-          "Exento"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Exento",
-          "Exento"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Títulos públicos en pesos con cláusula de ajuste (CER, dólar linked)"
-    },
-    "tp_usd": {
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "25%, 30% o 35%",
-          "Exento",
-          "N/A",
-          "N/A",
-          "Exento"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "SITER",
-          "N/A",
-          "Exento"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "Exento",
-          "Exento"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "Exento",
-          "Exento"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Exento",
-          "Exento",
-          "N/A",
-          "No",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "SITER",
-          "No",
-          "No gravado"
-        ]
-      ],
-      "nombre": "Títulos públicos en dólares"
-    },
-    "adr": {
-      "nombre": "ADR de emisores argentinos",
-      "filas": [
-        [
-          "Persona jurídica",
-          "Dividendos",
-          "25%, 30% o 35%",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Exento",
-          "N/A",
-          "N/A",
-          "No gravado"
-        ],
-        [
-          "Persona física",
-          "Dividendos",
-          "Gravado al 7%",
-          "No gravado",
-          "N/A",
-          "No computable",
-          "No gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Gravado al 15%",
-          "Exento",
-          "N/A",
-          "No computable",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Dividendos",
-          "Gravado al 7%",
-          "No gravado",
-          "N/A",
-          "No computable",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Exento",
-          "Exento",
-          "N/A",
-          "No computable",
-          "No gravado"
         ]
       ]
     },
-    "cripto": {
-      "nombre": "Monedas digitales",
+    "tp_ext": {
+      "nombre": "Títulos públicos de Estados extranjeros",
       "filas": [
         [
           "Persona jurídica",
-          "Venta",
+          "Renta",
           "25%, 30% o 35%",
-          "No gravado",
-          "N/A",
-          "N/A",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta o amortización",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Escala progresiva 5% a 35%",
           "Gravado"
         ],
         [
           "Persona física",
-          "Venta",
-          "Gravado al 15%",
-          "No gravado",
-          "N/A",
-          "Gravado",
-          "Habitualista: gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "N/A",
-          "No gravado",
-          "N/A",
-          "Responsable sustituto",
-          "Habitualista: gravado"
+          "Venta o amortización",
+          "15%",
+          "Gravado"
         ]
       ]
     },
@@ -1323,198 +70,56 @@
       "filas": [
         [
           "Persona jurídica",
-          "Renta por intereses",
+          "Renta",
           "Exento",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado"
+          "N/A"
         ],
         [
           "Persona jurídica",
-          "Venta",
+          "Venta o amortización",
           "25%, 30% o 35%",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado"
+          "N/A"
         ],
         [
           "Persona física",
-          "Renta por intereses",
+          "Renta",
           "Exento",
-          "No gravado",
-          "N/A",
-          "Gravado",
-          "No gravado"
+          "Gravado"
         ],
         [
           "Persona física",
-          "Venta",
-          "Gravado al 15%",
-          "No gravado",
-          "N/A",
-          "Gravado",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "Según legislación del país",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "Según legislación del país",
-          "No gravado"
+          "Venta o amortización",
+          "15%",
+          "Gravado"
         ]
       ]
     },
-    "bonos_bolivia": {
-      "nombre": "Bonos soberanos y corporativos de Bolivia",
-      "filas": [
-        [
-          "Persona jurídica",
-          "Renta por intereses",
-          "Exento (convenio de doble imposición)",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "Exento (convenio de doble imposición)",
-          "No gravado",
-          "N/A",
-          "N/A",
-          "No gravado"
-        ],
-        [
-          "Persona física",
-          "Renta por intereses",
-          "Exento (convenio de doble imposición)",
-          "No gravado",
-          "N/A",
-          "Exento",
-          "No gravado"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Exento (convenio de doble imposición)",
-          "No gravado",
-          "N/A",
-          "Exento",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Renta por intereses",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "Según legislación del país",
-          "No gravado"
-        ],
-        [
-          "Beneficiario del exterior",
-          "Venta",
-          "Según legislación del país",
-          "No gravado",
-          "N/A",
-          "Según legislación del país",
-          "No gravado"
-        ]
-      ]
-    },
-    "adr_ext": {
-      "nombre": "ADR de emisores del exterior",
+    "acciones": {
+      "nombre": "Acciones argentinas con cotización en la CNV",
       "filas": [
         [
           "Persona jurídica",
           "Dividendos",
-          "25%, 30% o 35%",
-          "Sin dato",
-          "N/A",
-          "N/A",
-          "Sin dato"
+          "No computable",
+          "N/A"
         ],
         [
           "Persona jurídica",
           "Venta",
           "25%, 30% o 35%",
-          "Sin dato",
-          "N/A",
-          "N/A",
-          "Sin dato"
+          "N/A"
         ],
         [
           "Persona física",
           "Dividendos",
-          "Escala progresiva 5% a 35%",
-          "Sin dato",
-          "N/A",
-          "Gravado",
-          "Sin dato"
+          "7%",
+          "No computable"
         ],
         [
           "Persona física",
           "Venta",
-          "Gravado al 15%",
-          "Sin dato",
-          "N/A",
-          "Gravado",
-          "Sin dato"
-        ]
-      ]
-    },
-    "acciones_ext": {
-      "nombre": "Acciones de emisores del exterior",
-      "filas": [
-        [
-          "Persona jurídica",
-          "Dividendos",
-          "25%, 30% o 35%",
-          "Sin dato",
-          "N/A",
-          "N/A",
-          "Sin dato"
-        ],
-        [
-          "Persona jurídica",
-          "Venta",
-          "25%, 30% o 35%",
-          "Sin dato",
-          "N/A",
-          "N/A",
-          "Sin dato"
-        ],
-        [
-          "Persona física",
-          "Dividendos",
-          "Escala progresiva 5% a 35%",
-          "Sin dato",
-          "N/A",
-          "Gravado",
-          "Sin dato"
-        ],
-        [
-          "Persona física",
-          "Venta",
-          "Gravado al 15%",
-          "Sin dato",
-          "N/A",
-          "Gravado",
-          "Sin dato"
+          "Exento",
+          "No computable"
         ]
       ]
     },
@@ -1525,37 +130,83 @@
           "Persona jurídica",
           "Dividendos",
           "No computable",
-          "Sin dato",
-          "N/A",
-          "N/A",
-          "Sin dato"
+          "N/A"
         ],
         [
           "Persona jurídica",
           "Venta",
           "25%, 30% o 35%",
-          "Sin dato",
-          "N/A",
-          "N/A",
-          "Sin dato"
+          "N/A"
         ],
         [
           "Persona física",
           "Dividendos",
-          "Gravado al 7%",
-          "Sin dato",
-          "N/A",
-          "No computable",
-          "Sin dato"
+          "7%",
+          "No computable"
         ],
         [
           "Persona física",
           "Venta",
-          "Gravado al 15%",
-          "Sin dato",
-          "N/A",
-          "No computable",
-          "Sin dato"
+          "15%",
+          "No computable"
+        ]
+      ]
+    },
+    "acciones_ext": {
+      "nombre": "Acciones de emisores del exterior",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Dividendos",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Dividendos",
+          "Escala progresiva 5% a 35%",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "15%",
+          "Gravado"
+        ]
+      ]
+    },
+    "on_arg": {
+      "nombre": "Obligaciones negociables de emisores argentinos (oferta pública)",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta o rescate",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Exento",
+          "Gravadas las emitidas en moneda extranjera; exentas las emitidas en pesos"
+        ],
+        [
+          "Persona física",
+          "Venta o rescate",
+          "Exento",
+          "Gravadas las emitidas en moneda extranjera; exentas las emitidas en pesos"
         ]
       ]
     },
@@ -1564,39 +215,462 @@
       "filas": [
         [
           "Persona jurídica",
-          "Renta por intereses",
+          "Renta",
           "25%, 30% o 35%",
-          "Sin dato",
-          "N/A",
-          "N/A",
-          "Sin dato"
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta o rescate",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Escala progresiva 5% a 35%",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta o rescate",
+          "15%",
+          "Gravado"
+        ]
+      ]
+    },
+    "fci_arg": {
+      "nombre": "FCI abiertos argentinos (oferta pública)",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta o rescate",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Exento",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)"
+        ],
+        [
+          "Persona física",
+          "Venta o rescate",
+          "Exento",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)"
+        ]
+      ]
+    },
+    "fci_ext": {
+      "nombre": "Fondos de inversión del exterior",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta o rescate",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Escala progresiva 5% a 35%",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta o rescate",
+          "15%",
+          "Gravado"
+        ]
+      ]
+    },
+    "ff_27440": {
+      "nombre": "Fideicomisos financieros argentinos (cumplen Ley 27.440)",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
         ],
         [
           "Persona jurídica",
           "Venta",
           "25%, 30% o 35%",
-          "Sin dato",
-          "N/A",
-          "N/A",
-          "Sin dato"
+          "N/A"
         ],
         [
           "Persona física",
-          "Renta por intereses",
-          "Escala progresiva 5% a 35%",
-          "Sin dato",
-          "N/A",
-          "Gravado",
-          "Sin dato"
+          "Renta",
+          "Según los activos del fondo (transparencia fiscal)",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)"
         ],
         [
           "Persona física",
           "Venta",
-          "Gravado al 15%",
-          "Sin dato",
+          "Exento",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)"
+        ]
+      ]
+    },
+    "ff_no27440": {
+      "nombre": "Fideicomisos financieros argentinos (no cumplen Ley 27.440)",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "7%",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Exento",
+          "Gravado, salvo que cumpla Ley 27.638 (75% en activos exentos)"
+        ]
+      ]
+    },
+    "ff_ext": {
+      "nombre": "Fideicomisos financieros del exterior",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Escala progresiva 5% a 35%",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "15%",
+          "Gravado"
+        ]
+      ]
+    },
+    "fcic_27440": {
+      "nombre": "FCI cerrados argentinos (cumplen Ley 27.440)",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Según los activos del fondo (transparencia fiscal)",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Exento",
+          "Gravado"
+        ]
+      ]
+    },
+    "fcic_no27440": {
+      "nombre": "FCI cerrados argentinos (no cumplen Ley 27.440)",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "7%",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Exento",
+          "Gravado"
+        ]
+      ]
+    },
+    "fcic_ext": {
+      "nombre": "FCI cerrados del exterior",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Escala progresiva 5% a 35%",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "15%",
+          "Gravado"
+        ]
+      ]
+    },
+    "adr": {
+      "nombre": "ADR de emisores argentinos",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta o conversión",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "7%",
+          "No computable"
+        ],
+        [
+          "Persona física",
+          "Venta o conversión",
+          "15%",
+          "No computable"
+        ]
+      ]
+    },
+    "adr_ext": {
+      "nombre": "ADR de emisores del exterior",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Dividendos",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta o conversión",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Dividendos",
+          "Escala progresiva 5% a 35%",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta o conversión",
+          "15%",
+          "Gravado"
+        ]
+      ]
+    },
+    "cedears": {
+      "nombre": "CEDEARs",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Escala progresiva 5% a 35%",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Exento",
+          "Gravado"
+        ]
+      ]
+    },
+    "futuros": {
+      "nombre": "Futuros",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
           "N/A",
-          "Gravado",
-          "Sin dato"
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta (liquidación o ejercicio)",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "N/A",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Venta (liquidación o ejercicio)",
+          "Escala progresiva 5% a 35%",
+          "N/A"
+        ]
+      ]
+    },
+    "opciones": {
+      "nombre": "Opciones sobre acciones con cotización en la CNV",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "N/A",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta (liquidación o ejercicio)",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "N/A",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Venta (liquidación o ejercicio)",
+          "Escala progresiva 5% a 35%",
+          "N/A"
+        ]
+      ]
+    },
+    "caucion": {
+      "nombre": "Cauciones",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "N/A",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Escala progresiva 5% a 35%",
+          "Gravado"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "N/A",
+          "Gravado"
+        ]
+      ]
+    },
+    "cheques": {
+      "nombre": "Descuento de cheques de pago diferido, pagarés y facturas electrónicas",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "N/A",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
+          "25%, 30% o 35%",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "N/A",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Venta",
+          "Escala progresiva 5% a 35%",
+          "N/A"
         ]
       ]
     },
@@ -1605,21 +679,56 @@
       "filas": [
         [
           "Persona jurídica",
-          "Renta por interés",
+          "Renta",
           "25%, 30% o 35%",
-          "Sin dato",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta",
           "N/A",
-          "N/A",
-          "Sin dato"
+          "N/A"
         ],
         [
           "Persona física",
-          "Renta por interés",
-          "Escala progresiva 5% a 35% (como plazo fijo)",
-          "Sin dato",
+          "Renta",
+          "Escala progresiva 5% a 35%",
+          "Depende del activo"
+        ],
+        [
+          "Persona física",
+          "Venta",
           "N/A",
-          "Depende del activo",
-          "Sin dato"
+          "Depende del activo"
+        ]
+      ]
+    },
+    "bonos_bolivia": {
+      "nombre": "Bonos soberanos y corporativos de Bolivia",
+      "filas": [
+        [
+          "Persona jurídica",
+          "Renta",
+          "Exento",
+          "N/A"
+        ],
+        [
+          "Persona jurídica",
+          "Venta o rescate",
+          "Exento",
+          "N/A"
+        ],
+        [
+          "Persona física",
+          "Renta",
+          "Exento",
+          "Exento"
+        ],
+        [
+          "Persona física",
+          "Venta o rescate",
+          "Exento",
+          "Exento"
         ]
       ]
     }

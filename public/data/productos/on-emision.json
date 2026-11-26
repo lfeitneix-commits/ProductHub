@@ -42,8 +42,7 @@
   "estado": "validado",
   "fuente": "One pager · Obligaciones negociables (Banca Corporativa)",
   "impuestos": [
-    "on_usd",
-    "on_pesos"
+    "on_arg"
   ],
   "interno": {
     "competencia": [

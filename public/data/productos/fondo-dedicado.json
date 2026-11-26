@@ -46,8 +46,7 @@
   "estado": "validado",
   "fuente": "Fondo Dedicado · One Page cliente (nuevo formato) + one pager anterior",
   "impuestos": [
-    "fci_tp_ars",
-    "fci_tp_usd"
+    "fci_arg"
   ],
   "interno": {
     "objeciones": [

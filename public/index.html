@@ -292,7 +292,7 @@ tr:last-child td{border-bottom:0} td.r,th.r{text-align:right}
 .fclear[hidden]{display:none}
 .ges-sbar{display:flex;gap:10px;align-items:center;margin:0 0 12px}.ges-sbar .ges-search{flex:1;margin:0}
 .imp-pdf{font-size:11.5px;table-layout:fixed}.imp-pdf td,.imp-pdf th{padding:7px 10px 7px 0;vertical-align:middle}
-.imp-pdf th:nth-child(1){width:27%}.imp-pdf th:nth-child(2){width:22%}.imp-pdf th:nth-child(3){width:18%}.imp-pdf th:nth-child(4){width:15%}.imp-pdf th:nth-child(5){width:18%}
+.imp-pdf th:nth-child(1){width:40%}.imp-pdf th:nth-child(2){width:32%}.imp-pdf th:nth-child(3){width:28%}
 .imp-pdf .imp-v{font-size:10.5px;padding:2px 8px;border-radius:7px;line-height:1.3}.imp-pdf .imp-2{display:grid;grid-template-columns:auto;justify-items:start;gap:1px;margin:3px 0}.imp-pdf .imp-2 em{font-size:9px;min-width:0;letter-spacing:.02em}
 .imp-pdf .imp-g td{background:#F3EFE9;color:#6B6459;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:5px 8px}
 .imp-pie{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;background:radial-gradient(55% 150% at 100% 0%, rgba(196,178,148,.32), transparent 65%) #232323;color:#F3F0EB;padding:30px 40px 32px}
@@ -1112,15 +1112,21 @@ function onePager(p){
    ${(c.lineas || []).length ? `<section class="xsplit"><h2>Qué incluye</h2><div class="t"><div class="xlin">${c.lineas.map(l => `<div><b>${esc(l[0])}</b><span>${esc(l[1])}</span>${l[2] ? `<em>${esc(l[2])}</em>` : ""}</div>`).join("")}</div>${(c.bancos || []).length ? `<p class="small" style="margin-top:12px"><b style="color:var(--ink);font-weight:500">Con</b> ${esc(c.bancos.join(" · "))}</p>` : ""}</div></section>` : ""}
    <section class="xbox"><div><span class="ic">${ico(p.categoria)}</span><h2>Ventajas</h2></div><div class="xben">${c.beneficios.map(b=>`<div><b>${esc(b[0])}</b><span>${esc(b[1])}</span></div>`).join("")}</div></section>
    <section class="xsplit"><h2>Cómo funciona</h2><ol class="xsteps">${c.comoFunciona.map(s=>`<li><span>${esc(s)}</span></li>`).join("")}</ol></section>
-   ${p.impuestos.length && S.imp ? `<section class="xtax"><div class="xtax-h"><h2>Tratamiento impositivo</h2><div><p class="small muted" style="margin-bottom:10px">Por instrumento, tipo de persona e ingreso.</p><div class="seg">${["Persona física","Persona jurídica"].map(x=>`<button data-act="persona" data-v="${x}" aria-pressed="${S.persona===x}">${x}</button>`).join("")}</div></div></div>
-     ${p.impuestos.map(k=>taxTable(k, S.persona, true)).join("")}<p class="tiny muted" style="margin-top:12px">Información orientativa. Consultá tu caso con tu asesor impositivo.</p></section>` : ""}
+   ${impKeys(p.impuestos).length ? `<section class="xtax"><div class="xtax-h"><h2>Tratamiento impositivo</h2><div><p class="small muted" style="margin-bottom:10px">Por instrumento, tipo de persona e ingreso.</p><div class="seg">${["Persona física","Persona jurídica"].map(x=>`<button data-act="persona" data-v="${x}" aria-pressed="${S.persona===x}">${x}</button>`).join("")}</div></div></div>
+     ${impKeys(p.impuestos).map(k=>taxTable(k, S.persona, true)).join("")}<p class="tiny muted" style="margin-top:12px">Información orientativa. Consultá tu caso con tu asesor impositivo.</p></section>` : ""}
    <section class="xsplit"><h2>Lo que tenés que saber</h2><div class="t"><ul class="clean" style="font-size:14.5px">${c.aTener.map(a=>`<li>${esc(a)}</li>`).join("")}</ul><div class="xneix"><div class="eyebrow" style="margin-bottom:6px">En Neix</div>${esc(c.enNeix)}</div></div></section>
   </div>`;
 }
+/* Cuadro impositivo (encuadre fiscal 2024): filas [persona, ingreso, Ganancias, Bienes Personales].
+   Las fichas guardadas con los instrumentos del cuadro anterior se traducen a los nuevos. */
+const IMP_ALIAS = {tp_pesos:["tp_arg"], tp_pesos_ajuste:["tp_arg"], tp_usd:["tp_arg"], on_pesos:["on_arg"], on_usd:["on_arg"], fci_tp_ars:["fci_arg"], fci_tp_usd:["fci_arg"], fci_abiertos:["fci_arg"],
+  fondos_ext:["fci_ext"], fci_cerr_ars:["fcic_27440"], fci_cerr_usd:["fcic_27440"], ff_cp_ars:["ff_27440"], ff_deuda_ars:["ff_27440"], ff_deuda_usd:["ff_27440"], caucion_ars:["caucion"], caucion_usd:["caucion"],
+  cpd_pagare_ars:["cheques"], pagare_usd:["cheques"], opc_fut:["futuros","opciones"], tp_brasil_bolivia:["tp_brasil","bonos_bolivia"]};
+const impKeys = l => { const T = (S.imp && S.imp.tablas) || {}, out = []; (l || []).forEach(k => (T[k] ? [k] : IMP_ALIAS[k] || []).forEach(x => { if (T[x] && !out.includes(x)) out.push(x); })); return out; };
 function taxTable(k, persona, cliente){
   const t = S.imp && S.imp.tablas[k]; if (!t) return "";
   const rows = t.filas.filter(f => !persona || f[0] === persona);
-  const cols = cliente ? [["Ingreso",1],["Ganancias",2],["IVA",3],["Bienes Personales",5],["IIBB CABA",6]] : [["Persona",0],["Ingreso",1],["Ganancias",2],["IVA",3],["Reg. información",4],["Bienes Personales",5],["IIBB CABA",6]];
+  const cols = cliente ? [["Ingreso",1],["Ganancias",2],["Bienes Personales",3]] : [["Persona",0],["Ingreso",1],["Ganancias",2],["Bienes Personales",3]];
   return `<div class="tname">${esc(t.nombre)}</div><div class="tw"><table><thead><tr>${cols.map(c=>`<th>${c[0]}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${r[c[1]]==="Gravado"?`<span class="gr">Gravado</span>`:esc(r[c[1]])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
 }
 const ventajas = p => (p.interno.ventajas && p.interno.ventajas.length) ? p.interno.ventajas : p.cliente.beneficios;
@@ -1250,7 +1256,8 @@ function edCampo([k, l, t, ayuda]){
   const p = S.ed.p, v = getP(p, k), fid = "ed_" + k.replace(/\./g, "_"), lab = `${esc(l)}${ayuda && t !== "list" ? ` <span class="ed-ayuda">${esc(ayuda)}</span>` : ""}`;
   if (t === "units") return `<div class="f ed-f"><span>${lab}</span><div class="ed-units">${Object.keys(UNI).map(u => `<label class="uchk" style="--u:${UNI_COLOR[u]}"><input type="checkbox" data-eu="${esc(u)}" ${(v || []).includes(u) ? "checked" : ""}><span><i></i>${esc(u === "Mercado de Capitales" ? "Mesa · Mercado de Capitales" : u)}</span></label>`).join("")}</div></div>`;
   if (t === "imp") { const T = (S.imp && S.imp.tablas) || {}, ks = IMP_GRUPOS.flatMap(g => g[1]).filter(k => T[k]).concat(Object.keys(T).filter(k => !IMP_GRUPOS.some(g => g[1].includes(k))));
-    return `<div class="f ed-f"><span>${lab}</span><div class="ed-imp">${ks.map(k => `<label class="impchk"><input type="checkbox" data-eimp="${k}" ${(v || []).includes(k) ? "checked" : ""}><span>${esc(T[k].nombre)}</span></label>`).join("")}</div></div>`; }
+    const sel = impKeys(v);
+    return `<div class="f ed-f"><span>${lab}</span><div class="ed-imp">${ks.map(k => `<label class="impchk"><input type="checkbox" data-eimp="${k}" ${sel.includes(k) ? "checked" : ""}><span>${esc(T[k].nombre)}</span></label>`).join("")}</div></div>`; }
   if (t === "cat") { const cats = CAT_ORDER.concat([...new Set(S.productos.map(x => x.categoria))].filter(c => !CAT_ORDER.includes(c)));
     return `<label class="f ed-f" for="${fid}">${lab}<select class="input" id="${fid}" data-ek="${k}">${cats.map(c => `<option ${c === v ? "selected" : ""}>${esc(c)}</option>`).join("")}${v && !cats.includes(v) ? `<option selected>${esc(v)}</option>` : ""}</select></label>`; }
   if (t === "riesgo") return `<div class="f ed-f"><span>${lab}</span><div class="seg ed-riesgo">${[1,2,3,4,5].map(n => `<button type="button" data-act="edRiesgo" data-v="${n}" aria-pressed="${+v === n}">${risk(n)}</button>`).join("")}</div></div>`;
@@ -1342,7 +1349,7 @@ function fichaCambios(base, p){
     if (t === "list") { const A = a || [], B = b || []; const mas = B.filter(x => !A.includes(x)), menos = A.filter(x => !B.includes(x)); out.push(mas.length || menos.length ? {tit, mas, menos} : {tit, nota: "cambió el orden"}); return; }
     if (t === "pairs") { const A = (a || []).map(x => x.join(" — ")), B = (b || []).map(x => x.join(" — ")); const mas = B.filter(x => !A.includes(x)), menos = A.filter(x => !B.includes(x)); out.push(mas.length || menos.length ? {tit, mas, menos} : {tit, nota: "cambió el orden"}); return; }
     if (t === "units") { const A = a || [], B = b || []; out.push({tit, mas: B.filter(x => !A.includes(x)), menos: A.filter(x => !B.includes(x))}); return; }
-    if (t === "imp") { const T = (S.imp && S.imp.tablas) || {}, nom = k2 => (T[k2] || {}).nombre || k2, A = a || [], B = b || []; out.push({tit, mas: B.filter(x => !A.includes(x)).map(nom), menos: A.filter(x => !B.includes(x)).map(nom)}); return; }
+    if (t === "imp") { const T = (S.imp && S.imp.tablas) || {}, nom = k2 => (T[k2] || {}).nombre || k2, A = impKeys(a), B = impKeys(b); if (JSON.stringify(A) === JSON.stringify(B)) return; out.push({tit, mas: B.filter(x => !A.includes(x)).map(nom), menos: A.filter(x => !B.includes(x)).map(nom)}); return; }
     if (t === "riesgo") { out.push({tit, antes: RISK_TXT[a] || "", despues: RISK_TXT[b] || ""}); return; }
     out.push({tit, antes: a, despues: b});
   }));
@@ -2590,7 +2597,7 @@ const EXPORT_HEAD = (title, extra) => `<!doctype html><html lang="es"><head><met
 ${PP_CSS}${extra||""}</style></head><body><div class="bar"><span>Documento de Neix</span><button onclick="window.print()">Guardar como PDF</button></div>`;
 function onePagerDoc(p){
   const c = p.cliente, f = c.ficha;
-  const tax = p.impuestos.length && S.imp ? `<div class="pp-sec"><div class="ey">Tratamiento impositivo</div>${["Persona física","Persona jurídica"].map(per=>p.impuestos.map(k=>{ const t = S.imp.tablas[k]; if(!t) return ""; const rows = t.filas.filter(r=>r[0]===per); if(!rows.length) return ""; return `<p style="margin:12px 0 4px;font-size:12.5px"><b>${esc(t.nombre)}</b> · ${per}</p><table class="pp-glance" style="margin-top:0"><thead><tr><th>Ingreso</th><th>Ganancias</th><th>IVA</th><th>Bienes Pers.</th><th>IIBB CABA</th></tr></thead><tbody>${rows.map(r=>`<tr><td style="font-family:inherit;color:inherit;width:auto">${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td>${esc(r[5])}</td><td>${esc(r[6])}</td></tr>`).join("")}</tbody></table>`; }).join("")).join("")}<p class="pp-note">Información orientativa. Consultá tu caso con tu asesor impositivo.</p></div>` : "";
+  const tax = impKeys(p.impuestos).length ? `<div class="pp-sec"><div class="ey">Tratamiento impositivo</div>${["Persona física","Persona jurídica"].map(per=>impKeys(p.impuestos).map(k=>{ const t = S.imp.tablas[k]; if(!t) return ""; const rows = t.filas.filter(r=>r[0]===per); if(!rows.length) return ""; return `<p style="margin:12px 0 4px;font-size:12.5px"><b>${esc(t.nombre)}</b> · ${per}</p><table class="pp-glance" style="margin-top:0"><thead><tr><th>Ingreso</th><th>Ganancias</th><th>Bienes Personales</th></tr></thead><tbody>${rows.map(r=>`<tr><td style="font-family:inherit;color:inherit;width:auto">${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join("")}</tbody></table>`; }).join("")).join("")}<p class="pp-note">Información orientativa. Consultá tu caso con tu asesor impositivo.</p></div>` : "";
   const contacto = p.unidades.includes("Banca Corporativa") ? "bancacorporativa@neix.com.ar" : "bancaprivada@neix.com.ar";
   return EXPORT_HEAD(p.nombre+" · Neix") + `<div class="pp"><div class="pp-cover"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="ey">${esc(p.unidades[0])} · ${esc(p.nombre)}</div><h1>${esc(c.titular)}</h1><p style="color:#CFC6B8;max-width:60ch;margin-top:4px">${esc(c.bajada)}</p></div>
   <div class="pp-body"><div class="pp-sec"><div class="ey">De qué se trata</div><p style="margin-top:8px">${esc(c.queEs)}</p>
@@ -3062,7 +3069,6 @@ document.addEventListener("click", e => {
   else if (a==="save") save(id);
   else if (a==="impP") { S.impP = v; render(); }
   else if (a==="impDl") dlImpPDF(b);
-  else if (a==="impPdf") { e.preventDefault(); verArchivo(IMP_PDF, "Eficiencia impositiva"); }
   else if (a==="neiaAbrir") { S.neia.open = true; neiaGuardar(); neiaPintar(); }
   else if (a==="neiaCerrar") { S.neia.open = false; neiaGuardar(); neiaPintar(); }
   else if (a==="neiaNueva") { S.neia.api = []; S.neia.error = ""; neiaGuardar(); neiaPintar(); }
@@ -3165,7 +3171,7 @@ document.addEventListener("change", e => {
   if (t.dataset.instpdf !== undefined) { instSubirPdf(+t.dataset.instpdf, t.files[0]); return; }
   if (t.dataset.opq) { upOPArchivo(t.dataset.opq, t.files[0]); t.value = ""; return; }
   if (t.dataset.fd !== undefined && S.fondEd && t.tagName === "SELECT") { S.fondEd[+t.dataset.fd][t.dataset.f] = t.value; return; }
-  if (t.dataset && t.dataset.eimp && S.ed) { const u = new Set(S.ed.p.impuestos || []); t.checked ? u.add(t.dataset.eimp) : u.delete(t.dataset.eimp); S.ed.p.impuestos = Object.keys((S.imp && S.imp.tablas) || {}).filter(x => u.has(x)); S.ed.dirty = true; edRefrescar(); return; }
+  if (t.dataset && t.dataset.eimp && S.ed) { const u = new Set(impKeys(S.ed.p.impuestos)); t.checked ? u.add(t.dataset.eimp) : u.delete(t.dataset.eimp); S.ed.p.impuestos = Object.keys((S.imp && S.imp.tablas) || {}).filter(x => u.has(x)); S.ed.dirty = true; edRefrescar(); return; }
   if (t.id==="fEstado") { S.fEstado = t.value; render(); }
   else if (t.dataset.pzp) { const i = S.pz.items.indexOf(t.dataset.pzp); if (t.checked && i<0) { S.pz.items.push(t.dataset.pzp); uso(t.dataset.pzp, "p"); } if (!t.checked && i>=0) S.pz.items.splice(i,1); pzSave(); render(); }
   else if (t.id==="pz_inst") { S.pz.inst = t.checked; pzSave(); refreshDeck(); }
@@ -3215,21 +3221,19 @@ function watchNotas(){
 }
 function softRender(){ const a = document.activeElement; if (a && (a.tagName==="TEXTAREA" || (a.tagName==="INPUT" && a.type!=="checkbox"))) return; render(); }
 /* ── Eficiencia impositiva (versión simplificada) ──
-   Usa el cuadro que ya carga el Hub (S.imp, data/config/impuestos.json) y lo resume por tipo de persona en
-   Ganancias, Bienes Personales, IVA e IIBB CABA. En la ficha (Para el asesor) y completo en Instructivos (#impuestos). */
-const IMP_PDF = "data/eficiencia-impositiva.pdf";
-const IMP_PER = [["Persona física", "Persona física"], ["Persona jurídica", "Persona jurídica"], ["Beneficiario del exterior", "Beneficiario del exterior"]];
-const IMP_GRUPOS = [["Títulos públicos", ["tp_pesos", "tp_pesos_ajuste", "tp_usd"]], ["Obligaciones negociables", ["on_pesos", "on_usd", "on_ext"]], ["Títulos del exterior", ["tp_ext", "tp_brasil", "bonos_bolivia"]],
-  ["Renta variable", ["acciones", "acciones_no_cot", "cedears", "adr", "adr_ext", "acciones_ext"]], ["Derivados", ["opc_fut"]], ["Caución y pases", ["caucion_ars", "caucion_usd", "pases"]], ["Cheques y pagarés", ["cpd_pagare_ars", "pagare_usd"]],
-  ["Fondos", ["fci_tp_ars", "fci_tp_usd", "fci_abiertos", "fci_cerr_ars", "fci_cerr_usd", "fondos_ext"]], ["Fideicomisos", ["ff_deuda_ars", "ff_deuda_usd", "ff_cp_ars"]], ["Otros", ["cripto"]]];
-function impResumen(k, persona){   // [ganRenta, ganVenta, ivaRenta, ivaVenta, bienesPersonales, iibbRenta, iibbVenta] + etiqueta del ingreso
+   Cuadro del Hub (S.imp, data/config/impuestos.json): encuadre fiscal del mercado de capitales vigente 2024,
+   Ganancias y Bienes Personales para persona física y jurídica. En la ficha (Para el asesor) y en la pestaña Eficiencia impositiva. */
+const IMP_PER = [["Persona física", "Persona física"], ["Persona jurídica", "Persona jurídica"]];
+const IMP_GRUPOS = [["Títulos públicos", ["tp_arg", "tp_ext", "tp_brasil", "bonos_bolivia"]], ["Obligaciones negociables", ["on_arg", "on_ext"]],
+  ["Acciones, ADR y CEDEARs", ["acciones", "acciones_no_cot", "acciones_ext", "adr", "adr_ext", "cedears"]], ["Fondos comunes de inversión", ["fci_arg", "fci_ext", "fcic_27440", "fcic_no27440", "fcic_ext"]],
+  ["Fideicomisos financieros", ["ff_27440", "ff_no27440", "ff_ext"]], ["Derivados", ["futuros", "opciones"]], ["Caución, pases y cheques", ["caucion", "pases", "cheques"]]];
+function impResumen(k, persona){   // {f: [ganRenta, ganVenta, bienesPersonales], ing}
   const t = S.imp && S.imp.tablas && S.imp.tablas[k]; if (!t) return null;
-  const rs = t.filas.filter(f => f[0] === persona || (persona === "Beneficiario del exterior" && /exterior/i.test(f[0])));
-  if (!rs.length) return null;
+  const rs = t.filas.filter(f => f[0] === persona); if (!rs.length) return null;
   const venta = rs.find(f => /^venta/i.test(f[1])), renta = rs.find(f => !/^venta/i.test(f[1]));
-  const r = renta || ["", "", "N/A", "N/A", "N/A", "N/A", "N/A"], v = venta || ["", "", "N/A", "N/A", "N/A", "N/A", "N/A"];
-  const bp = r[5] === v[5] || v[5] === "N/A" ? r[5] : r[5] === "N/A" ? v[5] : r[5] + " / " + v[5];
-  return {f: [r[2], v[2], r[3], v[3], bp, r[6], v[6]], ing: renta ? renta[1].replace(/^Renta (por )?/i, "").replace(/^./, c => c.toUpperCase()) : ""};
+  const r = renta || ["", "", "N/A", "N/A"], v = venta || ["", "", "N/A", "N/A"];
+  const bp = r[3] === v[3] || v[3] === "N/A" ? r[3] : r[3] === "N/A" ? v[3] : r[3] + " / " + v[3];
+  return {f: [r[2], v[2], bp], ing: renta ? renta[1] : ""};
 }
 const impClase = v => /^habitualista: no|^(exent|no gravado|no$|n\/a|no computable)/i.test(v) ? "ok" : /gravad|%|progresiva|^sí$/i.test(v) ? "gv" : "nt";
 const impVal = v => `<span class="imp-v ${impClase(v)}">${esc(v)}</span>`;
@@ -3239,21 +3243,21 @@ function impCel(a, b, ing){   // junta renta y venta cuando dicen lo mismo
   if (b === "N/A") return impVal(a);
   return `<span class="imp-2"><em>${esc(ing || "Renta")}</em>${impVal(a)}</span><span class="imp-2"><em>Venta</em>${impVal(b)}</span>`;
 }
-const IMP_COLS = ["Ganancias", "Bienes Personales", "IVA", "IIBB CABA"];
-const impCeldas = ({f, ing}) => [impCel(f[0], f[1], ing), impVal(f[4]), impCel(f[2], f[3], ing), impCel(f[5], f[6], ing)];
+const IMP_COLS = ["Ganancias", "Bienes Personales"];
+const impCeldas = ({f, ing}) => [impCel(f[0], f[1], ing), impVal(f[2])];
 function impTablaInstrumento(k){
   const t = S.imp.tablas[k]; if (!t) return "";
   return `<div class="imp-i"><b class="imp-tit">${esc(t.nombre)}</b><div class="tw"><table class="imp-t"><thead><tr><th>Quién invierte</th>${IMP_COLS.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>
     ${IMP_PER.map(([k2, txt]) => { const r = impResumen(k, k2); return r ? `<tr><td>${esc(txt)}</td>${impCeldas(r).map(c => `<td>${c}</td>`).join("")}</tr>` : ""; }).join("")}</tbody></table></div></div>`;
 }
-const impNota = `<p class="tiny muted imp-nota">Resumen orientativo: Ganancias y Bienes Personales según el encuadre fiscal del mercado de capitales vigente 2024; IVA, IIBB y beneficiario del exterior según el cuadro de Eficiencia Impositiva de Neix. "Sin dato": no figura en esas fuentes. "Habitualista" en IIBB: depende de si el cliente opera en forma habitual. Ante un caso puntual, que lo confirme el contador del cliente.</p>`;
+const impNota = `<p class="tiny muted imp-nota">Resumen orientativo del encuadre fiscal del mercado de capitales vigente 2024 (con la reforma de la Ley 27.638). Persona jurídica: alícuota del 25%, 30% o 35% según la ganancia neta. "Habitualista" en IIBB: depende de si el cliente opera en forma habitual. Ante un caso puntual, que lo confirme el contador del cliente.</p>`;
 function impProductoHTML(p){
-  const ks = (p.impuestos || []).filter(k => S.imp && S.imp.tablas && S.imp.tablas[k]);
+  const ks = impKeys(p.impuestos);
   if (!ks.length) return "";
   return `<div class="panel imp-p"><div class="imp-h"><h3>Eficiencia impositiva</h3><a class="tiny" href="#impuestos">Ver el cuadro completo →</a></div>
     <p class="small muted" style="margin:-4px 0 10px">${["cheques", "pagares", "on-emision", "facturas-fce"].includes(p.id) ? "Cómo tributa para quien invierte en el instrumento." : "Cómo tributa según quién invierte."}</p>
     ${ks.map(impTablaInstrumento).join("")}${impNota}
-    <details class="fold imp-det"><summary>Detalle por tipo de ingreso (con regímenes de información)</summary><div class="in">${ks.map(k => taxTable(k, null, false)).join("")}</div></details></div>`;
+    <details class="fold imp-det"><summary>Detalle por tipo de ingreso</summary><div class="in">${ks.map(k => taxTable(k, null, false)).join("")}</div></details></div>`;
 }
 function impFiltrar(){
   const q = sinAcento(S.impQ || "").trim().split(/\s+/).filter(Boolean), t = $(".imp-full"); if (!t) return;
@@ -3267,12 +3271,12 @@ function impDoc(){
   const I = S.imp.tablas, vistos = new Set(IMP_GRUPOS.flatMap(g => g[1])), grupos = IMP_GRUPOS.concat([["Otros instrumentos", Object.keys(I).filter(k => !vistos.has(k))]]);
   const fecha = new Date().toLocaleDateString("es-AR", {day: "numeric", month: "long", year: "numeric"});
   const tabla = per => `<table class="pp-tab imp-pdf"><thead><tr><th>Instrumento</th>${IMP_COLS.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${grupos.map(([g, ks]) => { ks = ks.filter(k => I[k]); if (!ks.length) return "";
-    return `<tr class="imp-g"><td colspan="5">${esc(g)}</td></tr>` + ks.map(k => { const r = impResumen(k, per); return r ? `<tr><td>${esc(I[k].nombre)}</td>${impCeldas(r).map(c => `<td>${c}</td>`).join("")}</tr>` : ""; }).join(""); }).join("")}</tbody></table>`;
+    return `<tr class="imp-g"><td colspan="3">${esc(g)}</td></tr>` + ks.map(k => { const r = impResumen(k, per); return r ? `<tr><td>${esc(I[k].nombre)}</td>${impCeldas(r).map(c => `<td>${c}</td>`).join("")}</tr>` : ""; }).join(""); }).join("")}</tbody></table>`;
   return `<div class="pp"><div class="pp-cover"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="ey">Eficiencia impositiva · ${esc(fecha)}</div><h1>Cómo tributa cada instrumento</h1>
-    <p style="color:#CFC6B8;max-width:60ch;margin-top:4px">Ganancias, Bienes Personales, IVA e Ingresos Brutos (CABA) según quién invierte: persona física, persona jurídica o beneficiario del exterior.</p></div>
-    <div class="pp-body"><div class="pp-sec imp-ley"><span>${impVal("Exento / No gravado")} sin impuesto</span><span>${impVal("Gravado")} paga impuesto</span><span>${impVal("Responsable sustituto")} otros casos</span></div>
+    <p style="color:#CFC6B8;max-width:60ch;margin-top:4px">Impuesto a las Ganancias y sobre los Bienes Personales según quién invierte: persona física o persona jurídica. Encuadre fiscal vigente 2024.</p></div>
+    <div class="pp-body"><div class="pp-sec imp-ley"><span>${impVal("Exento / No computable")} sin impuesto</span><span>${impVal("Gravado")} paga impuesto</span><span>${impVal("Según los activos")} depende del caso</span></div>
     ${IMP_PER.map(([k, t]) => `<div class="pp-sec"><div class="ey">${esc(t)}</div>${tabla(k)}</div>`).join("")}
-    <div class="pp-sec"><p style="font-size:12.5px;margin:0">Resumen orientativo. "Habitualista" en IIBB: depende de si se opera en forma habitual. Cada caso puntual conviene revisarlo con el contador.</p>
+    <div class="pp-sec"><p style="font-size:12.5px;margin:0">Resumen orientativo del encuadre fiscal del mercado de capitales vigente 2024. Persona jurídica: alícuota del 25%, 30% o 35% según la ganancia neta. Cada caso puntual conviene revisarlo con el contador.</p>
     </div></div></div>`;
 }
 const impPie = () => `<div class="pp" style="border-radius:0"><div class="imp-pie"><div><b>Contacto</b><span>${FIJO} · ${mailLink("info@neix.com.ar")}</span><span>Don Francisco 3345, piso 5, San Fernando · <a class="web" href="https://www.neix.com.ar" target="_blank" rel="noopener">www.neix.com.ar</a></span></div>
@@ -3288,17 +3292,17 @@ async function dlImpPDF(b){
 function impuestosHTML(){
   const I = S.imp && S.imp.tablas;
   const head = `<div class="page-head"><div><div class="eyebrow">Eficiencia impositiva</div><h1>Cómo tributa cada instrumento</h1>
-    <p class="muted">Ganancias, Bienes Personales, IVA e IIBB CABA según quién invierte: persona física, persona jurídica o beneficiario del exterior.</p></div>
-    <div class="btn-row"><a class="btn" href="${IMP_PDF}" data-act="impPdf">${ico("_doc")}Ver el cuadro oficial</a><button class="btn" data-act="impDl">${ico("_dl")}Descargar PDF</button></div></div>`;
+    <p class="muted">Impuesto a las Ganancias y sobre los Bienes Personales según quién invierte: persona física o persona jurídica. Encuadre fiscal del mercado de capitales vigente 2024.</p></div>
+    <div class="btn-row"><button class="btn" data-act="impDl">${ico("_dl")}Descargar PDF</button></div></div>`;
   if (!I) return `${head}<p class="small muted">Cargando…</p>`;
   const per = IMP_PER.some(x => x[0] === S.impP) ? S.impP : IMP_PER[0][0];
   const vistos = new Set(IMP_GRUPOS.flatMap(g => g[1])), grupos = IMP_GRUPOS.concat([["Otros instrumentos", Object.keys(I).filter(k => !vistos.has(k))]]);
   const filas = grupos.map(([g, ks]) => { ks = ks.filter(k => I[k]); if (!ks.length) return "";
-    return `<tr class="imp-g" data-g="${esc(g)}"><td colspan="5">${esc(g)}</td></tr>` + ks.map(k => { const r = impResumen(k, per); return r ? `<tr data-g="${esc(g)}" data-q="${esc(sinAcento(I[k].nombre + " " + g))}"><td><b>${esc(I[k].nombre)}</b></td>${impCeldas(r).map((c, n) => `<td data-l="${IMP_COLS[n]}">${c}</td>`).join("")}</tr>` : ""; }).join(""); }).join("");
+    return `<tr class="imp-g" data-g="${esc(g)}"><td colspan="3">${esc(g)}</td></tr>` + ks.map(k => { const r = impResumen(k, per); return r ? `<tr data-g="${esc(g)}" data-q="${esc(sinAcento(I[k].nombre + " " + g))}"><td><b>${esc(I[k].nombre)}</b></td>${impCeldas(r).map((c, n) => `<td data-l="${IMP_COLS[n]}">${c}</td>`).join("")}</tr>` : ""; }).join(""); }).join("");
   return `${head}<section class="imp-s" id="impuestos">
     <div class="imp-ctl"><div class="seg" role="tablist" aria-label="Quién invierte">${IMP_PER.map(([k, t]) => `<button role="tab" data-act="impP" data-v="${esc(k)}" aria-pressed="${per === k}">${esc(t)}</button>`).join("")}</div>
       <input class="input" id="impQ" type="search" placeholder="Buscar instrumento" value="${esc(S.impQ || "")}" aria-label="Buscar instrumento"></div>
-    <div class="tw"><table class="imp-t imp-full"><thead><tr><th>Instrumento</th>${IMP_COLS.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${filas}<tr class="imp-nada" hidden><td colspan="5" class="muted">Sin instrumentos con esa búsqueda.</td></tr></tbody></table></div>
+    <div class="tw"><table class="imp-t imp-full"><thead><tr><th>Instrumento</th>${IMP_COLS.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${filas}<tr class="imp-nada" hidden><td colspan="3" class="muted">Sin instrumentos con esa búsqueda.</td></tr></tbody></table></div>
     ${impNota}</section>`;
 }
 /* ── NEIA en el Hub ──
@@ -3345,7 +3349,7 @@ async function neiaHerramienta(nombre, inp){
     const T = (S.imp && S.imp.tablas) || {}, pal = sinAcento(inp.texto || "").split(/\s+/).filter(w => w.length > 1);
     const ks = Object.keys(T).filter(k => !pal.length || pal.some(w => sinAcento(T[k].nombre + " " + k).includes(w)));
     if (!ks.length) return {resultado: "Sin instrumentos con ese nombre", disponibles: Object.values(T).map(t => t.nombre)};
-    return {fuente: "Cuadro de Eficiencia Impositiva de Neix (orientativo)", columnas: ["Ganancias renta", "Ganancias venta", "IVA renta", "IVA venta", "Bienes Personales", "IIBB CABA renta", "IIBB CABA venta"],
+    return {fuente: "Encuadre fiscal del mercado de capitales vigente 2024 (orientativo)", columnas: ["Ganancias renta o dividendos", "Ganancias venta", "Bienes Personales"],
       instrumentos: ks.slice(0, 8).map(k => ({instrumento: T[k].nombre, porPersona: Object.fromEntries(IMP_PER.map(([pk]) => { const r = impResumen(k, pk); return [pk, r ? {ingreso: r.ing || "venta", valores: r.f} : null]; }))})), link: "#impuestos"};
   }
   if (nombre === "precios_bonos") return neiaPrecios(inp);

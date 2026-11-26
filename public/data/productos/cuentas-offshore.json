@@ -43,7 +43,8 @@
   "fuente": "Instructivo 3 · Apertura off shore + Inversoras (custodia Pershing)",
   "impuestos": [
     "tp_ext",
-    "fondos_ext"
+    "fci_ext",
+    "acciones_ext"
   ],
   "interno": {
     "competencia": [

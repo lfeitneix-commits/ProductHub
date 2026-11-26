@@ -41,8 +41,8 @@
   "estado": "validado",
   "fuente": "Relevamiento Mesa (nov 2026) · sin one pager",
   "impuestos": [
-    "on_usd",
-    "tp_usd"
+    "tp_arg",
+    "on_arg"
   ],
   "interno": {
     "objeciones": [],

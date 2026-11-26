@@ -43,7 +43,7 @@
   "fuente": "One pager 1 · Cheques de pago diferidos y avalados + Capacitación financiamiento",
   "id": "cheques",
   "impuestos": [
-    "cpd_pagare_ars"
+    "cheques"
   ],
   "interno": {
     "competencia": [

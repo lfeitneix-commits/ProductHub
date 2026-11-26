@@ -41,7 +41,7 @@
   "estado": "validado",
   "fuente": "One pager 1 · Futuros Agro (Mesa)",
   "impuestos": [
-    "opc_fut"
+    "futuros"
   ],
   "interno": {
     "objeciones": [

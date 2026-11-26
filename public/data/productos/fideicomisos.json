@@ -41,9 +41,8 @@
   "estado": "validado",
   "fuente": "One pager 5 · Fideicomisos financieros",
   "impuestos": [
-    "ff_deuda_ars",
-    "ff_deuda_usd",
-    "ff_cp_ars"
+    "ff_27440",
+    "ff_no27440"
   ],
   "interno": {
     "objeciones": [

@@ -41,8 +41,8 @@
   "estado": "validado",
   "fuente": "One pager 11 · ON's",
   "impuestos": [
-    "on_usd",
-    "on_pesos"
+    "on_arg",
+    "on_ext"
   ],
   "interno": {
     "objeciones": [

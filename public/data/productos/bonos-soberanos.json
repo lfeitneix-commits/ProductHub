@@ -41,8 +41,7 @@
   "estado": "validado",
   "fuente": "One pager · Bonos soberanos",
   "impuestos": [
-    "tp_usd",
-    "tp_pesos"
+    "tp_arg"
   ],
   "interno": {
     "objeciones": [

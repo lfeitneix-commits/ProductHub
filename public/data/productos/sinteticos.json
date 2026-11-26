@@ -44,7 +44,8 @@
   "estado": "a_validar",
   "fuente": "Ficha técnica de mercado de la Mesa · Derivados Financieros: Guía de Ejecución y Riesgo (GGAL)",
   "impuestos": [
-    "opc_fut"
+    "futuros",
+    "opciones"
   ],
   "interno": {
     "competencia": [],

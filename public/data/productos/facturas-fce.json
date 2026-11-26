@@ -42,7 +42,7 @@
   "estado": "validado",
   "fuente": "One pager 3 · Descuento de Facturas Electrónicas + Capacitación financiamiento (plataforma Neix-MAV)",
   "impuestos": [
-    "cpd_pagare_ars"
+    "cheques"
   ],
   "interno": {
     "competencia": [

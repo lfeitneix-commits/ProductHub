@@ -40,7 +40,7 @@
   "estado": "validado",
   "fuente": "One pager 2 · BOPREAL para pago de impuestos (Mesa)",
   "impuestos": [
-    "tp_usd"
+    "tp_arg"
   ],
   "interno": {
     "objeciones": [],

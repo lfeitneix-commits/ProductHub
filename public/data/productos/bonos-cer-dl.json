@@ -41,7 +41,7 @@
   "estado": "validado",
   "fuente": "One pager · Bonos CER y Dólar Linked",
   "impuestos": [
-    "tp_pesos_ajuste"
+    "tp_arg"
   ],
   "interno": {
     "objeciones": [],

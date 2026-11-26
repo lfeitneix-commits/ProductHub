@@ -40,8 +40,7 @@
   "estado": "validado",
   "fuente": "Capacitación financiamiento (no tiene one pager propio)",
   "impuestos": [
-    "cpd_pagare_ars",
-    "pagare_usd"
+    "cheques"
   ],
   "interno": {
     "competencia": [

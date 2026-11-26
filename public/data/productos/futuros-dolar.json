@@ -41,7 +41,7 @@
   "estado": "validado",
   "fuente": "Relevamiento Mesa (nov 2026) · sin one pager",
   "impuestos": [
-    "opc_fut"
+    "futuros"
   ],
   "interno": {
     "objeciones": [

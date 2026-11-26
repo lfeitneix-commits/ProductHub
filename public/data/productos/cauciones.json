@@ -41,8 +41,7 @@
   "estado": "validado",
   "fuente": "One pager 2 · Cauciones bursátiles",
   "impuestos": [
-    "caucion_ars",
-    "caucion_usd"
+    "caucion"
   ],
   "interno": {
     "competencia": [

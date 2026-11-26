@@ -41,9 +41,7 @@
   "estado": "validado",
   "fuente": "One pager 5 · FCI",
   "impuestos": [
-    "fci_tp_ars",
-    "fci_tp_usd",
-    "fci_abiertos"
+    "fci_arg"
   ],
   "interno": {
     "competencia": [

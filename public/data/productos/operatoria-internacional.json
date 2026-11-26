@@ -42,7 +42,8 @@
   "fuente": "One pager 12 · Operatoria internacional + relevamiento Mesa (nov 2026)",
   "impuestos": [
     "tp_ext",
-    "fondos_ext"
+    "fci_ext",
+    "acciones_ext"
   ],
   "interno": {
     "competencia": [

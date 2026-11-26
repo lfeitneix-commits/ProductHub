@@ -41,7 +41,7 @@
   "estado": "a_validar",
   "fuente": "Relevamiento Banca Privada + One pager · Operatoria internacional",
   "impuestos": [
-    "fondos_ext"
+    "fci_ext"
   ],
   "interno": {
     "competencia": [
