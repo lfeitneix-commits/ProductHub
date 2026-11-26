@@ -3270,10 +3270,9 @@ function impFiltrar(){
 /* PDF de la pestaña con el formato de los one pagers: portada oscura con el logo y una tabla por tipo de persona. */
 function impDoc(){
   const I = S.imp.tablas, vistos = new Set(IMP_GRUPOS.flatMap(g => g[1])), grupos = IMP_GRUPOS.concat([["Otros instrumentos", Object.keys(I).filter(k => !vistos.has(k))]]);
-  const fecha = new Date().toLocaleDateString("es-AR", {day: "numeric", month: "long", year: "numeric"});
   const tabla = per => `<table class="pp-tab imp-pdf"><thead><tr><th>Instrumento</th>${IMP_COLS.map(c => `<th>${c}</th>`).join("")}</tr></thead><tbody>${grupos.map(([g, ks]) => { ks = ks.filter(k => I[k]); if (!ks.length) return "";
     return `<tr class="imp-g"><td colspan="3">${esc(g)}</td></tr>` + ks.map(k => { const r = impResumen(k, per); return r ? `<tr><td>${esc(I[k].nombre)}</td>${impCeldas(r).map(c => `<td>${c}</td>`).join("")}</tr>` : ""; }).join(""); }).join("")}</tbody></table>`;
-  return `<div class="pp"><div class="pp-cover"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="ey">Eficiencia impositiva · ${esc(fecha)}</div><h1>Cómo tributa cada instrumento</h1>
+  return `<div class="pp"><div class="pp-cover"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="ey">Eficiencia impositiva</div><h1>Cómo tributa cada instrumento</h1>
     <p style="color:#CFC6B8;max-width:60ch;margin-top:4px">Impuesto a las Ganancias y sobre los Bienes Personales según quién invierte: persona física o persona jurídica. Encuadre fiscal vigente 2024.</p></div>
     <div class="pp-body"><div class="pp-sec imp-ley"><span>${impVal("Exento / No computable")} sin impuesto</span><span>${impVal("Gravado")} paga impuesto</span></div>
     ${IMP_PER.map(([k, t]) => `<div class="pp-sec"><div class="ey">${esc(t)}</div>${tabla(k)}</div>`).join("")}
