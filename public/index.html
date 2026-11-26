@@ -2387,15 +2387,16 @@ async function docPDFBlob(html, pieHTML){
     const cortes = [...root.querySelectorAll(".pp-sec,.pp-item,.pp-body,.pp-h4,.pp-kpis,.pp-diag > div,.pp-tab tbody tr")].filter(el => !(el.previousElementSibling && el.previousElementSibling.classList.contains("imp-g"))).map(el => Math.round((el.getBoundingClientRect().top - top0) * SC)).sort((a,b)=>a-b);
     const links = linksDe(root);
     const cv = await window.html2canvas(root, {scale:SC, backgroundColor:"#ffffff", useCORS:true, logging:false});
-    const pdf = new window.jspdf.jsPDF({unit:"pt", format:"a4"}), W = 595.28, H = 841.89, k = cv.width / W, alto = Math.floor(H * k);
+    const pdf = new window.jspdf.jsPDF({unit:"pt", format:"a4"}), W = 595.28, H = 841.89, k = cv.width / W, MT = 34, MB = 30;   // márgenes: arriba desde la 2da página, abajo en todas
     for (let y = 0, i = 0; y < cv.height - 2; i++) {
+      const top = i ? MT : 0, alto = Math.floor((H - top - MB) * k);
       let fin = Math.min(y + alto, cv.height);
       if (fin < cv.height) { const c = cortes.filter(x => x > y + alto * .35 && x <= fin).pop(); if (c) fin = c; }
       const pg = document.createElement("canvas"); pg.width = cv.width; pg.height = fin - y;
       const g = pg.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, pg.width, pg.height); g.drawImage(cv, 0, y, cv.width, pg.height, 0, 0, cv.width, pg.height);
-      if (i) pdf.addPage(); pdf.addImage(pg.toDataURL("image/jpeg", .92), "JPEG", 0, 0, W, pg.height / k);
-      links.forEach(l => { const ly = l.y * SC; if (ly >= y && ly < fin) pdf.link(l.x*SC/k, (ly - y)/k, l.w*SC/k, l.h*SC/k, {url: l.url}); });
-      y = fin; S._ultAlto = pg.height / k;
+      if (i) pdf.addPage(); pdf.addImage(pg.toDataURL("image/jpeg", .92), "JPEG", 0, top, W, pg.height / k);
+      links.forEach(l => { const ly = l.y * SC; if (ly >= y && ly < fin) pdf.link(l.x*SC/k, top + (ly - y)/k, l.w*SC/k, l.h*SC/k, {url: l.url}); });
+      y = fin; S._ultAlto = top + pg.height / k;
     }
     if (pieHTML) {   // pie (contacto y leyenda) al borde inferior de la última página
       host.innerHTML = pieHTML; const pr = host.firstElementChild, pl = linksDe(pr);
@@ -3274,7 +3275,7 @@ function impDoc(){
     return `<tr class="imp-g"><td colspan="3">${esc(g)}</td></tr>` + ks.map(k => { const r = impResumen(k, per); return r ? `<tr><td>${esc(I[k].nombre)}</td>${impCeldas(r).map(c => `<td>${c}</td>`).join("")}</tr>` : ""; }).join(""); }).join("")}</tbody></table>`;
   return `<div class="pp"><div class="pp-cover"><img src="${LOGO_LIGHT}" alt="NEIX"><div class="ey">Eficiencia impositiva · ${esc(fecha)}</div><h1>Cómo tributa cada instrumento</h1>
     <p style="color:#CFC6B8;max-width:60ch;margin-top:4px">Impuesto a las Ganancias y sobre los Bienes Personales según quién invierte: persona física o persona jurídica. Encuadre fiscal vigente 2024.</p></div>
-    <div class="pp-body"><div class="pp-sec imp-ley"><span>${impVal("Exento / No computable")} sin impuesto</span><span>${impVal("Gravado")} paga impuesto</span><span>${impVal("Según los activos")} depende del caso</span></div>
+    <div class="pp-body"><div class="pp-sec imp-ley"><span>${impVal("Exento / No computable")} sin impuesto</span><span>${impVal("Gravado")} paga impuesto</span></div>
     ${IMP_PER.map(([k, t]) => `<div class="pp-sec"><div class="ey">${esc(t)}</div>${tabla(k)}</div>`).join("")}
     <div class="pp-sec"><p style="font-size:12.5px;margin:0">Resumen orientativo del encuadre fiscal del mercado de capitales vigente 2024. Persona jurídica: alícuota del 25%, 30% o 35% según la ganancia neta. Cada caso puntual conviene revisarlo con el contador.</p>
     </div></div></div>`;
